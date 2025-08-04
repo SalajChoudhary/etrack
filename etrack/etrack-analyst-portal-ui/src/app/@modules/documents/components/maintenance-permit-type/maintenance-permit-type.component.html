@@ -1,0 +1,258 @@
+<!-- <div class="row">
+  <div class="col-12">
+          <strong class="header-3b t-center">Code Tables Maintenance is under construction.</strong>
+  </div>
+</div> -->
+
+<div class="row mb-4">
+  <div class="col-12 px-0">
+      <div class="header-center">
+          <strong class="header-3b">Permit Type Category Assignment</strong>
+        </div>
+  </div>
+</div>
+
+<ng-container class="mt-4 view">
+    <div class="view">
+      <form [formGroup]="maintenanceForm">
+ 
+        <!-- new TABLE!!! [value]="columns.controls" [scrollable]="columns?.controls?.length > 10 ? true : false"
+          [totalRecords]="columns.controls?.length"-->
+  
+        <p-table
+          *ngIf="maintenanceForm.controls['tableName'].value"
+          styleClass="p-datatable-lg"
+          scrollHeight="175px"
+          aria-describedby="Maintence table"
+          [value]="columns.controls"
+          [autoLayout]="true"
+          styleClass="p-datatable-lg"
+          [rows]="5"
+          [scrollable]="columns?.controls?.length > 10 ? true : false"
+          [totalRecords]="columns.controls?.length"
+          id="Code_Maintenance_table"
+          [scrollHeight]="'45rem'"
+        >
+          <caption class="typo-1">
+            Maintenance Table
+          </caption>
+          <ng-template pTemplate="header">
+            <tr role="rowgroup" class="no-filter">
+              <th
+                scope="col"
+                role="columnheader"
+                id="{{ header?.columnTitle + i }}"
+                aria-label="Header Title"
+                aria-sort="descending"
+                *ngFor="let header of headers; let i = index"
+                class="table-header-primary h-30"
+                [ngStyle]="{
+                  width: header?.headerWidth ? header.headerWidth : 'auto',
+                  'word-break': ' break-word',
+                  'max-height': '40px',
+                  height: '30px',
+                  'text-align': 'left'
+                }"
+              >
+                {{ header?.columnLabel }}
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template
+            pTemplate="body"
+            let-column
+            let-rowIndex="rowIndex"
+            formArrayName="columns"
+          >
+            <tr role="rowgroup" formGroupName="{{ rowIndex }}">
+              <td
+                *ngFor="let header of headers; let i = index"
+                scope="col"
+                role="cell"
+                aria-label="Column Name Codes Cell"
+                aria-sort="none"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'left',
+                  'word-wrap': 'break-word',
+                  width: header?.headerWidth ? header.headerWidth : 'auto'
+                }"
+              >
+                <select
+                  *ngIf="header.columnType == 'dropdown'"
+                  [ngStyle]="{ width: '90%' }"
+                  formControlName="{{ header.columnTitle }}"
+                  (change)="
+                    setCurrentValue($event, rowIndex);
+                    bindOtherValuesOnChange($event, rowIndex, header.columnTitle)
+                  "
+                >
+                  <option value="" selected>--Select--</option>
+                  <option
+                    *ngFor="let item of sysParameterNames"
+                    [value]="item[header.dropdownKey]"
+                  >
+                    {{ item[header.dropdownKey] }}
+                  </option>
+                </select>
+  
+                <select
+                *ngIf="header.columnType == 'dropdown-sub'"
+                [ngStyle]="{ width: '90%' }"
+                formControlName="{{ header.columnTitle }}"
+               
+              >
+                <option value="" selected>--Select--</option>
+                <option
+                  *ngFor="let item of header.dropdownValues"
+                  [value]="item[header.dropdownValue]"
+                >
+                  {{ item[header.dropdownKey] }}
+                </option>
+              </select>
+
+                <input
+                  *ngIf="header.columnType == 'textbox'"
+                  formControlName="{{ header.columnTitle }}"
+                  type="text"
+                  name="updatedVal"
+                  [ngStyle]="{ width: '90%' }"
+                />
+                <!-- <div
+                class="addr-error-msg pl-2"
+                *ngIf="
+                  formSubmitted && rowIndex == 0 && header.dropdownKey == 'Permit Type' &&
+                  columns.at(rowIndex).get(header.columnTitle)?.invalid &&
+                  columns.at(rowIndex).get(header.columnTitle)?.errors?.required
+                "
+              >
+                Error: Permit Type Required.
+              </div> -->
+                <div
+                  class="addr-error-msg pl-2"
+                  *ngIf="
+                    formSubmitted &&
+                    columns.at(rowIndex).get(header.columnTitle)?.invalid &&
+                    columns.at(rowIndex).get(header.columnTitle)?.errors?.required
+                  "
+                >
+                  Error: {{header.columnLabel}} Required.
+                </div>
+                <div
+                class="addr-error-msg pl-2"
+                *ngIf="
+                  formSubmitted &&
+                  columns.at(rowIndex).get(header.columnTitle)?.invalid &&
+                  columns.at(rowIndex).get(header.columnTitle)?.errors?.duplicate
+                "
+              >
+              Error: Duplicate Permit Type's not allowed.
+              </div>
+              <!-- <div
+              class="addr-error-msg pl-2"
+              *ngIf="
+                formSubmitted &&
+                columns.at(rowIndex).get(header.columnTitle)?.invalid &&
+                columns.at(rowIndex).get(header.columnTitle)?.errors?.sameOption
+              "
+            >
+            Error: Current and New Category must not be the same values.
+            </div> -->
+                <input
+                  *ngIf="header.columnType == 'checkbox'"
+                  (change)="
+                    checkBoxValidation(
+                      $event,
+                      rowIndex,
+                      header.columnTitle,
+                      header?.oppTitle
+                    )
+                  "
+                  [ngStyle]="{ 'text-align': 'center' }"
+                  type="checkbox"
+                  name="depInd"
+                  checked
+                  formControlName="{{ header.columnTitle }}"
+                />
+                <ng-container *ngIf="header.columnTitle == 'addBtn'">
+                  <span
+                    style="cursor: pointer; margin-left: -2px"
+                    (click)="createColumn()"
+                  >
+                  
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      x="0px"
+                      y="0px"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      class="ml-29"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z"
+                      ></path>
+                    </svg>
+                  </span>
+                  <span
+                    style="cursor: pointer; margin-left: 16px"
+                    (click)="removeColumn(rowIndex)"
+                  >
+                  <svg fill="#000000" xmlns="http://www.w3.org/2000/svg"
+                    width="20px" height="20px" viewBox="0 0 83 83">
+                      <path d="M81,36.166H2c-1.104,0-2,0.896-2,2v6.668c0,1.104,0.896,2,2,2h79c1.104,0,2-0.896,2-2v-6.668
+                          C83,37.062,82.104,36.166,81,36.166z">
+                      </path>
+                  </svg>
+                  </span>
+                </ng-container>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </form>
+    </div>
+    <div class="float-right mr-2" *ngIf="showServerError">
+      <app-server-error-message
+        [serverErrorMessage]="serverErrorMessage"
+      ></app-server-error-message>
+    </div>
+    <!-- <div
+    class="float-right addr-error-msg pl-2" 
+    *ngIf="duplicateError"
+  >
+    Error: Duplicate Permit Type's not allowed.
+  </div>
+  <div
+  class="float-right addr-error-msg pl-2" 
+  *ngIf="sameOption"
+>
+ Error: Current and New Category must not be the same values.
+</div> -->
+  
+  </ng-container>
+  <div class="row footer-row mb-0 mt-3">
+    <div class="col-12 text-right">
+      <button [disabled]="!maintenanceForm.dirty"
+        class="btn btn-sm btn-primari nextbutton upload mr-2"
+        (click)="onSaveClicked()"
+      >
+        Save
+      </button>
+      <button
+        class="btn btn-sm btn-outline-dark closebutton"
+        (click)="onCloseClicked()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+
+  <app-success-popup successMsg="Successfully Saved" #successPopup ></app-success-popup>
+  <app-pending-changes-popup
+    #pendingPopup
+    (onOkClick)="goBack()"
+  ></app-pending-changes-popup>
+  
+  

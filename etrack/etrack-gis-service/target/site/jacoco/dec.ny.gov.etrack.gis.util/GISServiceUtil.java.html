@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GISServiceUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.util</a> &gt; <span class="el_source">GISServiceUtil.java</span></div><h1>GISServiceUtil.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.util;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
+import dec.ny.gov.etrack.gis.exception.BadRequestException;
+import dec.ny.gov.etrack.gis.exception.GISException;
+import dec.ny.gov.etrack.gis.exception.URLInvalidException;
+import dec.ny.gov.etrack.gis.model.GISResponse;
+import dec.ny.gov.etrack.gis.model.GISServiceResponse;
+
+@Component
+<span class="nc" id="L28">public class GISServiceUtil {</span>
+
+  @Autowired
+  @Qualifier(&quot;gisInternalServiceRestTemplate&quot;)
+  private RestTemplate gisInternalServiceRestTemplate;
+
+  @Autowired
+  @Qualifier(&quot;gisExternalServiceRestTemplate&quot;)
+  private RestTemplate gisExternalServiceRestTemplate;
+
+  private static final String PJSON_FIELD = &quot;pjson&quot;;
+  private static final String INVALID_URL_LOG_INFO = 
+      &quot;URL {} contains invalid encoded value. Error Message {}&quot;;
+
+<span class="nc" id="L42">  private static final Logger LOGGER = LoggerFactory.getLogger(GISServiceUtil.class.getName());</span>
+  
+  /**
+   * Request GIS service to store the Polygon in GIS.
+   *  
+   * @param url - GIS Path to be used to store the polygon.
+   * @param featureMap - Feature Map.
+   * @param value - Value (pson)
+   * @param gisEnvInd - GIS Environment Indicator. EXTERNAL/INTERNAL.
+   * @param contextId - Unique UUID to track this request.
+   * 
+   * @return  - GIS response after submission.
+   */
+  public Object submitPolygonRequest(String url, List&lt;Object&gt; featureMap, String value,
+      final String gisEnvInd, final String contextId) {
+
+<span class="nc" id="L58">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L59">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L60">    formheaders.setContentType(MediaType.APPLICATION_JSON);</span>
+<span class="nc" id="L61">    HttpEntity&lt;List&lt;Object&gt;&gt; formJson = new HttpEntity&lt;&gt;(featureMap, formheaders);</span>
+<span class="nc" id="L62">    featureMapDetails.add(&quot;features&quot;, formJson);</span>
+
+<span class="nc" id="L64">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L65">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L66">    featureMapDetails.set(&quot;f&quot;, form);</span>
+<span class="nc" id="L67">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L68">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L69">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+<span class="nc" id="L71">    GISServiceResponse response = null;</span>
+    try {
+<span class="nc" id="L73">      LOGGER.info(&quot;URL for save Polygon {}&quot;, URLDecoder.decode(url, StandardCharsets.UTF_8.name()));</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">      if (&quot;EXTERNAL&quot;.equals(gisEnvInd)) {</span>
+<span class="nc" id="L75">        LOGGER.info(&quot;GIS External service is getting executed&quot;);</span>
+<span class="nc" id="L76">        response = gisExternalServiceRestTemplate.postForObject(</span>
+<span class="nc" id="L77">            URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity,</span>
+            GISServiceResponse.class);
+      } else {
+<span class="nc" id="L80">        LOGGER.info(&quot;GIS Internal service is getting executed&quot;);</span>
+<span class="nc" id="L81">        response = gisInternalServiceRestTemplate.postForObject(</span>
+<span class="nc" id="L82">            URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity,</span>
+            GISServiceResponse.class);
+      }
+<span class="nc" id="L85">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L86">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L87">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L88">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L89">      throw new GISException(&quot;GIS_SUBMIT_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+<span class="nc" id="L90">    }</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">    if (response != null) {</span>
+<span class="nc" id="L92">      List&lt;GISResponse&gt; gisResponse =</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">          !CollectionUtils.isEmpty(response.getAddResults()) ? response.getAddResults()</span>
+<span class="nc" id="L94">              : response.getUpdateResults();</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">      if (!CollectionUtils.isEmpty(gisResponse)) {</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (!gisResponse.get(0).isSuccess()) {</span>
+<span class="nc" id="L97">          throw new BadRequestException(&quot;GIS Error Code &quot; + gisResponse.get(0).getError().getCode(),</span>
+<span class="nc" id="L98">              gisResponse.get(0).getError().getDescription(), featureMap);</span>
+        }
+      }
+<span class="nc" id="L101">      return response;</span>
+    } else {
+<span class="nc" id="L103">      throw new GISException(&quot;GIS_SERVICE_ERROR&quot;, &quot;Error while interacting with GIS Service&quot;);</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

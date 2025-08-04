@@ -1,0 +1,66 @@
+package dec.ny.gov.etrack.dcs.util;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public interface DCSServiceConstants {
+    String GUID = "GUID";
+    String ACCESS = "access";
+    String DOCUMENT_ID = "documentId";
+    String USER_ID = "userId";
+    String CLIENT_ID = "clientId";
+    String CONTEXT_ID = "contextId";
+    String DOC_CATEGORY = "docCategory";
+    String TRACKED_APP_ID = "trackedAppId";
+    String DOCUMENT_TITLE = "DocumentTitle";
+    String DOC_SUB_CATEGORY = "docSubCategory";
+    String DOC_LAST_MODIFIER = "docLastModifier";
+    String FOIL_STATUS = "foilStatus";
+    String DOC_DESCRIPTION = "Description";
+    String HISTORIC = "historic";
+    String OTHER_SUB_CAT_TEXT = "otherSubCatText";
+    String APPLICATION_NAME = "applicationName";
+    String METHOD_NAME = "methodName";
+    String EVENT_NAME = "eventName";
+    String ERROR_MESSAGE = "errorMessage";
+    String PERMIT_TYPE = "permitType";
+    String DOC_NON_REL_REAS_CODES = "nonRelReasonCodes";
+    String RECEIVED_DATE = "receivedDate";
+    String EXPIRATION_DATE = "expirationDate";
+    String ETRACK_DOC_ID = "eTrackDocumentID";
+    String APPLICATION_ID = "applicationID";
+    String MODIFICATION_NUMBER = "modificationNumber";
+    String RENEWAL_NUMBER = "renewalNumber";
+    String SENT_DATE = "sentDate";
+    String EMAIL_SUBJECT = "EmailSubject";
+    String INDEX_DATE = "indexDate";
+    String NOT_APPLICABLE = "Not applicable";
+    String NO_DOCUMENT = "NO_DOCUMENT";
+    String UNABLE_TO_PROCESS_NOW = "UNABLE_TO_PROCESS_NOW";
+    String INVALID_REQUEST = "INVALID_REQUEST";
+    String DOC_NAME_DUPLICATE = "DOC_NAME_DUPLICATE";
+    String PERMIT = "PERMIT";
+    String APPLICATION = "APPLICATION";
+    String SUPPORTINGDOCUMENTS = "SUPPORTINGDOCUMENTS";
+    String NOTICES = "NOTICES";
+    String CORRESPONDENCE = "CORRESPONDENCE";
+    String UNABLE_TO_PROCESS_NOW_ERR_MSG = "Error : Unable to process your request at this time.";
+    String NO_DOCUMENT_ERR_MSG = "Error : Document does not exist.";
+    String INVALID_REQUEST_ERR_MSG = "Error : Invalid Request.";
+    String INVALID_ZIP_FILE = "INVALID_ZIP_FILE";
+    String INVALID_ZIP_FILE_MSG = "Error: Zip file contains a file with an invalid extension and cannot be uploaded.";
+    String PENDING_UPLOAD ="P";
+    String ACTIVE ="A";
+    String DELETED_PERMANENTLY="D";
+    String ERROR_WHILE_UPLOADING="E";
+    String LOGICALLY_DELETED="L";
+    String REFERENCE_TEXT="referenceText";
+//    String REFERENCE_DOC_ID="referenceDocId";
+    String PROJECT_ID = "projectID";
+    String DOC_CREATION_TYPE = "docCreationType";
+    String DISPLAY_NAME="DisplayName";
+    String DOCUMENT_TITLE_ID="documentTitleId";
+    String EXISTING_REF_DOCUMENT_ID = "existingDocumentId";
+    String CONFIDENTIAL = "confidential";
+    String INQUIRY_ID = "inquiryId";
+}

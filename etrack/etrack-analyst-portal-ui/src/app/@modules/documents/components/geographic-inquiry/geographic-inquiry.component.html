@@ -1,0 +1,843 @@
+<app-analyst-sub-header [showAddress]="false"></app-analyst-sub-header>
+<app-stepper-buttons [selectedIndex]="selectedIndex" [lastIndex]="1" [startNumber]="1" [endNumber]="1"
+  [startName]="'Geographical Inquiry'" [endName]="'Geographical Inquiry'" mainNavigation="/apply-for-inquiry"
+  [forwardName]="'Geographical Inquiry'" [showBackArrow]="false" [forward]="''"></app-stepper-buttons>
+<mat-horizontal-stepper class="child-stepper customStepper has-step-icon-bg--white custom-step-height" #stepper
+  [linear]="true" [selectedIndex]="selectedIndex" (selectionChange)="selectionChange($event)">
+  <ng-template matStepperIcon="edit">
+    <img src="assets/icons/check2-square.svg" alt="An edit square box">
+  </ng-template>
+  <ng-template matStepperIcon="number">
+    <img src="assets/icons/edit_square-white.svg" alt="">
+  </ng-template>
+  <mat-step [stepControl]="siSearchForm" [state]="selectedIndex === 0?'edit':''">
+    <ng-template matStepLabel>Geographical Inquiry</ng-template>
+    <br />
+    <div class="row" style="background-color:#CAD1CC; border-bottom:3px solid rgba(0, 0, 0, .6);text-align:center;">
+      <p style="font-weight: bold !important; padding-top: 1rem; color: #233E2A;" class="col-12">Choose how you would like to
+        search for the area of interest below.</p>
+      <p style="font-weight: bold !important; color: #233E2A;" class="col-12">On the map, please define the <i>property
+          boundary</i> for this inquiry, which will help us establish any relevant NYSDEC jurisdictions.</p>
+    </div>
+    <div class="float-right mr-2" *ngIf="serviceError" #error>
+        <app-server-error-message [serverErrorMessage]="serviceErrorMessage"></app-server-error-message>
+    </div>
+    <br />
+    <div class="col-12 pl-0 pr-0 d-flex body-content">
+      <div class="container-fluid" style="min-height: calc(100vh - 312px);">
+        <form [formGroup]="siSearchForm">
+          <fieldset [disabled]="isReadonly">
+          <div class="row">
+            <div class="form-group" style="margin-left: 1rem;">
+              <label class="font-label-bold" for="searchBy" alt="Search inquiry by address or zoom"
+                aria-label="Search inquiry by address or zoom">Search By*:</label>
+              <select class="form-control dec-select" style="margin-left: 0.3rem;width: 12rem;" id="searchBy"
+                formControlName="searchBy" aria-label="Select Search by address or zoom">
+                <option value="">-- SELECT --</option>
+                <option *ngFor="let search_type of search_types" [value]="search_type.id">
+                  {{ search_type.value }}
+                </option>
+              </select>
+            </div>
+            <div *ngIf="siSearchForm.controls['searchBy'].value === 'address'">
+              <div class="form-group form-inline" style="padding-left: 1.5rem;">
+                <label for="address" class="font-label-bold">Address*:</label>
+                <input type="text" class="form-control" style="margin-left: 0.3rem" id="address" size="42"
+                  maxlength="100" aria-label="enter street for address" formControlName="street" />
+              </div>
+              <div *ngIf="isAddressSearched && siSearchForm.controls['street'].invalid" class="errors2">
+                <div *ngIf="siSearchForm.controls.street.errors!.required" class="errors2"
+                  aria-errormessage="Street Name is Required">
+                  Street Name is Required
+                </div>
+                <div *ngIf="siSearchForm.controls.street.errors!.minlength" class="errors2" aria-errormessage="Street Name is should have
+                min length"> Street Name is should have
+                  min length
+                </div>
+              </div>
+              <div class="form-group form-inline">
+                <div class="form-group">
+                  <label for="city1" class="font-label-bold">Town/City*:</label>
+                  <input type="text" class="form-control" style="margin-left: 0.3rem" id="city1" size="15"
+                    formControlName="city" maxlength="65" aria-label="enter town or city for address" />
+                </div>
+                <div class="form-group">
+                  <label for="zip1" class="font-label-bold">Zip:</label>
+                  <input type="text" class="form-control" id="zip1" style="margin-left: 0.3rem" maxlength="5" size="3"
+                    formControlName="zip" mask="00000" aria-label="enter zip for address" />
+                </div>
+                <div class="form-group">
+                  <span id="state1" class="font-label-bold" style="padding-right: 0.3rem">State:</span>
+                  <output class="font-weight" aria-labelledby="state1">NY</output>
+                </div>
+                <div class="form-group">
+                  <button class="btn btn-sm btn-primari nextbutton mr-2 upload" type="button"
+                    (click)="onAddressSubmit()"
+                    aria-label="click search for address">Search</button>
+                  <button type="button" (click)="clearSiSearchForm()" class="btn btn-sm btn-outline-dark closebutton"
+                    [hidden]="isInquiryLoad" aria-label="clear values for address">Clear</button>
+                </div>
+              </div>
+              <div *ngIf="isAddressSearched && siSearchForm.controls['city'].invalid" class="errors2">
+                <div *ngIf="siSearchForm.controls['city'].errors!.required" class="errors2"
+                  aria-errormessage="error city is Required">
+                  City is Required
+                </div>
+                <div *ngIf="siSearchForm.controls['city'].errors!.minlength" class="errors2"
+                  aria-errormessage="error city is should have min length">
+                  City is should have min length
+                </div>
+              </div>
+              <div *ngIf="isAddressSearched && siSearchForm.controls['zip'].invalid" class="errors2">
+                <div *ngIf="siSearchForm.controls['zip'].errors!.minlength" class="errors"
+                  aria-errormessage="error zip is should have min length">
+                  Zip is should have min length
+                </div>
+              </div>
+            </div>
+            <div *ngIf="siSearchForm.controls['searchBy'].value === 'taxmap'">
+              <div class="row form-inline" >
+                <div class="form-group ">
+                  <label for="county" class="font-label-bold">County*:</label>
+                  <select class="form-control dec-select" id="county" style="margin-left: 0.3rem"
+                    formControlName="county" (change)="onSelectCountyChange($event)">
+                    <option *ngFor="let county of counties" [value]="county">
+                      {{ county }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group" *ngIf="!NYC.includes(selectedCounty?.trim())">
+                  <label for="municipality" class="font-label-bold">Municipality*:</label>
+                  <select [attr.disabled]="
+                  siSearchForm.value.county === '' ? '' : null
+                    " class="form-control dec-select" id="municipality" style="margin-left: 0.3rem"
+                    formControlName="municipality" (change)="onSelectMunicipalityChange($event)">
+                    <option *ngFor="let municipality of municipalities" [value]="municipality">
+                      {{ municipality }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div *ngIf="
+                  isTaxMapSearched &&
+                  siSearchForm.controls.county.errors
+                " class="errors2">
+                <div *ngIf="siSearchForm.controls.county.errors!.required" class="errors2">
+                  {{errorMsgObj?.PRJ_LOC_COUNTY_REQD}}
+                </div>
+              </div>
+              <div *ngIf="
+                  isTaxMapSearched &&
+                  siSearchForm.controls.municipality.errors
+                " class="errors2">
+                <div *ngIf="
+                siSearchForm.controls.municipality.errors!.required
+                  " class="errors">{{errorMsgObj?.PRJ_LOC_MUNCI_REQD}}
+                </div>
+              </div>
+              <div class="row form-inline" >
+                <div class="form-group">
+                  <label for="tax_map_number" class="font-label-bold">Tax Parcel ID / SBL*:
+                  </label>
+                  <input [attr.disabled]="
+                  siSearchForm.value.municipality === '' && !NYC.includes(selectedCounty?.trim())
+                        ? ''
+                        : null
+                    " type="text" class="form-control" id="tax_map_number" style="margin-left: 0.3rem"
+                    aria-describedby="taxMap-help" formControlName="taxMapNumber" size="10" />
+                  <span id="taxMap-help" class="mr-2 font-weight" style="
+                      margin-left: 0.2rem;
+                      font-style: italic;
+                    ">(As it appears on your tax bill, formatted)</span>
+                </div>
+                <div class="form-group">
+                  <button class="btn btn-sm btn-primari nextbutton mr-2 upload" (click)="taxMapSearch()" (keydown.enter)="taxMapSearch()"
+                    type="button">Search</button>
+                  <button type="button" (click)="clearTaxMap()"
+                    class="btn btn-sm btn-outline-dark closebutton">Clear</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group form-inline" *ngIf="siSearchForm.controls['searchBy'].value === 'zoom'"
+              style="margin-right: -15px;margin-left: -10px;">
+              <label for="county" class="font-label-bold">Zoom to County*:</label>
+              <select class="form-control dec-select" formControlName="county" id="county" (change)="onZoomCountyChange($event)"
+                aria-label="select county to zoom to county on map">
+                <option value="">-- SELECT --</option>
+                <option *ngFor="let county of counties" [value]="county">
+                  {{ county }}
+                </option>
+              </select>
+            </div>
+          </div>
+          </fieldset>
+          <div class="secondary-separator" [hidden]="siSearchForm.controls['searchBy'].value === ''"></div>
+          <div class="row" style="min-height: calc(100vh - 500px);">
+            <div class="col-lg-6 col-md-6 col-sm-12" [hidden]="!((isAddressSearchedSuccessful && siSearchForm.controls['searchBy'].value === 'address') || (siSearchForm.controls['searchBy'].value !== '' &&
+              isInquiryLoad || (isTaxMapSearchedSuccessful && siSearchForm.controls['searchBy'].value === 'taxmap')) ||siSearchForm.controls['searchBy'].value === 'zoom')">
+              <div class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold" aria-label="Define the Property Boundary">Define the Area of Interest</p>
+              </div>
+              <i style="font-size: 0.8rem !important;color:#007bff"
+                aria-label="Click to draw or select or unselect parcels on map">Click to draw or select/ unselect
+                parcels</i>
+                <app-gis-map-si [mapProperties]="mapProperties" [projectGraphic]="projectGraphic"
+                    (taxParcelNumbers)="onTaxMapUpdated($event)" (regions)="onRegionsUpdated($event)"
+                    (counties)="onCountyUpdated($event)" (municipalities)="onMunicipalityUpdated($event)"
+                    (polygonExist)="onPolygonExistUpdated($event)" [isReadonly]="isReadonly" [customTextElements]="customTextElements"></app-gis-map-si>
+              <div style="padding-top:0.5rem;padding-bottom: 0.5rem;">
+              <i style="font-size: 1rem !important;color:#007bff;" *ngIf="siSearchForm.controls['reason']?.value === 'PRE_APPLN_REQ'"
+                aria-label="Note">***Note: Pre-application Meetings are not automatically granted or necessary for all requests. Once a request is submitted, NYSDEC will review to determine if a meeting is required and respond accordingly.</i>
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12" *ngIf="siSearchForm.controls['region'].value?.trim() !==''">
+              <label class="font-label-bold" aria-label="select reason for this inquiry">Please select the reason for
+                this Inquiry:</label>
+              <fieldset [disabled]="isReadonly">
+                <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                  <div class="reasons-container">
+                    <div *ngFor="let reason of reasonsListApplicant; let i = index">
+                      <div class="reasons-item">
+                        <input id="reason_radio_app_{{i}}" type="radio" [value]="reason.spatialInqCategoryCode" formControlName="reason">
+                        <label for="reason_radio_app_{{i}}" [attr.aria-label]="'inquiry reason ' + reason?.spatialInqCategoryDesc"
+                          style="padding-left: 0.3rem;">{{reason.spatialInqCategoryDesc}}</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                  <div class="reasons-container">
+                    <div *ngFor="let reason of reasonsListAnalyst; let i = index">
+                      <div class="reasons-item">
+                        <input id="reason_radio_ana_{{i}}" type="radio" [value]="reason.spatialInqCategoryCode" formControlName="reason">
+                        <label for="reason_radio_ana_{{i}}" [attr.aria-label]="'inquiry reason ' + reason?.spatialInqCategoryDesc"
+                          style="padding-left: 0.3rem;">{{reason.spatialInqCategoryDesc}}</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+               </div>
+              </fieldset>
+              <br />
+              <form [formGroup]="inquiryReasonDetails">
+                <div class="row">
+                  <div class="col-lg-12 col-md-12" *ngIf="siSearchForm.controls['reason']?.value !== ''">
+                    <label class="font-label-bold">Please provide inquiry details:</label>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-5">
+                        <label for="inquiry_reason" id="inquiry_reason_lbl" class="font-label-bold">Inquiry Reason:</label>
+                        <input type="text" class="form-control" id="inquiry_reason" size="40" maxlength="100"
+                          [value]="reasonValue()" [attr.readonly]="true" aria-describedby="inquiry_reason_lbl" />
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-2">
+                        <label for="region" id="region_lbl" class="font-label-bold">Region:</label>
+                        <input type="text" class="form-control" id="region" size="40" maxlength="100"
+                          [value]="siSearchForm.controls['region']?.value" [attr.readonly]="true"
+                          aria-describedby="region_lbl" />
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-5">
+                        <label for="municipality" id="municipality_lbl" class="font-label-bold">Municipality:</label>
+                        <input type="text" class="form-control" id="municipality" size="40" maxlength="100"
+                          formControlName="municipality" [attr.readonly]="true" aria-describedby="municipality_lbl" />
+                      </div>
+                    </div>
+                  </div>
+                  <br />
+                  <div class="col-lg-12 col-md-12" *ngIf="siSearchForm.controls['reason']?.value === 'BOROUGH_DETERMINATION'">
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-2">
+                        <label for="borough" id="borough_lbl" class="font-label-bold">Borough*:</label>
+                        <input type="text" class="form-control" id="borough" size="25" maxlength="20" formControlName="borough"
+                          aria-describedby="borough_lbl" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['borough'].invalid && inquiryReasonDetails.controls['borough'].errors!.required" class="errors"
+                              aria-errormessage="Borough is Required">{{errorMsgObj?.BOROUGH_REQD}}</span>
+                      </div>
+
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-2">
+                        <label for="block" id="block_lbl" class="font-label-bold">Block*:</label>
+                        <input type="text" class="form-control" id="block" size="40" maxlength="5" formControlName="block"
+                          aria-describedby="block_lbl" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['block'].invalid && inquiryReasonDetails.controls['block'].errors!.required" class="errors"
+                              aria-errormessage="Block is Required">{{errorMsgObj?.BLOCK_REQD}}</span>
+                        </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-2">
+                        <label for="lot" id="lot_lbl" class="font-label-bold">Lot*:</label>
+                        <input type="text" class="form-control" id="lot" size="40" maxlength="4" formControlName="lot"
+                          aria-describedby="lot_lbl" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['lot'].invalid && inquiryReasonDetails.controls['lot'].errors!.required" class="errors"
+                          aria-errormessage="Lot is Required">{{errorMsgObj?.LOT_REQD}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="street_address" id="street_address_lbl" class="font-label-bold">Street Address*:</label>
+                        <input type="text" class="form-control" id="street_address" size="40" formControlName="street_address"
+                          maxlength="150" aria-describedby="street_address_lbl" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['street_address'].invalid && inquiryReasonDetails.controls['street_address'].errors!.required" class="errors"
+                          aria-errormessage="Street Address is Required">{{errorMsgObj?.STREET_ADR_REQD}}</span>
+                      </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="requestor_name" id="requestor_name_lbl" class="font-label-bold">Requestor Name*:</label>
+                        <input type="text" class="form-control" id="requestor_name" size="40" maxlength="150"
+                          aria-label="requestor_name" formControlName="requestor_name" placeholder="Last Name, First Name"
+                          aria-describedby="requestor_name_lbl" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['requestor_name'].invalid && inquiryReasonDetails.controls['requestor_name'].errors!.required" class="errors"
+                          aria-errormessage="Requestor Name is Required">{{errorMsgObj?.REQSTOR_NAME_REQD}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label class="font-label-bold">Mailing Address*:</label>
+                      </div>
+                      <span *ngIf="isInquirySaveClicked &&  ((inquiryReasonDetails.controls['mailing_address_street1'].invalid && inquiryReasonDetails.controls['mailing_address_street1'].errors!.required) || (inquiryReasonDetails.controls['mailing_address_zip'].invalid && inquiryReasonDetails.controls['mailing_address_zip'].errors!.required))" class="errors"
+                                aria-errormessage="Mailing Address is Required">{{errorMsgObj?.MAILING_ADR_REQD}}</span>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12  col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_street1" class="font-label-bold">Street Address 1*:</label>
+                        <input type="text" class="form-control" id="mailing_address_street1" size="40"
+                          formControlName="mailing_address_street1" aria-label="Mailing Address Street Address 1"
+                          maxlength="150" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['mailing_address_street1'].invalid && inquiryReasonDetails.controls['mailing_address_street1'].errors!.required" class="errors"
+                                aria-errormessage="Street Address 1 is Required">{{errorMsgObj?.STREET_ADR1_REQD}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_street2" class="font-label-bold">Street Address 2:</label>
+                        <input type="text" class="form-control" id="mailing_address_street2" size="40"
+                          formControlName="mailing_address_street2" aria-label="Mailing Address Street Address 2"
+                          maxlength="150" />
+                      </div>
+                      <div class="form-group col-sm-12  col-md-3 col-lg-3 col-xl-3">
+                        <label for="mailing_address_zip" class="font-label-bold">Zip*:</label>
+                        <input type="text" class="form-control" id="mailing_address_zip" size="5" (input)="onZipInput(nInput)" #nInput
+                          formControlName="mailing_address_zip" aria-label="Mailing Address zip" maxlength="5" (keyup)="zipKeyup()" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['mailing_address_zip'].invalid && inquiryReasonDetails.controls['mailing_address_zip'].errors!.required" class="errors"
+                                aria-errormessage="Zip is Required">Error: Zip is Required</span>
+                      </div>
+                      <div class="form-group col-sm-12  col-md-3 col-lg-3 col-xl-3">
+                        <label for="mailing_address_state" class="font-label-bold">State*:</label>
+                        <input type="text" class="form-control" id="mailing_address_state" size="40"
+                          formControlName="mailing_address_state" aria-label="Mailing Address state" maxlength="100" />
+                      </div>
+                      <div class="form-group col-sm-12  col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_city" class="font-label-bold">Post Office / City*:</label>
+                        <input type="text" class="form-control" id="mailing_address_city" size="40"
+                          formControlName="mailing_address_city" aria-label="Mailing Address Post Office or City"
+                          maxlength="100" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="phone_number" id="phone_number_lbl" class="font-label-bold">Phone Number:</label>
+                        <input type="text" class="form-control" id="phone_number" size="40" formControlName="phone_number"
+                          aria-describedby="phone_number_lbl" maxlength="14" matInput mask="(000) 000-0000" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['phone_number'].invalid && inquiryReasonDetails.controls['phone_number'].errors!.minlength" class="errors"
+                                aria-errormessage="Phone Number should be valid">{{errorMsgObj?.PHN_NUMBER_INVALID}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="email" id="email_lbl" class="font-label-bold">Email:</label>
+                        <input type="text" class="form-control" id="email" size="40" formControlName="email"
+                          aria-describedby="email_lbl" maxlength="150" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.required" class="errors"
+                                aria-errormessage="Email is Required">{{errorMsgObj?.EMAIL_ADDR_REQD_MSG}}</span>
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.pattern" class="errors"
+                                aria-errormessage="Email should be valid format">{{errorMsgObj?.EMAIL_ADDR_INVALID_MSG}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-12 col-md-12" *ngIf="siSearchForm.controls['reason']?.value === 'SEQR_LA_REQ'">
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-12 col-md-12 col-xl-12">
+                        <label for="project_description" id="project_description_lbl" class="font-label-bold">Project Description*:</label>
+                        <textarea id="project_description" formControlName="project_description" aria-describedby="project_description_lbl" cols="75"
+                            maxlength="300" class="form-control description" rows="4"></textarea>
+                          <span class="counter-brief">{{inquiryReasonDetails.controls.project_description.value?.length}} /
+                            300</span>
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['project_description'].invalid && inquiryReasonDetails.controls['project_description'].errors!.required" class="errors"
+                            aria-errormessage="Project Description is Required">{{errorMsgObj?.PROJ_DESC_REQD}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="project_name" id="project_name_lbl" class="font-label-bold">Project Name*:</label>
+                        <input type="text" class="form-control" id="project_name" size="40" formControlName="project_name"
+                          maxlength="150" aria-describedby="project_name_lbl"/>
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['project_name'].invalid && inquiryReasonDetails.controls['project_name'].errors!.required" class="errors"
+                          aria-errormessage="Project Name is Required">{{errorMsgObj?.PROJ_NAME_REQD}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="project_sponsor" id="project_sponsor_lbl" class="font-label-bold">Project Sponsor*:</label>
+                        <input type="text" class="form-control" id="project_sponsor" size="40" maxlength="150"
+                          formControlName="project_sponsor" aria-describedby="project_sponsor_lbl"/>
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['project_sponsor'].invalid && inquiryReasonDetails.controls['project_sponsor'].errors!.required" class="errors"
+                            aria-errormessage="Project Sponsor is Required">{{errorMsgObj?.PROJ_SPONSOR_REQD}}</span>
+                      </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="lead_agency_name" id="lead_agency_name_lbl"  class="font-label-bold">Lead Agency Name*:</label>
+                        <input type="text" class="form-control" id="lead_agency_name" size="40" maxlength="150"
+                          formControlName="lead_agency_name" aria-describedby="lead_agency_name_lbl"/>
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['lead_agency_name'].invalid && inquiryReasonDetails.controls['lead_agency_name'].errors!.required" class="errors"
+                          aria-errormessage="Lead Agency Name is Required">{{errorMsgObj?.LA_NAME_REQD}}</span>
+                      </div>
+
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="lead_agency_contact" id="lead_agency_contact_lbl" class="font-label-bold">Lead Agency Contact*:</label>
+                        <input type="text" class="form-control" id="lead_agency_contact" size="40" maxlength="100"
+                          aria-describedby="lead_agency_contact_lbl" formControlName="lead_agency_contact"
+                          placeholder="Last Name, First Name" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['lead_agency_contact'].invalid && inquiryReasonDetails.controls['lead_agency_contact'].errors!.required" class="errors"
+                          aria-errormessage="Lead Agency Contact is Required">{{errorMsgObj?.LA_CONTACT_REQD}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label class="font-label-bold">Mailing Address:</label>
+                      </div>
+                      <span class="addr-error-msg ml-110 d-block"
+                        *ngIf="this.addressNotFoundError">{{errorMsgObj?.NO_ADDR_MATCH_FOUND}}</span>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12  col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_street1" class="font-label-bold">Street Address 1:</label>
+                        <input type="text" class="form-control" id="mailing_address_street1" size="40"
+                          formControlName="mailing_address_street1" aria-label="Mailing Address Street Address 1"
+                          maxlength="150" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_street2" class="font-label-bold">Street Address 2:</label>
+                        <input type="text" class="form-control" id="mailing_address_street2" size="40"
+                          formControlName="mailing_address_street2" aria-label="Mailing Address Street Address 2"
+                          maxlength="150" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <label for="mailing_address_zip" class="font-label-bold">Zip:</label>
+                        <input type="text" class="form-control" id="mailing_address_zip" size="5" (input)="onZipInput(nInput)" #nInput
+                          formControlName="mailing_address_zip" aria-label="Mailing Address zip" maxlength="5" (keyup)="zipKeyup()"/>
+                      </div>
+                      <div class="form-group col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <label for="mailing_address_state" class="font-label-bold">State:</label>
+                        <input type="text" class="form-control" id="mailing_address_state" size="40"
+                          formControlName="mailing_address_state" aria-label="Mailing Address state" maxlength="100" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_city" class="font-label-bold">Post Office / City:</label>
+                        <input type="text" class="form-control" id="mailing_address_city" size="40"
+                          formControlName="mailing_address_city" aria-label="Mailing Address Post Office or City"
+                          maxlength="100"/>
+                      </div>
+                      <div class="float-right mr-2" *ngIf="showAddressServerError">
+                        <app-server-error-message [serverErrorMessage]="addressServerErrorMessage"></app-server-error-message>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="phone_number" id="phone_number_lbl" class="font-label-bold">Phone Number:</label>
+                        <input type="text" class="form-control" id="phone_number" size="40" formControlName="phone_number"
+                          aria-describedby="phone_number_lbl" maxlength="14" matInput mask="(000) 000-0000" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['phone_number'].invalid && inquiryReasonDetails.controls['phone_number'].errors!.minlength" class="errors"
+                                aria-errormessage="Phone Number should be valid">{{errorMsgObj?.PHN_NUMBER_INVALID}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="email" id="email_lbl" class="font-label-bold">Email:</label>
+                        <input type="text" class="form-control" id="email" size="40" formControlName="email"
+                          aria-describedby="email_lbl" maxlength="150" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.required" class="errors"
+                          aria-errormessage="Email is Required">{{errorMsgObj?.EMAIL_ADDR_REQD_MSG}}</span>
+                  <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.pattern" class="errors"
+                          aria-errormessage="Email should be valid format">{{errorMsgObj?.EMAIL_ADDR_INVALID_MSG}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-12 col-md-12" *ngIf="siSearchForm.controls['reason']?.value === 'PRE_APPLN_REQ' || siSearchForm.controls['reason']?.value === 'JURISDICTION_DETERMINATION'">
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-4" style="align-content: flex-start">
+                        <label for="project_name" id="project_name_lbl" class="font-label-bold">Project Name*:</label>
+                        <input type="text" class="form-control" id="project_name" size="40" formControlName="project_name"
+                          maxlength="150" aria-describedby="project_name_lbl" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['project_name'].invalid && inquiryReasonDetails.controls['project_name'].errors!.required" class="errors"
+                          aria-errormessage="Project Name is Required">{{errorMsgObj?.PROJ_NAME_REQD}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-8">
+                        <label for="project_description" id="project_description_lbl" class="font-label-bold">Project Description*:</label>
+                        <textarea id="project_description" formControlName="project_description" aria-describedby="project_description_lbl" cols="75"
+                            maxlength="300" class="form-control description" rows="4"></textarea>
+                          <span class="counter-brief">{{inquiryReasonDetails.controls.project_description.value?.length}} /
+                            300</span>
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['project_description'].invalid && inquiryReasonDetails.controls['project_description'].errors!.required" class="errors"
+                            aria-errormessage="Project Description is Required">{{errorMsgObj?.PROJ_DESC_REQD}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-4" style="align-content: flex-start">
+                        <label for="project_sponsor" id="project_sponsor_lbl" class="font-label-bold">Project Sponsor*:</label>
+                        <input type="text" class="form-control" id="project_sponsor" size="40" maxlength="150"
+                          formControlName="project_sponsor" aria-describedby="project_sponsor_lbl"/>
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['project_sponsor'].invalid && inquiryReasonDetails.controls['project_sponsor'].errors!.required" class="errors"
+                            aria-errormessage="Project Sponsor is Required">{{errorMsgObj?.PROJ_SPONSOR_REQD}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-8">
+                        <label for="issues_questions" id="issues_questions_lbl" class="font-label-bold">Questions or Comment*:</label>
+                        <textarea id="issues_questions" aria-describedby="issues_questions_lbl" formControlName="issues_questions" cols="75"
+                            maxlength="300" class="form-control description" rows="4"></textarea>
+                          <span class="counter-brief">{{inquiryReasonDetails.controls.issues_questions.value?.length}} /
+                            300</span>
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['issues_questions'].invalid && inquiryReasonDetails.controls['issues_questions'].errors!.required" class="errors"
+                            aria-errormessage="Questions or Comment is Required">{{errorMsgObj?.QUES_COMM_REQD}}</span>
+                      </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="requestor_name" id="requestor_name_lbl" class="font-label-bold">Requestor Name*:</label>
+                        <input type="text" class="form-control" id="requestor_name" size="40" maxlength="150"
+                        aria-describedby="requestor_name_lbl" formControlName="requestor_name" placeholder="Last Name, First Name" />
+                        <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['requestor_name'].invalid && inquiryReasonDetails.controls['requestor_name'].errors!.required" class="errors"
+                        aria-errormessage="Requestor Name is Required">{{errorMsgObj?.REQSTOR_NAME_REQD}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label class="font-label-bold">Mailing Address:</label>
+                      </div>
+                      <span class="addr-error-msg ml-110 d-block"
+                      *ngIf="this.addressNotFoundError">{{errorMsgObj?.NO_ADDR_MATCH_FOUND}}</span>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_street1" class="font-label-bold">Street Address 1:</label>
+                        <input type="text" class="form-control" id="mailing_address_street1" size="40"
+                          formControlName="mailing_address_street1" aria-label="Mailing Address Street Address 1"
+                          maxlength="150" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_street2" class="font-label-bold">Street Address 2:</label>
+                        <input type="text" class="form-control" id="mailing_address_street2" size="40"
+                          formControlName="mailing_address_street2" aria-label="Mailing Address Street Address 2"
+                          maxlength="150" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <label for="mailing_address_zip" class="font-label-bold">Zip:</label>
+                        <input type="text" class="form-control" id="mailing_address_zip" size="5" (input)="onZipInput(nInput)" #nInput
+                          formControlName="mailing_address_zip" aria-label="Mailing Address zip" maxlength="5" (keyup)="zipKeyup()"/>
+                      </div>
+                      <div class="form-group col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <label for="mailing_address_state" class="font-label-bold">State:</label>
+                        <input type="text" class="form-control" id="mailing_address_state" size="40"
+                          formControlName="mailing_address_state" aria-label="Mailing Address state" maxlength="100" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_city" class="font-label-bold">Post Office / City:</label>
+                        <input type="text" class="form-control" id="mailing_address_city" size="40"
+                          formControlName="mailing_address_city" aria-label="Mailing Address Post Office or City"
+                          maxlength="100" />
+                      </div>
+                      <div class="float-right mr-2" *ngIf="showAddressServerError">
+                        <app-server-error-message [serverErrorMessage]="addressServerErrorMessage"></app-server-error-message>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="phone_number" id="phone_number_lbl" class="font-label-bold">Phone Number:</label>
+                        <input type="text" class="form-control" id="phone_number" size="40" formControlName="phone_number"
+                          aria-describedby="phone_number_lbl" maxlength="14" matInput mask="(000) 000-0000" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['phone_number'].invalid && inquiryReasonDetails.controls['phone_number'].errors!.minlength" class="errors"
+                                aria-errormessage="Phone Number should be valid">{{errorMsgObj?.PHN_NUMBER_INVALID}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="email" id="email_lbl" class="font-label-bold">Email:</label>
+                        <input type="text" class="form-control" id="email" size="40" formControlName="email"
+                          aria-describedby="email_lbl" maxlength="150" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.required" class="errors"
+                          aria-errormessage="Email is Required">{{errorMsgObj?.EMAIL_ADDR_REQD_MSG}}</span>
+                  <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.pattern" class="errors"
+                          aria-errormessage="Email should be valid format">{{errorMsgObj?.EMAIL_ADDR_INVALID_MSG}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-12 col-md-12" *ngIf="siSearchForm.controls['reason']?.value === 'SERP_CERT'">
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="project_name" id="project_name_lbl" class="font-label-bold">Project Name:</label>
+                        <input type="text" class="form-control" id="project_name" size="40" formControlName="project_name"
+                          maxlength="150" aria-describedby="project_name_lbl"/>
+                      </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="efc_contact" class="font-label-bold">EFC Contact:</label>
+                        <input type="text" class="form-control" id="efc_contact" size="40" maxlength="150"
+                          formControlName="efc_contact" placeholder="Last Name, First Name" />
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="phone_number" id="phone_number_lbl" class="font-label-bold">Phone Number:</label>
+                        <input type="text" class="form-control" id="phone_number" size="40" formControlName="phone_number"
+                          aria-describedby="phone_number_lbl" maxlength="14" matInput mask="(000) 000-0000" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['phone_number'].invalid && inquiryReasonDetails.controls['phone_number'].errors!.minlength" class="errors"
+                                aria-errormessage="Phone Number should be valid">{{errorMsgObj?.PHN_NUMBER_INVALID}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="email" id="email_lbl" class="font-label-bold">Email:</label>
+                        <input type="text" class="form-control" id="email" size="40" formControlName="email"
+                          aria-describedby="email_lbl" maxlength="150" />
+                         <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.pattern" class="errors"
+                          aria-errormessage="Email should be valid format">{{errorMsgObj?.EMAIL_ADDR_INVALID_MSG}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-12 col-md-12" *ngIf="siSearchForm.controls['reason']?.value === 'MGMT_COMPRE_PLAN'">
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-8 col-md-8">
+                        <label for="plan_name" id="plan_name_lbl" class="font-label-bold">Plan Name:</label>
+                        <input type="text" class="form-control" id="plan_name" size="40" maxlength="200"
+                          formControlName="plan_name" aria-describedby="plan_name_lbl"/>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-12 col-md-12 col-xl-12">
+                        <label for="plan_description" id="plan_description_lbl" class="font-label-bold">Plan Description:</label>
+                        <textarea id="plan_description" formControlName="plan_description" aria-describedby="plan_description_lbl" cols="75"
+                            maxlength="300" class="form-control description" rows="4"></textarea>
+                          <span class="counter-brief">{{inquiryReasonDetails.controls.plan_description.value?.length}} /
+                            300</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-12 col-md-12 col-xl-12">
+                        <label for="issues_questions" id="issues_questions_lbl" class="font-label-bold">Questions or Comment:</label>
+                        <textarea id="issues_questions" aria-describedby="issues_questions_lbl" formControlName="issues_questions" cols="75"
+                            maxlength="300" class="form-control description" rows="4"></textarea>
+                          <span class="counter-brief">{{inquiryReasonDetails.controls.issues_questions.value?.length}} /
+                            300</span>
+                      </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="requestor_name" id="requestor_name_lbl" class="font-label-bold">Requestor Name:</label>
+                        <input type="text" class="form-control" id="requestor_name" size="40" maxlength="150"
+                          aria-label="requestor_name" formControlName="requestor_name" placeholder="Last Name, First Name" aria-describedby="requestor_name_lbl" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label class="font-label-bold">Mailing Address:</label>
+                      </div>
+                      <span class="addr-error-msg ml-110 d-block"
+                      *ngIf="this.addressNotFoundError">{{errorMsgObj?.NO_ADDR_MATCH_FOUND}}</span>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_street1" class="font-label-bold">Street Address 1:</label>
+                        <input type="text" class="form-control" id="mailing_address_street1" size="40"
+                          formControlName="mailing_address_street1" aria-label="Mailing Address Street Address 1"
+                          maxlength="150" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_street2" class="font-label-bold">Street Address 2:</label>
+                        <input type="text" class="form-control" id="mailing_address_street2" size="40"
+                          formControlName="mailing_address_street2" aria-label="Mailing Address Street Address 2"
+                          maxlength="150" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <label for="mailing_address_zip" class="font-label-bold">Zip:</label>
+                        <input type="text" class="form-control" id="mailing_address_zip" size="5" (input)="onZipInput(nInput)" #nInput
+                          formControlName="mailing_address_zip" aria-label="Mailing Address zip" maxlength="5" (keyup)="zipKeyup()"/>
+                      </div>
+                      <div class="form-group col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <label for="mailing_address_state" class="font-label-bold">State:</label>
+                        <input type="text" class="form-control" id="mailing_address_state" size="40"
+                          formControlName="mailing_address_state" aria-label="Mailing Address state" maxlength="100" />
+                      </div>
+                      <div class="form-group col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <label for="mailing_address_city" class="font-label-bold">Post Office / City:</label>
+                        <input type="text" class="form-control" id="mailing_address_city" size="40"
+                          formControlName="mailing_address_city" aria-label="Mailing Address Post Office or City"
+                          maxlength="100" />
+                      </div>
+                      <div class="float-right mr-2" *ngIf="showAddressServerError">
+                        <app-server-error-message [serverErrorMessage]="addressServerErrorMessage"></app-server-error-message>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="phone_number" id="phone_number_lbl" class="font-label-bold">Phone Number:</label>
+                        <input type="text" class="form-control" id="phone_number" size="40" formControlName="phone_number"
+                          aria-describedby="phone_number_lbl" maxlength="14" matInput mask="(000) 000-0000" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['phone_number'].invalid && inquiryReasonDetails.controls['phone_number'].errors!.minlength" class="errors"
+                                aria-errormessage="Phone Number should be valid">{{errorMsgObj?.PHN_NUMBER_INVALID}}</span>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="email" id="email_lbl" class="font-label-bold">Email:</label>
+                        <input type="text" class="form-control" id="email" size="40" formControlName="email"
+                          aria-describedby="email_lbl" maxlength="150" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.pattern" class="errors"
+                          aria-errormessage="Email should be valid format">{{errorMsgObj?.EMAIL_ADDR_INVALID_MSG}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-12 col-md-12" *ngIf="siSearchForm.controls['reason']?.value === 'SANITARY_SEWER_EXT'">
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="extender_name" id="extender_name_lbl" class="font-label-bold">Extender Name:</label>
+                        <input type="text" class="form-control" id="extender_name" size="40" maxlength="150"
+                          formControlName="extender_name" aria-describedby="extender_name_lbl"/>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="dow_contact" id="dow_contact_lbl" class="font-label-bold">DOW Contact:</label>
+                        <input type="text" class="form-control" id="dow_contact" size="40" maxlength="150"
+                          formControlName="dow_contact" placeholder="Last Name, First Name" aria-describedby="dow_contact_lbl"/>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="email" id="email_lbl" class="font-label-bold">Email:</label>
+                        <input type="text" class="form-control" id="email" size="40" formControlName="email"
+                          aria-describedby="email_lbl" maxlength="150" />
+                          <span *ngIf="isInquirySaveClicked && inquiryReasonDetails.controls['email'].invalid && inquiryReasonDetails.controls['email'].errors!.pattern" class="errors"
+                          aria-errormessage="Email should be valid format">{{errorMsgObj?.EMAIL_ADDR_INVALID_MSG}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-12 col-md-12" *ngIf="siSearchForm.controls['reason']?.value === 'ENERGY_PROJ'">
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-6" style="align-content: flex-start">
+                        <label for="dep_project_manager" id="dep_project_manager_lbl" class="font-label-bold">DEP Analyst:</label>
+                        <select class="form-control" id="dep_project_manager"
+                          formControlName="dep_project_manager" aria-label="Please select DEP project manager">
+                          <option value="">-- SELECT --</option>
+                          <option *ngFor="let depProjectMng of depProjectManager" [value]="depProjectMng.userId">
+                            {{ depProjectMng.managerName }}
+                          </option>
+                        </select>
+                      </div>
+
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-6" style="align-content: flex-start">
+                        <label for="project_name" id="project_name_lbl" class="font-label-bold">Project Name:</label>
+                        <input type="text" class="form-control" id="project_name" size="40" formControlName="project_name"
+                          maxlength="150" aria-describedby="project_name_lbl" />
+                      </div>
+
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-12 col-md-12 col-xl-12">
+                        <label for="project_description" id="project_description_lbl" class="font-label-bold">Project Description:</label>
+                        <textarea id="project_description" formControlName="project_description" aria-describedby="project_description_lbl" cols="75"
+                            maxlength="300" class="form-control description" rows="4"></textarea>
+                          <span class="counter-brief">{{inquiryReasonDetails.controls.project_description.value?.length}} /
+                            300</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="developer" id="developer_lbl" class="font-label-bold">Developer:</label>
+                        <input type="text" class="form-control" id="developer" size="40" formControlName="developer"
+                          maxlength="150" placeholder="Last Name, First Name if individual" aria-describedby="developer_lbl"/>
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6">
+                        <label for="owner" id="owner_lbl" class="font-label-bold">Owner:</label>
+                        <input type="text" class="form-control" id="owner" size="40" formControlName="owner" maxlength="150"  aria-describedby="owner_lbl"/>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-4" style="align-content: flex-start">
+                        <label for="psc_docket_num" id="psc_docket_num_lbl" class="font-label-bold">PSC Docket #:</label>
+                        <input type="text" class="form-control" id="psc_docket_num" size="40" formControlName="psc_docket_num"
+                        maxlength="150" aria-describedby="psc_docket_num_lbl" />
+                      </div>
+                      <div class="form-group col-sm-12 col-lg-6 col-md-6 col-xl-8">
+                        <label for="comments" id="comments_lbl" class="font-label-bold">Comments:</label>
+                        <textarea id="comments" formControlName="comments" aria-describedby="comments_lbl" cols="75"
+                            maxlength="300" class="form-control description" rows="4"></textarea>
+                          <span class="counter-brief">{{inquiryReasonDetails.controls.comments.value?.length}} /
+                            300</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row">
+            <div class="footer-row" style="margin-left:-1rem">
+              <div class="col-md-12 bottom-button-container">
+                <button type="submit" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" #nextBtn
+                [disabled]="siSearchForm.controls['polygon'].invalid || siSearchForm.controls['reason'].invalid" (click)="onInquirySave()">
+                  Next
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="cancel()">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </mat-step>
+</mat-horizontal-stepper>
+<app-pending-changes-popup #pendingPopup (onOkClick)="gotoDashBoard()"></app-pending-changes-popup>
+
+<ng-template #redirectInfo let-modal>
+  <div class="modal-body center-align">
+    <div class="text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red" class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+       <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+       <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+     </svg>
+     <span class="text-left mt-2">Permit Screenings for the selected Region require submittal of a signed application.<br/>Please click <strong>OK</strong> to return to dashboard<br/>to access the Apply for Permit link and submit your application</span>
+   </div>
+  </div>
+  <div class="modal-footer model-footer-reduced" style="justify-content: center;">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="modal.dismiss('Cross click');gotoDashBoard()">
+      OK
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click');">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #submitConfirmModal let-modal>
+  <div class="modal-body center-align">
+    <div class="text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="green" class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+       <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+       <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+     </svg>
+     <span class="text-left mt-2">You are about to save your Geographical Inquiry.<br/>From this point forward, your area of interest and inquiry reason can no longer be updated.<br/>Click <strong>OK</strong> to continue or <br/><strong>Cancel</strong> to return to screen without changes.</span>
+   </div>
+  </div>
+  <div class="modal-footer model-footer-reduced" style="justify-content: center;">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="modal.dismiss('Cross click');onInquirySubmit()">
+      OK
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click');">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #dataLostWarning let-modal>
+  <div class="modal-header text-center modal-header-dec-reduced">
+    <h2 class="modal-title modal-basic-title-dec" id="modal-basic-title">
+      This Search will create new Inquiry
+    </h2>
+    <button type="button" class="close remove-left-margin" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>All the previous sections and data entry will be removed</p>
+    <p>Do you wish to continue?</p>
+  </div>
+  <div class="modal-footer model-footer-reduced">
+    <button type="button" class="btn btn-outline-dark" (click)="resetForm(); modal.dismiss('Cross click')">
+      Yes
+    </button>
+    <button type="button" class="btn btn-outline-dark" (click)="reloadPage(); modal.dismiss('Cross click')">
+      No
+    </button>
+  </div>
+</ng-template>

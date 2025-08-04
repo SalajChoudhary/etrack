@@ -1,0 +1,10 @@
+-------------------------------------------------------------------------------
+Test set: dec.ny.gov.etrack.permit.service.impl.ETrackSearchServiceImplTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.034 s <<< FAILURE! - in dec.ny.gov.etrack.permit.service.impl.ETrackSearchServiceImplTest
+storeSearchQuerytest(dec.ny.gov.etrack.permit.service.impl.ETrackSearchServiceImplTest)  Time elapsed: 0.007 s  <<< ERROR!
+dec.ny.gov.etrack.permit.exception.ETrackPermitException: java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.ETrackSearchServiceImplTest.storeSearchQuerytest(ETrackSearchServiceImplTest.java:48)
+Caused by: java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.ETrackSearchServiceImplTest.storeSearchQuerytest(ETrackSearchServiceImplTest.java:48)
+

@@ -1,0 +1,57 @@
+<mat-accordion class="vdg-accordion mat-expansion--has-toggle-icon-left w-982 pad-left-0">
+    <mat-expansion-panel [expanded]="false" class="mat-elevation-z0 w-982 pad-left-0">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <h3 class="header header-1b">Add/Edit Keyword</h3>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <h3 class="header header-1b">Keyword for Project:</h3>
+      <div class="body overflow-auto w-100 white pad-left-0" role="rowgroup">
+        <keyword-category-grid  [rounded]="false" [checkBoxKey]="'projectSelected'" [keywordItems]="categoryList" (changedTimes)="keywordEmittedData($event)" ></keyword-category-grid>        
+      </div>
+      <br/>    
+        
+
+        <div class="form-group text-center col-12 pl-0 pr-0">
+          <div class="col text-left pl-0"> 
+          <div class="form-check form-check-inline col-10 pl-0 struc-align mtop-10 ">
+            <h3 class="header header-1b">'Other' Keywords:&nbsp;</h3>
+            <input
+              [(ngModel)]="otherSearchItem"
+              (input)="onOtherTextChange()"
+              [ngModelOptions]="{standalone:true}"
+              class="form-input col-6"
+              placeholder=""
+            />
+          </div>
+          <div class="col-sm-6">
+            <span
+              class="addr-error-msg typo-2"
+              *ngIf="otherKeywordButton && !otherSearchItem"
+              >{{errorMsgObj?.OTHER_KEYWORD_REQD}}</span
+            >
+          </div>
+          </div>
+          <div class="col-2"></div>
+          <div class="form-check form-check-inline t-align-right mr-0">
+            <button
+              type="button"
+              (click)="addOtherkeyWord()"
+              class="btn btn-sm btn-outline-dark nextbutton mb-2 upload ml-20"
+              id="addBtn"
+              
+            >
+              Add
+            </button>
+        </div>
+      </div>
+      <div class="float-right mr-2" *ngIf="showOtherServerError && otherSearchItem.length>0"><span > <app-server-error-message
+        [serverErrorMessage]="serverErrorMessage"
+      ></app-server-error-message>
+    </span></div>
+      
+      <div class="body overflow-auto w-100 white pad-left-0" role="rowgroup">
+        <app-keyword-other-grid #otherKeywordItemsTable [checkBoxKey]="'projectSelected'" [otherKeywordItems]="otherKeywordItems" (changedTimes)="otherKeywordEmittedData($event)" ></app-keyword-other-grid>
+    </div>
+    </mat-expansion-panel>  
+  </mat-accordion> 

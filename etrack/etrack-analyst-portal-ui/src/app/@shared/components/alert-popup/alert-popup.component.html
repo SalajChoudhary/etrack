@@ -1,0 +1,32 @@
+<ng-template #alertModal let-modal>
+    <div>
+        <div  [ngClass]="{'modal-header-confirmation-with-alerts' : hasAlerts , 'modal-header-confirmation-without-alerts' : !hasAlerts}"
+           >
+            <h2 class="modal-title modal-basic-title-dec ml-3 mb-0 mt-2 font-size header-1b" id="modal-basic-title">
+               <span *ngIf="hasAlerts" (click)="deleteAlerts()" style="cursor: 'pointer'">New Activity</span>  <span *ngIf="!hasAlerts">No New Activity</span>
+                <button class="action-delete right   btn-no-border-transparent line-height mr-2"
+                    aria-label="A button that will close the modal" (click)="modal.dismiss('Cross click'); close()">
+                    X
+                </button>
+            </h2>
+            <hr class="mt-0 mb-0">
+        </div>
+        <div class="modal-body-confirmation typo-2" *ngFor="let alert of alertData; let i = index">
+            <ng-container *ngIf="hasAlerts">
+                <div class="ml-3">
+                    <span *ngIf="alert?.projectId">Project ID:{{alert.projectId}} </span> 
+                        <span *ngIf="alert?.inquiryId">Inquiry ID:{{alert.inquiryId}}</span>
+                        has been assigned for review.
+                        <span *ngIf="alert?.assignmentNote"><button
+                                (click)="onViewClicked(alert, alert.alertId)"
+                                class="btn btn-link font-14 m-0 p-0">View</button>
+                            the assignment note. <br> <span
+                            *ngIf="alert?.isShow">{{showNote(alert.alertId)}}</span></span>
+                </div>
+                <hr class="mt-0 mb-1">
+                <div class="float-right mr-2" *ngIf="showServerError">
+                    <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+                            </div>
+            </ng-container>
+        </div>
+    </div>

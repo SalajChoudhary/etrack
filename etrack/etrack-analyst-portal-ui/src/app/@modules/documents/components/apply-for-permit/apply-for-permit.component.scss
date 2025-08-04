@@ -1,0 +1,90 @@
+h2.heading{
+    text-align: center;
+    // border: 1px solid #000;
+    margin: -17px -16px 0px -16px !important;
+}
+.w-400{
+    width:400px;
+}
+.form-labels{
+    width:450px;
+    text-align: end;
+}
+.note-txt{
+    text-align: center;
+    color: #007bff;
+    width: 100%;
+    /* padding-top: 15px; */
+    display: flex;
+    justify-content: center;
+    font-style: italic;
+    font-size: medium;
+}
+.w-200{
+    width:200px;
+}
+.mt-20{
+    margin-top:20px;
+}
+.footer-label{
+    font-size: 16px;
+    font-style: italic;
+    color:rgb(0 102 255 / 77%);
+}
+.etrack-logo{
+    width:170px;
+    margin-left:17px;
+}
+.w-150{
+    width:150px;
+}
+form{
+        // border: 1px solid #000;
+        padding-top: 27px;
+        margin: -18px -16px 0px -16px;
+}
+.ml--16 {
+    margin-left:-16px;
+}
+.footer-row{
+    //border: 1px solid #000;
+    // padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0px -16px -16px -16px;
+    border-top: 0;
+}
+
+.nextbutton{
+    background-color: #233E2A !important;
+    width:55px;
+}
+.closebutton{
+    color: black;
+    width:55px;
+}
+.width-fit{
+    min-width: 140px;
+}
+.width-fitt{
+    min-width: 170px;
+}
+
+.form-group {
+  flex-wrap: nowrap;
+}
+
+.inv-error-msg {
+    font-size: 16px;
+    font-weight: 400;
+    color: red;
+  }
+
+  div.hr{
+    width:100%;
+    height: 1px;
+    border-bottom: 1px solid #c0c0c0;
+  }
+
+  .form-check-inline {
+    display : inline;
+  }

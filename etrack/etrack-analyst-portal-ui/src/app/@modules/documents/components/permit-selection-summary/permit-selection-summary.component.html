@@ -1,0 +1,436 @@
+<div class="form-container body-bg " *ngIf="pageFrom ==='selection' && !hasPermits">
+  <!-- <app-validate-banner class="firstStepValidation" *ngIf="isValidate" [validated]="projectSelectionValidated"
+      [showBottomBorder]="true"></app-validate-banner> -->
+  <div class="content-wrapper--nomargin-top">
+    <div class="container">
+      <div class="mb-2 mt-20 empty-container">
+        <div class="empty-inner-container typo-2 bg-white">
+          <div>
+            <div>Select applications needed for this project.</div>
+          </div>
+          <div class="popup-button-container">
+            <button class="btn btn-sm btn-primari mb-2 mr-2" (click)="openPermitSelectionModal()">
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="form-container  mt-3" *ngIf="hasPermits">
+  <form #permitSelectionSummaryForm>
+    <fieldset [disabled]="isReadOnly">
+      <!-- <app-validate-banner class="firstStepValidation" *ngIf="isValidate" [validated]="projectSelectionValidated"
+      [showBottomBorder]="false"></app-validate-banner> -->
+
+      <div class="content-wrapper">
+        <div class="heading-wrapper mt-30">
+          <div class="container align-items-center">
+            <h4 class="top-heading text-center mb-1 header-2b">
+              Project ID {{ projectId }} Permit Selection Summary
+            </h4>
+          </div>
+        </div>
+
+        <ng-container *ngFor="let key of permitSelectionSummaryKeys; let k = index">
+
+          <div class="container"
+            *ngIf="permitSelectionSummaryResponse && permitSelectionSummaryResponse[key.ref]?.length"
+            attr.role="{{key?.containerRole}}" attr.aria-label="{{key?.containerAriaLabel}}"
+            attr.aria-describedby="{{key?.containerAriaDescribedBy}}">
+            <div class="permits-wrapper mt-20 mb-2">
+
+
+              <div class="box-shadow border-radius-25">
+                <div class="container-header-title header-1n border-radius-25">
+                  <div *ngIf="key.ref != 'dart-mod' 
+                      && key.ref != 'etrack-permits'
+                      && key.modify" class=" header-1b border-radius-25">
+                    <span *ngIf="!isValidate">{{key?.modifyContainerTitlePrefix}}<a href="javascript:void(0)"
+                        (click)="onModifyClick($event, key.ref)">modify</a>{{key?.modifyContainerTitleSuffix}}</span>
+                    <span *ngIf="isValidate ">{{key?.containerTitle}}</span>
+                  </div>
+                  <div *ngIf="key.ref != 'dart-mod' 
+                && key.ref != 'etrack-permits'
+                && !key.modify" class=" header-1b border-radius-25"> <span> {{
+                      key?.containerTitle }}</span>
+                  </div>
+                  <div *ngIf="key.ref == 'etrack-permits' && emergencyInd"
+                    class=" header-1b border-radius-25">
+                    You are applying for Emergency Authorization(s):
+                  </div>
+                  <div *ngIf="key.ref == 'etrack-permits' && !emergencyInd"
+                    class=" header-1b border-radius-25">
+                    {{key?.containerTitle}}
+                  </div>
+                  <div *ngIf="key.ref =='dart-mod'" class=" header-1b border-radius-25">
+                    <span *ngIf="!isValidate">You are applying to<a href="javascript:void(0)"
+                        (click)="onModifyClick($event,key.ref)"> modify </a>the
+                      following permit(s):</span>
+                    <span *ngIf="isValidate">You are applying to modify the
+                      following permit(s):</span>
+
+                  </div>
+
+                  <div *ngIf="canShowAdditionalBubble(permitSelectionSummaryResponse[key.ref])">
+                    Transfers for Water Withdrawal permits are treated as a Change of Ownership transaction.
+                  </div>
+                </div>
+              </div>
+              <table class="table table-borderless mb-0 mt-3" attr.aria-label="{{key?.tableAriaLabel}}"
+                attr.aria-describedby="{{key?.tableAriaDescribedBy}}">
+                <tbody role="rowgroup">
+                  <tr *ngIf="isValidate">
+                    <td *ngIf="key.ref != 'etrack-permits'" class="text-black" style="width:305px">Request Type</td>
+                    <!-- <td class="text-black"></td>
+                    <td *ngIf="key.ref != 'etrack-permits'" class="text-black"></td>
+                    <td *ngIf="key.ref == 'etrack-permits'" class="text-black"></td> -->
+                    <td></td>
+                    <td></td>
+                    <td class="permit-desc permit-td-color" *ngIf="key.ref != 'etrack-permits'"></td>
+
+                  </tr>
+                  <ng-container
+                    *ngFor="let permitArr of  permitSelectionSummaryResponse[key.ref]; let i = index; let last = last">
+                    <ng-container *ngIf="key.ref == 'etrack-permits'">
+                      <ng-container *ngFor="let permit of permitArr; let j = index">
+                        <tr scope="col" role="cell">
+                          <ng-container *ngIf="isValidate">
+                            <td class="permit-td-color" style="width:300px">
+                            </td>
+                            <td></td>
+                          </ng-container>
+
+                          <td colspan="3" class="permit-desc permit-td-color">
+                            <span> {{ permit?.permitTypeDesc }}</span>
+                          </td>
+                          <td class="permit-desc permit-td-color">
+                            {{ permit?.programIdFormatted }}
+                          </td>
+
+                          <td class="permit-desc permit-td-color">
+                            <span *ngIf="!i">
+                              {{ permit?.effectiveEndDate }}
+                            </span>
+                          </td>
+                          <td scope="col" role="cell" class="permit-action">
+                            <div class="d-flex justify-content-end align-items-center" style="padding-right:25px;">
+                              <button class="action action-delete" (click)="confirmBatchDelete(key.ref, permit)"
+                                aria-label="A button to delete an existing permit">
+                                X
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+
+                      </ng-container>
+                    </ng-container>
+                    <ng-container *ngIf="key.ref != 'etrack-permits'">
+                      <ng-container *ngFor="let permit of permitArr; let j = index; let end = last">
+                        <tr>
+                          <ng-container *ngIf="isValidate">
+                            <td class="permit-td-color" style="width:305px">
+                              <ng-container>
+
+                                <label *ngFor="let types of permit?.availableTransTypes; let t=index;" class="mr-2">
+                                  <input type="checkbox" class="mr-2" id="{{types.code}}{{k}}{{i}}{{j}}"
+                                    name="{{types.code}}{{k}}{{i}}{{j}}" [(ngModel)]="types.selected"
+                                    (change)="onModifyClickedRevised(types, permit, permitArr)">
+                                  <a href="javascript:void(0)"
+                                    *ngIf="types.selected && types.code=='MOD' && !projectSelectionValidated  "
+                                    (click)="onModifyClick($event,key.ref)">{{types.type}} </a>
+                                  <span
+                                    *ngIf="!types.selected && types.code=='MOD' && !projectSelectionValidated && permit.modReqInd == 'Y' ">{{types.type}}</span>
+                                  <span
+                                    *ngIf="!types.selected && permit.modReqInd !== 'Y' && types.code == 'MOD'  && !projectSelectionValidated">Modify</span>
+                                  <span *ngIf="types.code == 'MOD' && projectSelectionValidated ">{{types.type}}</span>
+                                  <span *ngIf="types.code !== 'MOD' ">{{types.type}}</span>
+                                </label>
+                              </ng-container>
+                            </td>
+                          </ng-container>
+                          <td class="permit-desc permit-td-color">
+                            <span *ngIf="!permit?.applnPermitDesc">
+                              {{ permit?.permitTypeDesc }}
+                            </span>
+                            <button class="btn btn-link pl-0" *ngIf="permit?.applnPermitDesc"
+                              (click)="showApplnPermitDesc(permit)">
+                              {{ permit?.permitTypeDesc }}
+                            </button>
+                          </td>
+
+                          <td class="permit-desc permit-td-color" style="width:150px">
+                            {{ permit?.programIdFormatted }}
+                          </td>
+
+                          <td class="permit-desc permit-td-color" style="width:100px">
+
+                            <span *ngIf="!j">
+                              {{ permit?.effectiveEndDate }}
+                            </span>
+
+                          </td>
+                          <td scope="col" role="cell" class="permit-action">
+                            <div class="d-flex justify-content-center align-items-center" *ngIf="!j">
+
+                              <button class="action action-delete" (click)="confirmBatchDelete(key.ref, permitArr)"
+                                aria-label="A button to delete an existing permit">
+                                X
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+
+
+                        <tr *ngIf="end && !last">
+                          <td colspan="6">
+                            <div class="shadow-div"></div>
+                          </td>
+                        </tr>
+                      </ng-container>
+                    </ng-container>
+
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-container>
+        <div class="container" role="rowgroup" aria-label="New permit Table" aria-describedby="new_permit_table">
+
+          <div class="mb-2 mt-20 permits-wrapper">
+            <div class="box-shadow border-radius-25" *ngIf="newPermits?.length">
+              <div *ngIf="!emergencyInd" class="container-header-title header-1b border-radius-25 mb-3">
+                You are applying for the following new permit(s):
+              </div>
+              <div *ngIf="emergencyInd" class="container-header-title header-1b border-radius-25 mb-3">
+                You are applying for Emergency Authorization(s):
+              </div>
+            </div>
+            <table id="new_permit_table" class="table table-borderless"
+              aria-label="A table that shows permits the user applied for">
+              <tbody role="rowgroup">
+                <tr role="row" *ngFor="let permit of newPermits">
+                  <td scope="col" role="cell" class="permit-desc permit-td-color">
+                    {{ permit?.permitTypeDesc }}
+                  </td>
+                  <td scope="col" role="cell" class="permit-action">
+                    <div class="d-flex justify-content-center align-items-center">
+
+                      <button class="action action-delete" (click)="confirmDelete(permit)"
+                        aria-label="A button to delete a new permit">
+                        X
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- *ngIf="!emergencyInd && hasPermits" -->
+            <!-- <div class="text-center non-click-link typo-2 " *ngIf="isValidate"
+            [ngClass]="{'non-click-link': !showPesticidesError}">
+            <button class="btn btn-sm btn-primari  mr-2" (click)="uploadToDart($event)">
+              UPLOAD TO DART
+            </button>
+          </div> -->
+
+            <div class="text-center header-1n non-click-link mb-3" *ngIf="!emergencyInd && hasPermits"
+              [ngClass]="{'non-click-link': !showPesticidesError}">
+              Apply for
+              <button class="" (click)="openPermitSelectionModal()" class="header-1n btn click-link pl-0"
+                [disabled]="isReadOnly">
+                new permit application
+              </button>
+            </div>
+
+            <div class="text-center non-click-link typo-2 mb-3" *ngIf="emergencyInd "
+              [ngClass]="{'non-click-link': !showPesticidesError}">
+              Select another permit needed for this
+              <button class="" (click)="openPermitSelectionModal()" class="btn click-link pl-0" [disabled]="isReadOnly">
+                Emergency Authorization
+              </button>
+            </div>
+            <span class="typo-2 mt-3" *ngIf="showPesticidesError">{{errorMsgObj?.PERMIT_REQD_AQUATIC_PEST}}</span>
+            <div class="typo-2 mt-3 error-msg" *ngIf="mustHaveAtleastOneTrackedRecord">Permits must have atleast one
+              tracked Record selected</div>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+</div>
+<app-custom-modal-popup #modal [modalConfig]="summaryConfig" (modalClosed)="closeSummaryModal($event)">
+  <ng-container *ngIf="showPermitSelectionModalContent">
+    <app-permit-selection [selectedPermitGroups]="permitGroups" [newPermits]="newPermits"
+      [permitSummaryResponse]="permitSelectionSummaryResponseUnmodified"
+      (closeClicked)="onPermitSelectionClose($event)">
+    </app-permit-selection>
+  </ng-container>
+</app-custom-modal-popup>
+
+<div class="float-right mr-2" *ngIf="showServerError">
+  <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+</div>
+
+<div class="footer-row">
+  <div class="col-md-12 bottom-button-container d-flex align-items-center">
+
+    <!-- <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent('Associated Applicants')"  matStepperPrevious>Back</button> -->
+    <app-validate-checkbox class="mb-2" *ngIf="isValidate" category="PROJ-INFO" activityId="10"
+      [(validatedModel)]="projectSelectionValidated"></app-validate-checkbox>
+
+    <button [disabled]="!hasPermits" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="nextButton()"
+      id="permitNxtBtn1">
+      Next
+    </button>
+    <button (click)="onClose()" type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" id="permitCloseBtn1">
+      Close
+    </button>
+  </div>
+</div>
+
+<app-delete-confirm-popup [openModal]="deleteIsClicked" (result)="onDeleteConfirmPopupClosed($event)"
+  [bodyText]="confirmDeleteBodyText"></app-delete-confirm-popup>
+
+<ng-template #confirmDeleteModal let-modal>
+  <div class="modal-body">
+    <div class="confirm-custom-header">
+      <h2 class="modal-title m-auto" id="modal-basic-title">Confirm </h2>
+    </div>
+    <p style="text-align: center; font-size: 15px" class="mb-0">
+      Are you sure you want to remove the following applications?
+    </p>
+    <div class="clearfix"></div>
+    <table id="new_permit_table" class="table table-borderless"
+      aria-label="A table that shows permits the user applied for">
+      <tbody role="rowgroup">
+        <tr role="row">
+          <td scope="col" text='"bold"' role="cell" class="permit-desc permit-td-color">
+            {{ permitSelectedToDelete?.permitTypeDesc }}
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer model-footer-reduced">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="modal.close('deleted')"
+      id="deleteBtn">
+      Delete
+    </button>
+
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click')"
+      id="cancelBtn2">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #confirmBatchDeleteModal let-modal>
+  <div class="modal-body">
+    <div class="confirm-custom-header">
+      <h2 class="modal-title m-auto bold" id="modal-basic-title">CONFIRM</h2>
+    </div>
+    <p style="text-align: center; font-size: 15px" class="mb-0">
+      Are you sure you want to remove the following applications from your project?
+    </p>
+
+    <div class="clearfix"></div>
+    <table class="table table-borderless mb-0" aria-label="A table which shows the permits you have applied for"
+      aria-describedby="A table which shows the permits you have applied for">
+      <tbody role="rowgroup">
+        <tr scope="col" role="cell" *ngFor="let permit of batchPermitsSelectedToDelete?.permits; let i = index">
+          <td class="permit-desc permit-td-color text-left text-bold">
+            {{ permit?.permitTypeDesc }}
+          </td>
+          <td class="permit-desc permit-td-color">
+            {{ permit?.programIdFormatted }}
+          </td>
+          <td class="permit-desc permit-td-color">
+            <span *ngIf="!i">
+              {{ permit?.effectiveEndDate }}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="modal-footer model-footer-reduced">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="[deleteBatch(batchPermitsSelectedToDelete), modal.close('deleted')]" id="deleteBtn2">
+      Delete
+    </button>
+
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click')"
+      id="cancelBtn3">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #etrackPermitDeleteWarningModal let-modal>
+  <div class="modal-body pb-0">
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="mr-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red"
+          class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+          <path
+            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+          <path
+            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+        </svg>
+      </div>
+      <div class="d-flex justify-content-center align-items-center flex-column">
+        <p class="instruction-font text-center">You must change the tracked record to delete.</p>
+      </div>
+      <div>
+        <!-- Intentionally left blank -->
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer model-footer-reduced align-center border-0 pt-0">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="modal.close(true)"
+      id="trackedOkBtn">
+      OK
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #dartPendingTxsEdbTransTypesExistsInWatchListModal let-modal>
+  <div class="modal-body pb-0">
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="mr-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red"
+          class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+          <path
+            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+          <path
+            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+        </svg>
+      </div>
+      <div class="d-flex justify-content-center align-items-center flex-column">
+        <p class="instruction-font text-center">A Department Initiated application is already pending. </p>
+        <p class="instruction-font text-center"> Please review all active pending and existing authorizations for appropriate processing</p>
+      </div>
+      <div>
+        <!-- Intentionally left blank -->
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer model-footer-reduced align-center border-0 pt-0">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="modal.close(true)">
+      OK
+    </button>
+  </div>
+</ng-template>
+<app-pending-changes-popup #pendingPopup (onOkClick)="commonService.navigateToMainPage();"></app-pending-changes-popup>

@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GISPolygonServiceController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.controller</a> &gt; <span class="el_source">GISPolygonServiceController.java</span></div><h1>GISPolygonServiceController.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.controller;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import dec.ny.gov.etrack.gis.exception.BadRequestException;
+import dec.ny.gov.etrack.gis.model.PolygonAction;
+import dec.ny.gov.etrack.gis.model.ProjectPolygon;
+import dec.ny.gov.etrack.gis.service.GISPolygonService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@RestController
+<span class="nc" id="L32">public class GISPolygonServiceController {</span>
+
+<span class="nc" id="L34">  private static final Logger LOGGER = LoggerFactory.getLogger(GISPolygonServiceController.class.getName());</span>
+
+  @Autowired
+  private GISPolygonService gisService;
+  private static final String MANTORY_VAL_MISSING_LOG_INFO = &quot;Mandatory value is missing {} &quot;;
+
+  /**
+   * Retrieve the DEC Polygon by Tax Id, County and Municipality details.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param taxParcelID - Tax Parcel Id.
+   * @param countyName - Country name.
+   * @param municipalName - Municipality name.
+   * 
+   * @return - DEC Polygon related details.
+   */
+  @GetMapping(value = &quot;/DECPolygonByTaxId&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Retrieve the DEC Polygon details for the input Tax Parcel Id, County and Municipality name.&quot;)
+  public String getDECPolygonByTaxId(HttpServletResponse response,
+      @RequestParam(&quot;taxParcelID&quot;) @ApiParam(example = &quot;156.17-2-41&quot;, value=&quot;Tax Parcel Id&quot;) final String taxParcelID,
+      @RequestParam(&quot;countyName&quot;) @ApiParam(example = &quot;Albany&quot;, value=&quot;County Name&quot;) final String countyName,
+      @RequestParam(&quot;municipalName&quot;) @ApiParam(example = &quot;Albany&quot;, value=&quot;Municipality&quot;) final String municipalName) {
+
+<span class="nc" id="L57">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L58">    LOGGER.info(&quot;Entering into getDECPolygonByTaxId. Context Id {}&quot;, contextId);</span>
+<span class="nc bnc" id="L59" title="All 4 branches missed.">    if (!(StringUtils.hasLength(taxParcelID) &amp;&amp; StringUtils.hasLength(countyName)</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        &amp;&amp; StringUtils.hasLength(municipalName))) {</span>
+      
+<span class="nc" id="L62">      LOGGER.error(</span>
+          &quot;One of the Mandatory value is missing Tax Parcel Id {} County Name {} Municipal {}&quot;,
+          taxParcelID, countyName, municipalName);
+<span class="nc" id="L65">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L66">      return null;</span>
+    }
+<span class="nc" id="L68">    return gisService.getDECPolygonByTaxId(taxParcelID, countyName, municipalName, contextId);</span>
+  }
+
+  /**
+   * Retrieve the DEC Polygon details by the input address.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param street - Street address detail.
+   * @param city - City name.
+   * 
+   * @return - DEC Polygon details.
+   */
+  @GetMapping(value = &quot;/DECPolygonByAddress&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Retrieve the DEC Facility Polygon details for the input street and city.&quot;)
+  public String getDECPolygonByAddress(HttpServletResponse response,
+      @RequestParam @ApiParam(example = &quot;625 Broadway&quot;, value=&quot;Street/Address line 1&quot;) final String street, 
+      @RequestParam @ApiParam(example = &quot;Albany&quot;, value=&quot;City&quot;) final String city) {
+
+<span class="nc" id="L86">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L87">    LOGGER.info(&quot;Entering into getDECPolygonByAddress. Context Id {}&quot;, contextId);</span>
+
+<span class="nc bnc" id="L89" title="All 4 branches missed.">    if (!(StringUtils.hasLength(street) &amp;&amp; StringUtils.hasLength(city))) {</span>
+<span class="nc" id="L90">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L91">      return null;</span>
+    }
+<span class="nc" id="L93">    return gisService.getDECPolygonByAddress(street, city, contextId);</span>
+  }
+
+  /**
+   * Retrieve the DEC Polygon details by the input DEC Id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param jwtToken - JWT Token.
+   * @param decId - DEC Id.
+   * 
+   * @return - DEC Polygon detail for the input DEC ID.
+   */
+  @GetMapping(value = &quot;/DECPolygonByDecId&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Retrieve the DEC Facility Polygon details for the input DEC ID.&quot;)
+  public String getDECPolygonByDecId(HttpServletResponse response,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken,
+      @RequestParam(&quot;decId&quot;) @ApiParam(example = &quot;0-0000-12345&quot;, value=&quot;DEC ID&quot;) final String decId) {
+
+<span class="nc" id="L111">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L112">    LOGGER.info(&quot;Entering into getDECPolygonByDecId Context Id {}&quot;, contextId);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">    if (!StringUtils.hasLength(decId)) {</span>
+<span class="nc" id="L114">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L115">      return null;</span>
+    }
+<span class="nc" id="L117">    return gisService.getDECPolygonByDecId(decId, contextId, jwtToken);</span>
+  }
+
+  /**
+   * Upload the polygon details into eFind.
+   * 
+   * @param uploadPolygonProjects - Polygon details for this project.
+   * 
+   * @return - Uploaded details.
+   */
+  @PostMapping(&quot;/upload-polygon-efind&quot;)
+  @ApiOperation(value=&quot;Upload the Final approved/reviewed polygon by the DEC Staff in eTrack to eFind.&quot;
+      + &quot;This will also shares the details of if any change in the polygon made by the user/staff &quot;
+      + &quot;in the exiting polygon for the existing facility which helps the staff to validate in eFind.&quot;)
+  public Map&lt;Long, String&gt; uploadFinalApprovedPolygonToEFind(
+      @RequestBody List&lt;ProjectPolygon&gt; uploadPolygonProjects) {
+
+<span class="nc" id="L134">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L135">    LOGGER.info(&quot;Entering into uploadFinalApprovedPolygonToEFind. Context Id {}&quot;, contextId);</span>
+
+<span class="nc bnc" id="L137" title="All 2 branches missed.">    if (CollectionUtils.isEmpty(uploadPolygonProjects)) {</span>
+<span class="nc" id="L138">      return null;</span>
+    }
+<span class="nc" id="L140">    return gisService.uploadApprovedPolygonToEFind(contextId, uploadPolygonProjects);</span>
+  }
+
+  /**
+   * Save/Amend the Applicant Polygon details.
+   * 
+   * @param featureMap - Feature details.
+   * @param value - pjson value.
+   * @param action - Save-S/Update-U.
+   * 
+   * @return - Updated Polygon after save/amend.
+   */
+  @PostMapping(value = &quot;/applicantPolygon/{action}&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Save/Update the Applicant/User scratch Polygon into eTrack.&quot;)
+  public Object saveApplicantPolygon(
+      final @RequestPart(value = &quot;features&quot;) Object featureMap,
+      final @RequestPart(value = &quot;f&quot;) String value, 
+      @PathVariable @ApiParam(example = &quot;S&quot;, value=&quot;S-Save, U-Update&quot;) final PolygonAction action) {
+
+<span class="nc" id="L159">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L160">    LOGGER.info(&quot;Entering into applicantPolygon Context Id: {} &quot;, contextId);</span>
+<span class="nc" id="L161">    return gisService.applicantPolygon(Arrays.asList(featureMap), value, action.name(), contextId);</span>
+  }
+
+
+  /**
+   * Save Or Update the Analyst Polygon based on the action requested by the user.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param featureMap - Feature details.
+   * @param value - pjson value.
+   * @param action - Save(S) or Update(U)
+   * 
+   * @return - Save or Update Analyst Polygon details.
+   */
+  @PostMapping(value = &quot;/analystPolygon/{action}&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(&quot;Save the Polygon while the DEC Staff reviewing the details.&quot;)
+  public Object saveAnalystPolygon(HttpServletResponse response,
+      @RequestPart(value = &quot;features&quot;) Object featureMap, @RequestPart(value = &quot;f&quot;) String value,
+      @PathVariable @ApiParam(example = &quot;S&quot;, value=&quot;S-Save, U-Update&quot;) final PolygonAction action) {
+
+<span class="nc" id="L181">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L182">    LOGGER.info(&quot;Entering into analyst Polygon Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L183">    return gisService.analystPolygon(Arrays.asList(featureMap), value, action.name(), contextId);</span>
+  }
+
+  /**
+   * Save or Update the Submitted Polygon requested by the user.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param featureMap - Feature details.
+   * @param value - pjson value.
+   * @param action - Save(S) or Update(U)
+   * 
+   * @return - Save or Update Submitted Polygon details.
+   */
+  @PostMapping(value = &quot;/submitedPolygon/{action}&quot;)
+  @ApiOperation(&quot;Save the Submitted Polygon requested by the user/staff.&quot;)
+  public Object saveSubmitedPolygon(HttpServletResponse response,
+      @RequestPart(value = &quot;features&quot;) Object featureMap, @RequestPart(value = &quot;f&quot;) String value,
+      @PathVariable @ApiParam(example = &quot;S&quot;, value=&quot;S-Save, U-Update&quot;) final PolygonAction action) {
+
+<span class="nc" id="L202">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L203">    LOGGER.info(&quot;Entering into submitedPolygon Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L204">    return gisService.submittedPolygon(Arrays.asList(featureMap), value, action.name(), contextId);</span>
+  }
+
+  /**
+   * Retrieve the Applicant Polygon details for the input application id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param applicationId - Application Id.
+   * 
+   * @return - Applicant Polygon details.
+   */
+  @GetMapping(value = &quot;/applicantPolygon&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(&quot;Retrieve the Applicant polygon for the input application id.&quot;)
+  public String getApplicantPolygon(HttpServletResponse response,
+      @RequestParam(&quot;applicationId&quot;) @ApiParam(example = &quot;234892&quot;, value=&quot;Application Id&quot;) final String applicationId) {
+
+<span class="nc" id="L220">    String contextId = UUID.randomUUID().toString();</span>
+
+<span class="nc" id="L222">    LOGGER.info(&quot;Entering into getApplicantPolygon. Context Id {}&quot;, contextId);</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">    if (!StringUtils.hasLength(applicationId)) {</span>
+<span class="nc" id="L224">      LOGGER.info(MANTORY_VAL_MISSING_LOG_INFO, applicationId);</span>
+<span class="nc" id="L225">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L226">      return null;</span>
+    }
+<span class="nc" id="L228">    return gisService.getApplicantPolygon(applicationId, contextId);</span>
+  }
+
+  /**
+   * Retrieve the Analyst Polygon details for the requested Analyst Id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param analystId - Analyst Id.
+   * 
+   * @return - Analyst Polygon details.
+   */
+  @GetMapping(value = &quot;/analystPolygon&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(&quot;Retrieve the Analyst polygon for the input analyst polygon id.&quot;)
+  public String getAnalystPolygon(HttpServletResponse response,
+      @RequestParam(&quot;analystId&quot;) @ApiParam(example = &quot;24324&quot;, value=&quot;Analyst Polygon Id&quot;) final String analystId) {
+
+<span class="nc" id="L244">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L245">    LOGGER.info(&quot;Entering into getAnalystPolygon, Context Id {}&quot;, contextId);</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">    if (!StringUtils.hasLength(analystId)) {</span>
+<span class="nc" id="L247">      LOGGER.info(MANTORY_VAL_MISSING_LOG_INFO, analystId);</span>
+<span class="nc" id="L248">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L249">      return null;</span>
+    }
+<span class="nc" id="L251">    return gisService.getAnalystPolygon(analystId, contextId);</span>
+  }
+
+  /**
+   * Retrieve the Submitted Polygon details for the requested application submit id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param applSubId - Submitted Polygon Id.
+   * 
+   * @return - Submitted Polygon details.
+   */
+  @GetMapping(value = &quot;/submitedPolygon&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(&quot;Retrieve the Submitted Polygon id for the input request application submitted polygon id.&quot;)
+  public String getsubmitedPolygon(HttpServletResponse response,
+      @RequestParam(&quot;applSubId&quot;) @ApiParam(example = &quot;24283&quot;, value=&quot;Applicant/Analyst Submitted Polygon id&quot;) final String applSubId) {
+
+<span class="nc" id="L267">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L268">    LOGGER.info(&quot;Entering into getsubmitedPolygon, Context Id {}&quot;, contextId);</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">    if (StringUtils.isEmpty(applSubId)) {</span>
+<span class="nc" id="L270">      LOGGER.info(MANTORY_VAL_MISSING_LOG_INFO, applSubId);</span>
+<span class="nc" id="L271">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L272">      return null;</span>
+    }
+<span class="nc" id="L274">    return gisService.getsubmitedPolygon(applSubId, contextId);</span>
+  }
+
+  /**
+   * Retrieve the DEC ID by the program Id and Type requested by the user.
+   * 
+   * @param userId - User who initiates this request.
+   * @param programId - ProgramId.
+   * @param programType - Program Type.
+   * @param jwtToken - JWT Token.
+   * 
+   * @return - matched DEC Id if any.
+   */
+  @GetMapping(&quot;/decId&quot;)
+  @ApiOperation(&quot;Retrieve the DEC ID for the input Program Id and Program Type.&quot;)
+  public Map&lt;String, Object&gt; getDECIdByProgramType(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      @RequestHeader @ApiParam(example = &quot;0-0000-00012&quot;, value=&quot;Program Id&quot;) final String programId, 
+      @RequestHeader @ApiParam(example = &quot;DEC&quot;, value=&quot;Program Type&quot;) final String programType,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken) {
+
+<span class="nc" id="L295">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L296">    LOGGER.info(&quot;Entering into getDECIdByProgramType. User Id {} Context Id {}&quot;, userId, contextId);</span>
+<span class="nc bnc" id="L297" title="All 4 branches missed.">    if (!StringUtils.hasLength(programId) || !StringUtils.hasLength(programType)) {</span>
+<span class="nc" id="L298">      LOGGER.error(&quot;Program Type or Id cannot be null&quot;);</span>
+<span class="nc" id="L299">      throw new BadRequestException(&quot;PROG_ID_BLANK&quot;, &quot;Program Type or Id cannot be null&quot;,</span>
+          programType);
+    }
+<span class="nc" id="L302">    return gisService.getDECIdByProgramType(userId, contextId, jwtToken, programId, programType);</span>
+  }
+
+  /**
+   * Retrieve the DEC ID by the input Tax map number, County, Municipality.
+   * 
+   * @param userId - User who initiates this request.
+   * @param txmap - Tax Map number.
+   * @param county - County name.
+   * @param municipality - Municipality name.
+   * @param jwtToken - JWT Token
+   * 
+   * @return - Matched DEC Id.
+   */
+  @GetMapping(&quot;/decId/txmap&quot;)
+  @ApiOperation(&quot;Retrieve the DEC ID for the input Tax Map, County and Municipality.&quot;)
+  public ResponseEntity&lt;String&gt; getDECIdByTxmap(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      @RequestParam(&quot;txmap&quot;) @ApiParam(example = &quot;156.17-2-41&quot;, value=&quot;Tax Map Number&quot;) final String txmap, 
+      @RequestParam(&quot;county&quot;) @ApiParam(example = &quot;Albany&quot;, value=&quot;County&quot;) final String county,
+      @RequestParam(name = &quot;municipality&quot;, required = false) @ApiParam(example = &quot;Albany&quot;, value=&quot;Municipality&quot;) final String municipality,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken) {
+
+<span class="nc" id="L325">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L326">    LOGGER.info(&quot;Entering into getDECIDDetail. User Id {} Context Id{}&quot;, userId, contextId);</span>
+<span class="nc bnc" id="L327" title="All 4 branches missed.">    if (StringUtils.hasLength(txmap) &amp;&amp; StringUtils.hasLength(county)</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">        &amp;&amp; StringUtils.hasLength(userId)) {</span>
+<span class="nc" id="L329">      return gisService.getDECIdByTxmap(userId, contextId, jwtToken, txmap, county, municipality);</span>
+    }
+<span class="nc" id="L331">    throw new BadRequestException(&quot;INVALID_REQ&quot;,</span>
+        &quot;One of them is missing a valid value. TaxMap, County, Municipality&quot;, txmap);
+  }
+
+  /**
+   * Delete the requested Polygon Object id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param objectId - Object Id.
+   * 
+   * @return - Deleted Polygon details.
+   */
+  @PostMapping(value = &quot;/deletePolygon/{objectId}&quot;)
+  @ApiOperation(value=&quot;Delete the Applicant Polygon Object for the input Object id from GIS&quot;)
+  public Object deletePolygonByObjId(HttpServletResponse response,
+      @PathVariable @ApiParam(example = &quot;23424&quot;, value=&quot;Polygon Object id&quot;) final String objectId) {
+
+<span class="nc" id="L348">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L349">    LOGGER.info(&quot;Entering into deletePolygonByObjId Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L350">    return gisService.deletePolygonByObjId(objectId, contextId);</span>
+  }
+
+  /**
+   * Delete the requested Analyst Polygon by the requested Object Id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param userId - User who initiates this request.
+   * @param objectId - Object id.
+   * 
+   * @return - Deleted Analyst Polygon details.
+   */
+  @PostMapping(value = &quot;/delete-analyst-polygon/{objectId}&quot;)
+  @ApiOperation(value=&quot;Delete the Analyst Polygon Object for the input Object id from &quot;
+      + &quot;GIS which is created/modified during the review process&quot;)
+  public Object deleteAnalystPolygonByObjId(HttpServletResponse response,
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId, 
+      @PathVariable @ApiParam(example = &quot;23423&quot;, value=&quot;Polygon Object id&quot;) final String objectId) {
+
+<span class="nc" id="L369">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L370">    LOGGER.info(&quot;Entering into deleteAnalystPolygonByObjId Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L371">    return gisService.deleteAnalystPolygonByObjId(userId, contextId, objectId);</span>
+  }
+
+  /**
+   * Delete the Applicant Submitted Polygon.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param userId - User who initiates this request.
+   * @param objectId - Requested Object id to be deleted.
+   * 
+   * @return - Deleted Polygon Object id.
+   */
+  @PostMapping(value = &quot;/delete-submittal-polygon/{objectId}&quot;)
+  @ApiOperation(value=&quot;Delete the Applicant Submitted Polygon Object for the input Object id from GIS&quot;)
+  public Object deleteApplicantSubmittalPolygonByObjId(HttpServletResponse response,
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId, 
+      @PathVariable @ApiParam(example = &quot;23432&quot;, value=&quot;Delete the Applicant submitted Polygon&quot;) final String objectId) {
+
+<span class="nc" id="L389">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L390">    LOGGER.info(&quot;Entering into deleteApplicantSubmittalPolygonByObjId Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L391">    return gisService.deleteApplicantSubmittalPolygonByObjId(userId, contextId, objectId);</span>
+  }
+
+  /**
+   * Upload the requested shape file.
+   * 
+   * @param userId - user who initiates this request.
+   * @param filetype - File Type.
+   * @param publishParameters - Published Parameters.
+   * @param value - pjson value.
+   * @param files - Files to be uploaded.
+   * 
+   * @return - Uploaded shape file details.
+   */
+  @PostMapping(value = &quot;/upload&quot;)
+  @ApiOperation(value=&quot;Upload the Shape file into GIS.&quot;)
+  public Object uploadShapeFile(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      final @RequestPart(&quot;filetype&quot;) String filetype,
+      final @RequestPart(&quot;publishParameters&quot;) String publishParameters,
+      final @RequestPart(&quot;f&quot;) String value, final @RequestPart(&quot;file&quot;) MultipartFile files) {
+
+<span class="nc" id="L413">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L414">    LOGGER.info(&quot;Entering into uploadShapeFile User Id {} Context Id: {} &quot;, userId, contextId);</span>
+<span class="nc" id="L415">    return gisService.uploadShapefile(userId, contextId, filetype, publishParameters, value,</span>
+        files);
+  }
+
+  /**
+   * Save/Update the WorkArea Polygon.
+   * @param featureMap - Feature Map details of the Polygon.
+   * @param value - pjson value.
+   * @param action - Save (S)/Update(U).
+   * 
+   * @return - Updated Work Area Polygon details.
+   */
+  @PostMapping(value = &quot;/workarea-polygon/{action}&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Save/Update the Work area polygon based action requested by the user.&quot;)
+  public Object saveWorkAreaPolygon(final @RequestPart(value = &quot;features&quot;) Object featureMap,
+      final @RequestPart(value = &quot;f&quot;) String value, 
+      @PathVariable @ApiParam(example = &quot;S&quot;, value=&quot;S-Save/U-Update&quot;) final PolygonAction action) {
+
+<span class="nc" id="L433">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L434">    LOGGER.info(&quot;Entering into saveWorkAreaPolygon Context Id: {} &quot;, contextId);</span>
+<span class="nc" id="L435">    return gisService.saveOrUpdateWorkAreaPolygon(Arrays.asList(featureMap), value, action.name(),</span>
+        contextId);
+  }
+
+  /**
+   * Delete the Work area polygon requested by the user.
+   * 
+   * @param userId - User who initiates this request.
+   * @param objectId - Object id.
+   * 
+   * @return - Deleted WorkArea Polygon details.
+   */
+  @PostMapping(value = &quot;/delete-workarea-polygon/{objectId}&quot;)
+  @ApiOperation(value=&quot;Delete the Work Area Polygon requested by the user from GIS.&quot;)
+  public Object deleteWorkAreaPolygonByObjId(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId, 
+      @PathVariable @ApiParam(example = &quot;23424&quot;, value=&quot;Work area polygon object id&quot;) final String objectId) {
+
+<span class="nc" id="L453">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L454">    LOGGER.info(&quot;Entering into deleteWorkAreaPolygonByObjId Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L455">    return gisService.deleteWorkAreaPolygonByObjId(userId, contextId, objectId);</span>
+  }
+
+  /**
+   * Retrieve the Work Area Polygon details for the input work area id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param workareaId - Work Area Id.
+   * 
+   * @return - Work Area Polygon details.
+   */
+  @GetMapping(value = &quot;/workarea-polygon&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Retrieve the Work area Polygon from GIS.&quot;)
+  public String getWorkAreaPolygon(HttpServletResponse response,
+      @RequestParam(&quot;workareaId&quot;) @ApiParam(example = &quot;23423&quot;, value=&quot;Work Area Id&quot;) final String workareaId) {
+
+<span class="nc" id="L471">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L472">    LOGGER.info(&quot;Entering into getWorkAreaPolygon, Context Id {}&quot;, contextId);</span>
+<span class="nc bnc" id="L473" title="All 2 branches missed.">    if (!StringUtils.hasLength(workareaId)) {</span>
+<span class="nc" id="L474">      LOGGER.info(MANTORY_VAL_MISSING_LOG_INFO, workareaId);</span>
+<span class="nc" id="L475">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L476">      return null;</span>
+    }
+<span class="nc" id="L478">    return gisService.getWorkAreaPolygon(workareaId, contextId);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,6 @@
+<div class="row mb-2">
+    <!-- <span class="mat-button-wrapper" src="assets/icons/back_button_with_arrow.svg"></span> -->
+      <img (click)="navigate(main)" ngbTooltip="Main Navigation" placement="auto"  style="margin-left: 60px; cursor: pointer;" src="assets/icons/back_button_with_arrow.svg" alt="A back button with an arrow">
+      <img (click)="navigate(backward)" *ngIf="showBackArrow" ngbTooltip="{{backwardName}}" placement="auto"  style="margin-left:25px; cursor: pointer;" src="assets/icons/back_button_without_arrow.svg" alt="A back button without an arrow">
+      <img (click)="navigate(forWard)"  *ngIf="showForwardArrow" ngbTooltip="{{forwardName}}" placement="auto" width="25px" height="25px" [ngClass]="selectedIndex==lastIndex?'skip-track':'skip-track-disabled'" src="assets/icons/forward_button_without_arrow.svg" alt="A forward button without an arrow">
+  </div><br>

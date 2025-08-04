@@ -1,0 +1,156 @@
+<div class="emailcomposeContainer" #emailModal>
+    <div class="emailContainer" #emailContainer>
+        <form [formGroup]="emailForm" (ngSubmit)="Submit()">
+            <div class="header displayFlex fullWidth">
+                <div *ngIf="showTitle" class="title">
+                    Project {{ projectId }} {{headerText}}
+                </div>
+                <div *ngIf="!showTitle" class="title">
+                    {{title}}
+                </div>
+                <div class="displayFlex">
+                    <div class="reply_button" *ngIf="showReply">
+                        <button type="button" (click)="reply()">Reply</button>
+                    </div>
+                    <div class="close_button">
+                        <button type="button" (click)="close()">X</button>
+                    </div>
+                </div>
+            </div>
+            <div class="email_content">
+                <div *ngIf=showemailtemplate>
+                    <div class="action_container displayFlex fullWidth">
+                        <button type="submit" class="send_button on_hover" [disabled]="isSubmitted"
+                            [attr.disabled]="!isReply || ccshowError || toshowError ? true : null">
+                            <div class="send_image_container">
+                                <!-- <img class="send_image fullWidth" src="assets/icons/send.png" alt=""> -->
+                                <mat-icon class="mt_1">send</mat-icon>
+                            </div>
+                            <div class="send_text">
+                                Send
+                            </div>
+                        </button>
+
+                        <div class="reciptptants_container displayFlex fullWidth">
+                            <div class="to_section displayFlex " *ngIf="showReply">
+                                <div class="to_button on_hover" [ngClass]="!isReply ? 'from-btn-disabled' : null">
+                                    <div class="fullWidth center_aligin typo-2">From</div>
+                                </div>
+                                <div class="to_input fullWidth">
+                                    <input class="bottom_border_input fullWidth" type="text" id="fromEmail"
+                                        name="fromEmail" formControlName="fromEmail"
+                                        [attr.disabled]="!isReply ? true : null">
+                                </div>
+                            </div>
+                            <div class="to_section displayFlex ">
+                                <div class="to_button on_hover ">
+                                    <div class="fullWidth center_aligin">
+                                        <select [attr.disabled]="!isReply? true:null" #sel
+                                            class="to_emailDropdown fullWidth center_aligin"
+                                            (change)='userChange(sel.value)' name="To" id="toEmail">
+                                            <option value="To" selected> To </option>
+                                            <option class="dropdown_options" *ngFor="let data of sampleData"
+                                                value="{{data.emailAddress}}">
+                                                {{data.managerName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="to_input fullWidth autocomplete">
+                                    <input #toInput class="bottom_border_input fullWidth" type="email" id="toEmail2"
+                                        name="toEmail" autocomplete="off" formControlName="toEmail"
+                                        [attr.disabled]="(!isReply || disableToEmail) ? true : null"
+                                        (input)="toSearchOptionsFn(toInput.value)" (blur)="toBlurFn()">
+                                    <small *ngIf="toshowError" class="text-danger">Please enter an email within DEC
+                                        system</small>
+                                    <ul class="autocomplete_options" #toOptions>
+                                        <li *ngFor="let data of toSearchEmails"
+                                            (click)="toSelectOption(data.emailAddress)">
+                                            {{data.emailAddress}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                            <div class="cc_section displayFlex fullWidth " *ngIf="!removeCC">
+                                <div class="to_button  on_hover">
+                                    <select [attr.disabled]="!isReply? true:null" #ccsel
+                                        class="to_emailDropdown fullWidth center_aligin"
+                                        (change)='ccChange(ccsel.value)' name="Cc" id="ccEmail2">
+                                        <option value="Cc"> Cc </option>
+                                        <option class="dropdown_options" *ngFor="let data of sampleData"
+                                            value="{{data.emailAddress}}">
+                                            {{data.managerName}}</option>
+                                    </select>
+                                </div>
+                                <div class="to_input fullWidth autocomplete">
+                                    <input #ccInput class="bottom_border_input fullWidth fullWidth" type="text"
+                                        id="ccEmail1" autocomplete="off" name="ccEmail" formControlName="ccEmail"
+                                        [attr.disabled]="!isReply ? true : null"
+                                        (input)="ccSearchOptionsFn(ccInput.value)" (blur)="ccBlurFn()">
+                                    <small *ngIf="ccshowError" class="text-danger">Please enter an email within DEC
+                                        system</small>
+                                    <ul class="autocomplete_options" #ccOptions>
+                                        <li *ngFor="let data of ccSearchEmails"
+                                            (click)="ccSelectOption(data.emailAddress)">
+                                            {{data.emailAddress}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="subject_container displayFlex fullWidth subject">
+                        <div class="subject_label" [ngClass]="!isReply || disableSubject ? 'from-btn-disabled' : null">
+                            Subject
+                        </div>
+                        <div class="subject_input fullWidth">
+                            <input type="text" class=" subject_input bottom_border_input fullWidth" id="emailSubject"
+                                name="emailSubject" formControlName="emailSubject"
+                                [attr.disabled]="!isReply || disableSubject ? true : null">
+                        </div>
+                    </div>
+                    <div class="subject_container displayFlex fullWidth attachments">
+                        <div class="subject_input fullWidth displayFlex">
+                            <input type="file" [attr.disabled]="!isReply? true:null" multiple style="display: none;"
+                                (change)="uploadfiles($event)" #fileUpload  formControlName="emailAttachments">
+                            <button type="button" class="upload-btn rotate90" (click)="fileUpload.click()">
+                                <mat-icon>attachment</mat-icon>
+                                <!-- <img src="assets/icons/attachment.png" id="image" class="upload-image"> -->
+                            </button>
+                            <div *ngFor="let file of files ; let i = index" style="margin:5px ;">
+                                {{file.name}}<mat-icon class="removefileicon" (click)="removeFile(i)">close</mat-icon>
+                             </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="body_container">
+                    <div>
+                        <div class="wrapper" *ngIf="showBody">
+                            <textarea (keyup)="autoGrowTextZone($event)" (input)="onEmailInput($event)" class="body_text_area fullWidth" cols="63"
+                                rows="3" id="inputEmailBody" name="inputEmailBody"
+                                formControlName="inputEmailBody"
+                                [ngStyle]="{'height': emailTextAreaHeight}"></textarea>
+                        </div>
+                        <div *ngIf="showhistory">
+                            <div class="email_body existingBody">
+                                <div *ngFor="let historycontent of historyInfo"
+                                    [ngClass]="enableSubject ? 'checkedClass' : 'uncheckedClass'"
+                                    [innerHtml]="historycontent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="float-right mr-2" *ngIf="showServerError">
+            <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+            </div>
+    </div>
+</div>
+
+<app-pending-changes-popup
+  #pendingPopup
+  (onOkClick)="pendingOkClicked()"
+  (onCloseClicked)="pendingCloseClicked()"
+></app-pending-changes-popup>

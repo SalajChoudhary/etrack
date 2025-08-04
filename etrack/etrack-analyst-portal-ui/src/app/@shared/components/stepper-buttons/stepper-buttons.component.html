@@ -1,0 +1,60 @@
+
+
+<!-- <div [ngClass]="className==='sign-submit'? 'lablled-row':'label-row'" class="bg-white">
+    <span class="title start font-15 step-names mb-2">{{ startName }}</span>
+    <span
+      class="lbl-align title increase-contrast font-15 mb-2 "
+      [ngClass]="
+        selectedIndex == lastIndex ? className==='sign-submit'?'skipp-track':'skip-track' : 'skip-track-disabled'
+      "
+    >
+      {{ endName }}
+</span>
+  </div> -->
+  
+  <div class="stepper-row d-flex {{className}}">
+    <label hidden="hidden" for="mainNavBttn">Main navigation button</label>
+    <button aria-label="A button that will bring you to main navigation" class="btn p-0 " id="mainNavBttn" *ngIf="mainNavigation" (click)="navigate(mainNavigation)" ngbTooltip="Main Navigation"
+    placement="top">
+      <img  src="assets/icons/back_button_with_arrow.svg" alt="A back button with an arrow">
+    </button>
+    <label for="backBttn" hidden="hidden">A back button</label>
+    <button aria-label="back button" id="backBttn" class="btn p-0" [disabled]="isValidateMode" [ngClass]="showBackArrow?'btn-visible':'btn-hidden'" (click)="navigate(backward)" [ngbTooltip]="backwardName"
+    placement="top">
+    <img   src="assets/icons/back_button_without_arrow.svg" alt="A back button without an arrow">
+  
+    </button>
+  
+    <!-- <button tabindex="-1" class="round-btn mt-25" aria-label="Previous step number">{{ startNumber }}</button>
+   -->
+    <!-- <button tabindex="-1" *ngIf="!isChecked"
+      class="round-btn rt-align ml-auto mt-25"
+      [ngClass]="
+        selectedIndex == lastIndex ? 'round-btn' : 'skip-round-button-disabled'
+      "
+      aria-label="Next step button"
+    >
+      {{ endNumber }}
+    </button> -->
+    <!-- <div *ngIf="isChecked" class="rt-align ml-auto mt-25" >
+      <img class="check-icon" src="assets/icons/white-check.png"  alt="check2-square" />
+    </div> -->
+    <!-- <button tabindex="-1" *ngIf="isChecked"
+    class="round-btn rt-align ml-auto mt-25"
+    [ngClass]="
+      selectedIndex == lastIndex ? 'round-btn' : 'skip-round-button-disabled'
+    "
+    aria-label="Next step button"
+  >
+  <img class="check-icon" src="assets/icons/white-check.ico"  alt="check2-square" />
+  </button> -->
+  
+  <!-- navigate(forward) -->
+  <label for="forwardBttn" hidden="hidden">A forward bttn</label>
+    <button aria-label="forward button" id="forwardBttn" class=" btn p-0 ml-auto"  *ngIf="forward" (click)="navigate(mainNavigation)" [ngbTooltip]="forwardName"
+    placement="top" [ngClass]="selectedIndex==lastIndex?'':'button-disabled'"  [disabled]="selectedIndex !== lastIndex">
+    <img  src="assets/icons/forward_button_without_arrow.svg" alt="A back button without an arrow">
+    </button>
+  </div>
+
+

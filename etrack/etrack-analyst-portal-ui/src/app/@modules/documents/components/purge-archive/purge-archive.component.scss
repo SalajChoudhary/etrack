@@ -1,0 +1,61 @@
+.w-66 {
+    min-width: 66.5%;
+    max-width: 67%;
+}
+
+.w-77 {
+    min-width: 76%;
+    max-width: 77%;
+}
+
+.w-85 {
+    min-width: 85%;
+    max-width: 85.5%;
+}
+
+.header-center {
+    text-align: center; 
+    padding: 5px 0px 30px 0px;
+}
+
+.t-center {
+    text-align: center;
+    display: block !important;
+}
+
+.result-header {
+    margin-left: 23.4rem;
+}
+
+.footer-row {
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+.result-set {
+    display: inline-block; 
+    height: 25px !important;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+::ng-deep .query-popover .popover-body {
+    color:#007bff !important;
+    font-style: italic;
+    padding: 0.25rem 0.5rem !important;
+    text-align: center;
+}
+
+.adddocument {
+    background-color: #233e2a !important;
+    float: right !important;
+    margin-right: 67px !important;
+}
+
+.disabled-text {
+    color: grey !important;
+}
+
+.text-red {
+    color: red;
+}

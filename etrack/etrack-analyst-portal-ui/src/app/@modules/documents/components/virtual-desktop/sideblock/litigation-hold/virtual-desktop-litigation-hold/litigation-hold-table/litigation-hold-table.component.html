@@ -1,0 +1,36 @@
+
+  <div>
+    <p-table
+      class="removeBoxShadow"
+      styleClass="p-datatable-lg has-no-rounded-headers"
+      [value]="rows"
+      scrollHeight="160px"
+      [scrollable]="rows?.length > 3 ? true : false"
+      [totalRecords]="rows.length"
+    >
+    <ng-template pTemplate="header">
+        <tr role="rowgroup">
+          <th scope="col" role="row" headers="h1" class="table-header-primary" 
+            >
+            <div>Start Date</div>
+          </th>
+          <th scope="col" role="row" headers="h1" class="table-header-primary"
+            >
+            <div>End Date</div>
+          </th>
+        </tr>
+  
+      </ng-template> 
+      <ng-template pTemplate="body" let-row let-i="rowIndex">
+        <tr role="rowgroup">
+          <td scope="cell" role="row" class="table-body">
+            <div>{{ row?.litigationStartDate }}</div>
+          </td>
+          <td scope="cell" role="row" class="table-body">
+            <div>{{ row?.litigationEndDate }}</div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  

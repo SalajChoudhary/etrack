@@ -1,0 +1,606 @@
+<div class="bg-white typo-primary">
+  <div class="container-fluid mt-2">
+    <div class="row">
+      <div class="col-12">
+        <form [formGroup]="docForm" >
+          <ng-container *ngIf="pageFrom === 'other' || pageFrom === 'virtual-workspace' || pageFrom === 'gi-virtual-workspace' || pageFrom === 'required-other-Add'">
+            <div class="form-check mt-4 t-center" id="top-elem">
+              <label class="header-1b form-check-label">
+                <span>
+
+                    Please provide a name for these files and select a type from
+                    below. </span><br />
+                <span class="mt-3">
+                    If none apply, please choose <span class="font-italic">'Other'</span> and provide a
+                    description.<!--container--></span> </label><br />
+            </div>
+            <div class="t-center">
+              <div class="form-check form-check-inline mt-3">
+                <label class="typo-2 form-check-label ">Name:*</label>
+                <input formControlName="documentName" class="form-check-input heade-text input-doc" value="" maxlength="100" id="docName"/>
+              </div>
+            </div>
+            <div class="errors">
+              <span *ngIf="
+                  docFormsubmitted &&
+                  docForm.controls.documentName.errors?.required
+                " class="errors ml-42">{{ errorMessages?.DOC_NAME_REQ }}</span>
+              <span *ngIf="
+                  docFormsubmitted &&
+                  docForm.controls.documentName.errors?.documentNameInvalid
+                " class="errors ml-42">{{ errorMessages?.INVALID_DOC_NAME }}</span>
+            </div>
+            <div class="t-center">
+              <div class="form-check form-check-inline mt-3">
+                <label class="typo-2 form-check-label">Type:*</label>
+                <select (change)="onDocumentChange()" formControlName="docCategory" class="form-check-input heade-text" value="" id="docTypeSelect">
+                  <option value="" disabled>-- SELECT --</option>
+                  <option *ngFor="let item of documentTypes" [ngValue]="item.docTypeId">
+                    {{ item.docTypeDesc }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="errors">
+              <span *ngIf="
+                  docFormsubmitted &&
+                  docForm.controls.docCategory.errors?.required
+                " class="errors ml-42">{{ errorMessages?.DOC_TYPE_REQ }}</span>
+            </div>
+            <div class="form-check mt-4 t-center">
+              <label class="typo-2 form-check-label">
+                <span class="font-italic" *ngIf="!showOtherDirections">
+                  Select a sub-type or leave blank if none apply.
+                  <!-- <span class="note-italic">*conditional if does not equal 'Other'</span>  -->
+                </span>
+                <span class="font-italic" *ngIf="showOtherDirections">
+                  Please provide a description: </span>
+                <!-- <span class="note-italic">*conditional for 'Other'</span> -->
+              </label><br />
+            </div>
+            <div class="form-check form-check-inline t-center mt-3">
+              <label class="typo-2 form-check-label">Sub-Type:</label>
+              <select formControlName="docSubCategory" class="form-check-input heade-text" value="" id="subTypeSelect">
+                <option *ngIf="documentSubTypes.length" value="0">
+                  -- SELECT --
+                </option>
+                <option *ngFor="let item of documentSubTypes" [ngValue]="item.subTypeId">
+                  {{ item.subTypeDesc }}
+                </option>
+              </select>
+            </div>
+            <div class="form-check form-check-inline t-center mt-3">
+              <label class="typo-2 form-check-label input-doc">{{otherLabel}}</label>
+              <input formControlName="otherDocSubCategory" maxlength="50" class="form-check-input heade-text input-doc"
+                value="" id="otherInput" />
+            </div>
+            <div class="errors">
+              <span *ngIf="
+                  docFormsubmitted &&
+                  docForm.controls.docCategory.value == '10' &&
+                  docForm.controls.otherDocSubCategory.errors?.required
+                " class="errors ml-42">{{ errorMessages?.OTH_SUB_TYPE_REQ }}</span>
+            </div>
+            <hr class="border-bottom" />
+          </ng-container>
+
+          <ng-container *ngIf="pageFrom === 'required-Add'">
+            <div class="form-check form-check-inline mt-4 t-center">
+              <label class="typo-2 form-check-label"><b> Please upload all files related to:</b> </label>&nbsp;
+              <input formControlName="documentName" class="form-check-input heade-text w-30" value="" maxlength="100" />
+            </div>
+            <div class="errors-center">
+              <span *ngIf="
+              docFormsubmitted &&
+              docForm.controls.documentName.errors?.required
+            " class="errors">{{ errorMessages?.DOC_NAME_REQ }}</span>
+              <span *ngIf="
+              docFormsubmitted &&
+              docForm.controls.documentName.errors?.documentNameInvalid
+            " class="errors">{{ errorMessages?.INVALID_DOC_NAME }}</span>
+            </div>
+          </ng-container>
+
+
+
+
+
+          <ng-container *ngIf="pageFrom !== 'virtual-workspace' && pageFrom !== 'gi-virtual-workspace' && pageFrom !== 'other' && pageFrom !=='required-Add' && pageFrom !== 'required-other-Add'">
+
+            <div class="form-check form-check-inline mt-4 t-center">
+              <label class="typo-2 form-check-label"><b> Please upload all files related to:</b> </label>&nbsp;
+              <input formControlName="documentName" class="form-check-input heade-text w-30" value="" maxlength="100" />
+            </div>
+            <div class="errors-center">
+              <span *ngIf="
+              docFormsubmitted &&
+              docForm.controls.documentName.errors?.required
+            " class="errors">{{ errorMessages?.DOC_NAME_REQ }}</span>
+              <span *ngIf="
+              docFormsubmitted &&
+              docForm.controls.documentName.errors?.documentNameInvalid
+            " class="errors">{{ errorMessages?.INVALID_DOC_NAME }}</span>
+            </div>
+            <div class="form-check form-check-inline mt-4 pl-4" [hidden]="otherPageFrom==='inquiry'">
+              <input class="form-check-input" #isConfident formControlName="isConfidential" type="checkbox" value="" id="isConfidentialChckbox" />
+              <label class="typo-2 form-check-label"><b>
+                  Please check if any of these files contain confidential
+                  information</b>
+              </label>
+            </div>
+
+            <div class="ml-5 mt-2" *ngIf="isConfidential === true">
+              <div class="form-group col-12 pl-4" *ngFor="let item of reasons">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" type="checkbox" [checked]="
+                    docForm?.controls.reasons.value.includes(item.key)
+                  " (change)="onCheckChange($event)" [value]="item.key" />
+                  <label class="form-check-label typo-2">
+                    {{ item.value }}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="isConfident?.checked" class="errors">
+              <span *ngIf="
+                docFormsubmitted && docForm.controls.reasons.value?.length < 1
+              " class="errors">{{ errorMessages?.ATLEAST_ONE_REASON_REQD }}</span>
+            </div>
+
+          </ng-container>
+
+          <ng-container *ngIf="pageFrom === 'other'">
+            <div class="form-check form-check-inline mt-4 pl-4" [hidden]="otherPageFrom==='inquiry'">
+              <input class="form-check-input" #isConfident formControlName="isConfidential" type="checkbox" value="" id="isConfidentialChckbox1" />
+              <label class="typo-2 form-check-label"><b>
+                  Please check if any of these files contain confidential
+                  information</b>
+              </label>
+            </div>
+            <div class="ml-5 mt-2" *ngIf="isConfidential === true">
+              <div class="form-group col-12 pl-4" *ngFor="let item of reasons">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" type="checkbox" [checked]="
+                    docForm?.controls.reasons.value.includes(item.key)
+                  " (change)="onCheckChange($event)" [value]="item.key" />
+                  <label class="form-check-label typo-2">
+                    {{ item.value }}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="isConfident?.checked" class="errors">
+              <span *ngIf="
+                docFormsubmitted && docForm.controls.reasons.value?.length < 1
+              " class="errors">{{ errorMessages?.ATLEAST_ONE_REASON_REQD }}</span>
+            </div>
+          </ng-container>
+
+          <br />
+          <!-- New spec, 8/30 these two fields have been removed. ** -->
+          <ng-container *ngIf="userRoles?.includes(userRole.Online_Submitter) && pageFrom==='other'">
+            <div class="form-check form-check-inline mt-4 pl-2" [hidden]="otherPageFrom==='inquiry'">
+              <input class="form-check-input" #isConfident formControlName="isConfidential" type="checkbox" value=""   id="isConfidentialChckbox3"/>
+              <label class="typo-2 form-check-label"><b>
+                  Please check if any of these files contain confidential
+                  information</b>
+              </label>
+            </div>
+            <div *ngIf="isConfident?.checked" class="row mt-4">
+              <div class="form-row col col-12 pl-4">
+                <label for="inputEmail4" class="mr-2 typo-2">Select the reason(s) that apply:</label>
+              </div>
+
+              <div class="ml-5">
+                <div class="form-group col-12 pl-4" *ngFor="let item of reasons">
+                  <div class="form-check form-check-inline mr-4">
+                    <input class="form-check-input" type="checkbox" [checked]="
+                      docForm?.controls.reasons.value.includes(item.key)
+                    " (change)="onCheckChange($event)" [value]="item.key" />
+                    <label class="form-check-label typo-2">
+                      {{ item.value }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="isConfident?.checked" class="errors">
+              <span *ngIf="
+                docFormsubmitted && docForm.controls.reasons.value?.length < 1
+              " class="errors">{{ errorMessages?.ATLEAST_ONE_REASON_REQD }}</span>
+            </div>
+          </ng-container>
+          <!-- *ngIf="userRoles?.includes(userRole.DEC_Program_Staff)" This is not needed for step 4 "Other" so I've removed: && pageFrom==='other and I've commented this section out. -->
+          <ng-container *ngIf="(pageFrom === 'virtual-workspace' || pageFrom === 'gi-virtual-workspace') && !userRoles?.includes(userRole.Online_Submitter)">
+            <div class="row ">
+              <div class="col-12">
+                <label for="inputEmail4" class="typo-1 mr-4">
+                  Access Level:</label
+                >
+                <div class="form-check form-check-inline mr-4">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="accessByDepOnly"
+                    value="0"
+                    formControlName="accessByDepOnly"
+                    id="accessByDepOnly0"
+                  />
+                  <label for="accessByDepOnly0" class="form-check-label typo-2">DEC Only</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="accessByDepOnly"
+                    value="1"
+                    formControlName="accessByDepOnly"
+                    id="accessByDepOnly1"
+                  />
+                  <label for="accessByDepOnly1" class="form-check-label typo-2">DEC and Applicant</label>
+                </div>
+                  <label for="trackedApplicationId" class="typo-1 mr-1 ">Application ID: </label>
+                    <span class="mr-2 typo-2">{{formattedDECId(decId)}}/</span>
+                        <input
+                          type="text"
+                          formControlName="trackedApplicationId"
+                          class=" track mr-2"
+                          maxlength="5"
+                          id="trackedApplicationId"
+                          [mask]="'00000'"
+                        />
+                    <i class="typo-2">(tracked record)</i>
+                  <div class="errors">
+                    <span
+                      *ngIf="
+                        docFormsubmitted &&
+                        docForm.controls.trackedApplicationId.errors
+                          ?.maxFiveAllowed
+                      "
+                      class="errors"
+                      >{{ errorMessages?.REG_APP_ID_FORMAT }}</span
+                    >
+                  </div>
+              </div>
+            </div>
+
+            <div class="row mt-4" #documentFormReasonsElem>
+              <div class="form-row col col-12 pl-4">
+                <label for="inputEmail4" class="mr-2 typo-2"
+                  ><b>DEP Determination for Release:</b></label
+                >
+              </div>
+              <div class="form-group col col-12 pl-4 mb-4">
+                <div class="form-check form-check-inline mr-4">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="documentReleasableCode"
+                    value="NODET"
+                    formControlName="documentReleasableCode"
+                    (change)="depDeterminationChange()"
+                    id="NODET"
+                  />
+                  <label for="NODET" class="form-check-label typo-2">No Determination</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="documentReleasableCode"
+                    value="REL"
+                    formControlName="documentReleasableCode"
+                    (change)="depDeterminationChange()"
+                    id="REL"
+                  />
+                  <label for="REL" class="form-check-label typo-2">Releasable</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="documentReleasableCode"
+                    value="NOREL"
+                    formControlName="documentReleasableCode"
+                    (change)="showOptions = true"
+                    id="NOREL"
+                  />
+                  <label for="NOREL" class="form-check-label typo-2">Non - Releasable</label>
+                </div>
+              </div>
+              <div
+                *ngIf="
+                  showOptions &&
+                  docForm.controls.documentReleasableCode.value == 'NOREL'
+                "
+              >
+                <div
+                  class="form-group col-12 pl-4"
+                  *ngFor="let item of reasons"
+                >
+                  <div class="form-check form-check-inline mr-4">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [value]="item.key"
+                      [checked]="
+                        docForm.controls.reasons.value.includes(item.key)
+                      "
+                      (change)="onCheckChange($event)"
+                    />
+                    <label class="form-check-label" for="flexCheckDefault">
+                      {{ item.value }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="errors">
+                <span
+                  *ngIf="
+                    docFormsubmitted &&
+                    showOptions &&
+                    docForm.controls.documentReleasableCode.value == 'NOREL' &&
+                    docForm.controls.reasons.value?.length < 1
+                  "
+                  class="errors"
+                  >{{ errorMessages?.NON_REL_SEL_REQ }}</span
+                >
+              </div>
+
+            </div>
+          </ng-container>
+          <!-- <div class="col-12" *ngIf="isEdit">
+            <div class="float-right">
+              <button
+                type="submit"
+                class="btn btn-sm btn-primari mb-2 mr-2 upload"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                (click)="hideDocForm()"
+                class="btn btn-sm btn-outline-secondary mb-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div> -->
+          <div class="row mt-4">
+            <div class="form-row col col-12 pl-4">
+              <label for="inputEmail4" class="mr-2 typo-2"></label>
+              <textarea formControlName="description" rows="5" maxlength="255" class="form-control" id="docDescription"></textarea>
+              <span class="desc-count typo-2">{{
+                docForm.controls.description.value
+                ? docForm.controls.description.value.length
+                : 0
+                }}/255</span>
+            </div>
+          </div>
+
+          <hr class="border-bottom" />
+          <div class="form-row mt-2">
+            <div class="row col-12 table-header-primary">
+              <div class="form-row col-6 pl-2 mt-2">
+                <label for="inputEmail4" class="fontsize mr-2 typo-2"><b>UPLOAD FILES</b></label>
+              </div>
+            </div>
+
+            <div class="container-fluid mt-2">
+              <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                  <div class="form-group col-12 pl-4 drop-align">
+                    <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)">
+                      <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector()">
+                        <div class="drag-n-drop-cont">
+                          <div class="text-container mb-2 mt-2">
+                            <span>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="63" height="64" viewBox="0 0 63 64">
+                                <g fill="#233E2A" fill-rule="nonzero">
+                                  <path
+                                    d="M42.656 15.135a1.953 1.953 0 0 1-1.391-.578L31.5 4.795l-9.765 9.762a1.97 1.97 0 1 1-2.785-2.785L30.106.616a1.97 1.97 0 0 1 2.785 0l11.157 11.156a1.97 1.97 0 0 1-1.392 3.363z" />
+                                  <path
+                                    d="M31.5 36.791a1.97 1.97 0 0 1-1.969-1.969V2.01a1.97 1.97 0 0 1 3.938 0v32.812a1.97 1.97 0 0 1-1.969 1.969z" />
+                                  <path
+                                    d="M55.781 63.041H7.22A7.225 7.225 0 0 1 0 55.822V41.385a4.599 4.599 0 0 1 4.594-4.594h7.234a4.567 4.567 0 0 1 4.402 3.276l2.814 9.382a.658.658 0 0 0 .628.467h23.656a.658.658 0 0 0 .628-.467l2.814-9.385a4.572 4.572 0 0 1 4.402-3.273h7.234A4.599 4.599 0 0 1 63 41.385v14.437a7.225 7.225 0 0 1-7.219 7.219zM4.594 40.729a.656.656 0 0 0-.657.656v14.437a3.286 3.286 0 0 0 3.282 3.282H55.78a3.286 3.286 0 0 0 3.282-3.282V41.385a.656.656 0 0 0-.657-.656h-7.234a.65.65 0 0 0-.628.467L47.73 50.58a4.628 4.628 0 0 1-4.402 3.274H19.672a4.567 4.567 0 0 1-4.402-3.276l-2.814-9.382a.65.65 0 0 0-.628-.467H4.594z" />
+                                </g>
+                              </svg> </span><br />
+                            <span class="typo-2">Drag and drop files here</span><br />
+                            <span>Or</span> <br />
+                            <button type="button" (click)="(openFileSelector)" style="background-color: #233E2A" id="browseBtn">
+                              Browse
+                            </button>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </ngx-file-drop>
+                    <p style="color: #007bff">
+                      <i>Allowed files types include .accdb, .doc, .docx, .eml,
+                        .gif, .jpg, .jpeg, .mdb, .mbox, .msg, .pdf/a, .pdf,
+                        .png, .ppt, .pptx, .rtf, .tif, .txt, .vsd, .vsdx, .xls,
+                        .xlsx, .xml, .zip (Shape files only)</i>
+                    </p>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                  <div class="row mt-0">
+                    <div class="col-12 pl-4 mb-4">
+                      <div class="row">
+                        <div class="errors">
+                          <span *ngIf="docFormsubmitted && rawFiles.length < 1" class="errors">{{
+                            errorMessages?.FILE_UPLOAD_REQ }}</span>
+                          <span *ngIf="docFormsubmitted && fileTypesArr.length" class="errors">{{
+                            errorMessages?.SAME_FILE_TYPES_REQ }}</span>
+                          <span *ngIf="
+                              docFormsubmitted &&
+                              fileErrorType?.includes('invalidFilesError')
+                            " class="errors">{{ errorMessages?.INVALID_FILE_EXT }}</span>
+                          <span *ngIf="
+                              docFormsubmitted &&
+                              (fileErrorType.includes('totalSizeError') ||
+                                fileErrorType.includes('sizeExceededError'))
+                            " class="errors">{{ errorMessages?.DOC_TOTAL_SIZE_LIMIT }}</span>
+                          <span *ngIf="isSpecialChar || fileNameChar?.length > 0" class="errors">{{
+                            errorMessages?.FILE_NAME_INVALID }}</span>
+                          <span *ngIf="
+                              docFormsubmitted &&
+                              fileErrorType.includes('sameFileNameErr')
+                            " class="errors">{{ errorMessages?.DUP_FILE_NAME_IN_DOC }}</span>
+                          <span *ngIf="
+                            docFormsubmitted &&
+                            showInvalidZipError
+                          "
+                          class="errors"
+                          >{{ errorMessages?.INVALID_ZIP_FILE }}</span
+                        >
+                        <span *ngIf="
+                        docFormsubmitted &&
+                        showCantProcessError
+                      "
+                      class="errors"
+                      >{{ errorMessages?.UNABLE_TO_PROCESS_NOW }}</span
+                    >
+                    <span *ngIf="
+                    docFormsubmitted &&
+                    showDuplicateDocNameError
+                  "
+                  class="errors mt-1"
+                  >{{ errorMessages?.DOC_NAME_DUPLICATE }}</span
+                >
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="form-row pl-3 ml-0">
+                          <label for="inputEmail4" class="mr-2 typo-2">File(s) selected for upload (multiples
+                            allowed)*:</label>
+                        </div>
+                      </div>
+                      <div class="files-tables" role="Document Upload table" aria-label="Document Upload table"
+                        aria-describedby="Document Upload table">
+                        <p-table [value]="rawFiles" [autoLayout]="true" styleClass="p-datatable-lg" class="shadow"
+                          [scrollable]="rawFiles?.length > 5 ? true : false" scrollHeight="55vh">
+                          <caption>
+                            Document Upload table
+                          </caption>
+                          <ng-template pTemplate="header">
+                            <tr role="rowgroup">
+                              <th scope="col" role="columnheader" class="table-header-primary"
+                                [pSortableColumn]="'name'" [ngStyle]="{ width: '53%' }">
+                                File Name
+                              </th>
+                              <th scope="col" role="columnheader" class="table-header-primary"
+                                [pSortableColumn]="'lastModified'" [ngStyle]="{
+                                  width: '22%',
+                                  'text-align': 'left'
+                                }">
+                                File Date
+                              </th>
+                              <th scope="col" role="columnheader" class="table-header-primary"
+                                [pSortableColumn]="'size'" [ngStyle]="{
+                                  width: '14%',
+                                  'text-align': 'left'
+                                }">
+                                Size
+                              </th>
+                              <th scope="col" role="columnheader" class="table-header-primary"
+                                [ngStyle]="{ width: '12%' }"></th>
+                            </tr>
+                          </ng-template>
+                          <ng-template pTemplate="body" let-item let-i="rowIndex">
+                            <tr role="rowgroup">
+                              <td scope="col" role="cell" class="table-body" [ngStyle]="{
+                                  'text-align': 'left',
+                                  'word-wrap': 'break-word',
+                                  width: '52%'
+                                }">
+                                {{ item.name }}
+                              </td>
+                              <td scope="col" role="cell" class="table-body" [ngStyle]="{
+                                  'text-align': 'left',
+                                  'word-wrap': 'break-word',
+                                  width: '22%'
+                                }">
+                                {{ item.lastModified | date: "MM/dd/yyyy" }}
+                              </td>
+                              <td scope="col" role="cell" class="table-body" [ngStyle]="{
+                                  'text-align': 'left',
+                                  'word-wrap': 'break-word',
+                                  width: '14%'
+                                }">
+                                {{ item.size / 1024 | number: "1.0-0" }}kB
+                              </td>
+
+                              <td scope="col" role="cell" class="table-body" style="text-align: center; width: 8%">
+                                <span class="cursor-pointer" (click)="deleteFile(i)">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red"
+                                    class="bi bi-x" viewBox="0 0 16 16">
+                                    <path
+                                      d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                  </svg>
+                                </span>
+                              </td>
+                            </tr>
+                          </ng-template>
+                        </p-table>
+                        <p class="mt-3" style="color: #007bff">
+                          <i>Note: Files must have the same extension to upload
+                            as a group.</i>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- <hr class="border-bottom" *ngIf="pageFrom !== 'other'" /> -->
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="float-right mr-2" *ngIf="showServerError">
+  <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+</div>
+<div class="col-12">
+  <div class="footer-row">
+    <div class="float-right">
+      <button type="submit" (click)="onDocFormSubmit()" (keyUp.enter)="onDocFormSubmit()" class="btn btn-sm btn-primari mb-2 mr-2 upload" id="uploadBtn">
+        Upload
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="onCloseClicked()" id="closeBtn">
+        Close
+      </button>
+    </div>
+  </div>
+
+</div>
+<!-- <ng-template #duplicateFileName let-modal>
+  <div class="modal-header text-center modal-header-dec-reduced">
+    <h2 class="modal-title modal-basic-title-dec" id="modal-basic-title">
+      {{ modalDocumentNameTitle }}
+    </h2>
+    <button type="button" class="close remove-left-margin" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <p>This Document Name already exists for this DEC ID. Are you sure that you want to REPLACE it?</p>
+    <p>{{ modalDocumentNameBodyMessage }}</p>
+  </div>
+  <div class="modal-footer model-footer-reduced">
+    <button type="button" class="btn btn-outline-dark" (click)="deleteAndReplaceDoc(); modal.dismiss('Cross click')">
+      Yes
+    </button>
+    <button type="button" class="btn btn-outline-dark" (click)="modal.dismiss('Cross click')">
+      No
+    </button>
+  </div>
+</ng-template> -->
+
+<app-pending-changes-popup #pendingChangesPopup (onOkClick)="onPendingChangesOkclick($event)">
+</app-pending-changes-popup>

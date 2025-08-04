@@ -1,0 +1,15 @@
+.actions-btn-cont button{
+    background-color: #fff;border: none;
+}
+.actions-btn-cont{
+    display: flex;
+}
+.clearbutton{
+    background-color: #233E2A !important;
+}
+
+:host ::ng-deep .multiselect .k-searchbar {
+  display: none;
+}
+
+

@@ -1,0 +1,57 @@
+.stepper-with-navbtns {
+  .child-stepper .mat-horizontal-stepper-header-container {
+    // border-top: solid 2px black !important;
+
+    // border-bottom: solid 2px black !important;
+
+    width: 65%;
+    margin-left: 25%;
+    @media (max-width: 1024px) {
+      width: 60%;
+      margin-left: 29%;
+    }
+  }
+
+  .child-stepper {
+    background-color: transparent !important;
+  }
+
+  .mat-step-header .mat-step-label-selected .child-label {
+    // background-color: red;
+
+    font-size: large;
+
+    font-weight: 500;
+  }
+
+  .mat-step-header .mat-step-icon-selected {
+    // background-color: red;
+
+    width: 30px;
+
+    height: 30px;
+  }
+}
+
+.customStepper {
+  .mat-horizontal-stepper-header-container {
+    margin-bottom: 8px;
+
+    .mat-step-header {
+      height: 40px;
+
+      .mat-step-label-selected .child-label {
+        font-size: large;
+
+        font-weight: bold;
+
+        color: #233e2a;
+      }
+    }
+
+    .mat-step-icon-state-,
+    .mat-step-icon-state-done {
+      display: none;
+    }
+  }
+}

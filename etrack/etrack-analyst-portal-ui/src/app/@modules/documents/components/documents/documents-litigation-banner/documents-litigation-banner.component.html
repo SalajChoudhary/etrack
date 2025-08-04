@@ -1,0 +1,16 @@
+<div class="container-fluid">
+    <div class="row">
+      <div class="col-12 p-0">
+            <div class="banner header-3b">
+              <div *ngIf="litigationHoldProjects?.length == 1">
+                **** LITIGATION HOLD **** PROJECT ID {{litigationHoldProjects[0]}}****
+              </div>
+              <div *ngIf="litigationHoldProjects?.length > 1">
+                **** LITIGATION HOLD **** PROJECT ID 
+                <span [ngbTooltip]="litigationHoldProjects.join(', ')" tooltipClass="documents--litigation-tooltip-custom-class">{{litigationHoldProjects[0]}}...</span>****
+              </div>
+            </div>
+      </div>
+    </div>
+  </div>
+  

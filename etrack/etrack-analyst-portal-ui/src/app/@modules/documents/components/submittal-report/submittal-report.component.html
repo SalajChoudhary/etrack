@@ -1,0 +1,301 @@
+<div class="col-12 pl-0 pr-0 d-flex">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12 pl-0 pr-0">
+        <div style="text-align: center; padding: 5px 0px 30px 0px">
+          <strong class="header-3b">eTrack Submittal Report</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<form [formGroup]="reportQueryForm">
+<div class="row">
+  <div class="col-1"></div>
+  <div class="col-12">
+    <div class="row form-group align-center 1h">
+      <!-- <span class="header-3b">Select </span> -->
+      <div class="col-4 no-padding-left">
+        <div>
+          <label class="header-1n justify-content-center">Select Submittal Date Range*:&nbsp;&nbsp;</label>
+          <input
+            type="date"
+            class="w-90"
+            formControlName="startDate"
+            required
+          />
+        </div>
+        <div class="col-12">
+          <p class="align-center addr-error-msg" *ngIf="dateError && runClicked">
+            {{ dateError }}
+          </p>
+          <p>
+            <app-server-error-message
+            [serverErrorMessage]="serverErrorMessage"
+          ></app-server-error-message>
+          </p>
+        </div>
+      </div>
+      <div class="col-2 no-padding-left">
+        <div>
+          <label class="header-1n">to:&nbsp;</label>
+          <input
+            type="date"
+            class="w-90"
+            formControlName="endDate"
+          />
+        </div>
+      </div>
+      <div class="col-2 ">
+        <button
+            type="button"
+            class="btn btn-sm btn-primari mb-2 mr-2 upload"
+            (click)="generateProjectReport()">
+          Run
+        </button>
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="createForm()">
+          Clear
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="form-group row">
+  <div class="col-2"></div>
+  <label for="staticEmail" class="col-sm-2 col-form-label text-right flex-end justify-content-center ">Region:</label>
+  <div class="pl-0 col-sm-2 justify-content-center pt-1">
+    <select class="form-control" formControlName="region" (change)="onRegionChange($event)" [(ngModel)]="region" name="region" id="filterBy">
+      <option value="">-- Select --</option>
+      <option  *ngFor="let region of regionList" [value]="region">
+        {{ region }}
+    </option>
+    </select>
+  </div>
+</div>
+<ng-container formArrayName="permitTypes">
+  <ng-container *ngFor="let permitForm of permitTypes.controls; let i = index">
+<div class="form-group row" [formGroup]="permitForm">
+  <div class="col-2"></div>
+  <label for="staticEmail" class="col-sm-2 col-form-label text-right flex-end justify-content">{{i == 0 ? 'Permit Type:' : ''}}</label>
+  <div class="col-sm-4 pl-0 pt-1">
+    <select value="" class="form-control" formControlName="permitTypeCode" >
+      <option  value="">-- Select --</option>
+      <option
+              *ngFor="let permit of availablePermitTypes"
+              [value]="permit.permitType"
+            >
+              {{ permit.permitTypeDesc }}
+            </option>
+    </select>
+  </div>
+  <div class="col-sm-2">
+    <span
+    style="cursor: pointer; margin-left: -2px"
+    (click)="addPermitAndTransType(true)"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      x="0px"
+      y="0px"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      class="ml-29"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z"
+      ></path>
+    </svg>
+  </span>&nbsp;&nbsp;
+  <span *ngIf="i > 0" (click)="deletePermitAndTransType(i, true)" class="mr-2" style="cursor: pointer; margin-left: -2px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-trash"><path  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path><path  fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path></svg></span>
+  </div>
+</div>
+</ng-container>
+</ng-container>
+<ng-container formArrayName="transTypes">
+  <ng-container *ngFor="let tranForm of transTypes.controls; let i = index">
+<div class="form-group row" [formGroup]="tranForm">
+  <div class="col-2"></div>
+  <label for="staticEmail" class="col-sm-2 col-form-label flex-end justify-content text-right">{{i == 0 ? 'App Type Code:' : ''}}</label>
+  <div class="col-sm-4 pl-0 pt-1">
+    <select value="" class="form-control" formControlName="transTypeCode" >
+      <option  value="">-- Select --</option>
+      <option *ngFor="let item of availableTransTypes" [value]="item.transTypeCode">{{item.transTypeCode}}</option>
+    </select>
+  </div>
+  <div class="col-sm-2">
+    <span
+    style="cursor: pointer; margin-left: -2px"
+    (click)="addPermitAndTransType(false)"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      x="0px"
+      y="0px"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      class="ml-29"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z"
+      ></path>
+    </svg>
+  </span>&nbsp;&nbsp;
+  <span *ngIf="i > 0" (click)="deletePermitAndTransType(i)" class="mr-2" style="cursor: pointer; margin-left: -2px;"><svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-trash"><path  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path></svg></span>
+  </div>
+</div>
+</ng-container>
+</ng-container>
+
+</form>
+
+<br />
+<br />
+
+<div class="col-12 row">
+  <div class="col-3"></div>
+  <div class="col-6" *ngIf="submitted">
+    <p-table
+      styleClass="p-datatable-lg"
+      [value]="submittedProject"
+      class="w"
+      aria-describedby="An Keywords table"
+    >
+      <caption class="typo-1">
+        For Submitted Project table
+      </caption>
+      <ng-template pTemplate="header">
+        <tr role="rowgroup" class="no-filter">
+          <th
+            scope="col"
+            aria-label="Keyword Category Header"
+            role="columnheader"
+            aria-sort="ascending"
+            class="table-header-primary"
+            [pSortableColumn]="'categoryText'"
+            [ngStyle]="{ width: '30%', 
+            'text-align': 'center',
+            color: '#65666B' }"
+          >
+            Submittal Type
+          </th>
+          <th
+            scope="col"
+            role="columnheader"
+            aria-label="Keyword Category Header"
+            aria-sort="ascending"
+            class="table-header-primary"
+            [pSortableColumn]="'keywordText'"
+            [ngStyle]="{ width: '40%',
+            'text-align': 'center' }"
+          >
+            Count
+          </th>
+          <th
+            scope="col"
+            role="columnheader"
+            aria-label="Keyword Category Header"
+            aria-sort="ascending"
+            class="table-header-primary"
+            [pSortableColumn]="'projectSelected'"
+            [ngStyle]="{ width: '20%',
+            'text-align': 'center' }"
+          >
+            % of Total
+          </th>
+          <th
+            scope="col"
+            role="columnheader"
+            aria-label="Keyword Category Header"
+            aria-sort="ascending"
+            class="table-header-primary"
+            [pSortableColumn]="'projectSelected'"
+            [ngStyle]="{'text-align': 'center',
+               width: '10%' }"
+          >
+            <img
+              src="assets/icons/export.png"
+              alt="Export Icon"
+              style="height: auto; width: 25px; cursor: pointer"
+              (click)="exportToExcel()"
+            />
+          </th>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="body" let-item>
+        <tr role="rowgroup">
+          <td
+            scope="col"
+            role="cell"
+            aria-label="Activity Type Cell"
+            aria-sort="none"
+            class="table-body"
+            [ngStyle]="{
+              'text-align': 'center',
+              'word-wrap': 'break-word',
+              width: '30%'
+            }"
+          >
+            {{item.keywordText}}
+          </td>
+          <td
+            scope="col"
+            role="columnheader"
+            aria-label="KeyWords text Cell"
+            aria-sort="ascending"
+            class="table-body"
+            [ngStyle]="{
+              'text-align': 'center',
+              'word-wrap': 'break-word',
+              width: '40%'
+            }"
+          >
+          {{item.count}}
+          </td>
+
+          <td *ngIf="item?.percentage!= null"
+            scope="col"
+            role="columnheader"
+            aria-label="Bridge Cell Cell"
+            aria-sort="ascending"
+            class="table-body"
+            [ngStyle]="{
+              'text-align': 'center',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }"
+          >
+          {{item.percentage}} %
+          </td>
+          <td
+            scope="col"
+            role="columnheader"
+            aria-label="Bridge Cell Cell"
+            aria-sort="ascending"
+            class="table-body"
+            [ngStyle]="{
+              'text-align': 'center',
+              'word-wrap': 'break-word',
+              width: '10%'
+            }"
+          >
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td style="text-align: center" colspan="100">
+            No Records Available.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <div class="col-1"></div>
+</div>

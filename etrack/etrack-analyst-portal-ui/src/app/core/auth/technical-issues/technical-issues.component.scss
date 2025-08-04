@@ -1,0 +1,17 @@
+.error-container {
+    position: relative;
+    height: calc(100vh - 300px);
+    background: linear-gradient(
+        rgba(0, 0, 0, 0.4), 
+        rgba(0, 0, 0, 0.4)
+      ), url('assets/images/cancel.jpg') no-repeat center;
+      background-size: cover;
+      color: white;
+
+      h1{
+          font-size: 4rem;
+      }
+      h1, h3 {
+          margin: 0;
+      }
+}

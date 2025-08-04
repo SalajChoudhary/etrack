@@ -1,0 +1,232 @@
+<div class="bg-white modal_popup">
+  <div class="top-header header-align">
+    <div class="top-headings header-2b mb-3">Fees & Invoices</div>
+  </div>
+  <div class="col-10 offset-1 fees-invoice">
+    <form [formGroup]="selectionForm">
+      <fieldset [disabled]="invoiceId">
+        <div class="form-group row" *ngIf="freshWaterprojectInvoiceList?.length">
+          <label for="" class="col-sm-4 pr-2 col-form-label pr-0">Freshwater Wetlands<sup>*</sup>:</label>
+          <div class="col-sm-8 pl-0">
+            <select class="form-control" formControlName="freshwater">
+              <option value="">--Select--</option>
+              <option *ngFor="let list of freshWaterprojectInvoiceList" [value]="list?.invoiceFeeType">
+                 ${{ list?.invoiceFee }} - {{ list?.invoiceFeeDesc }} 
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row" *ngIf="projectInvoiceList?.length">
+          <label for="" class="col-sm-4 pr-2 col-form-label pr-0">Tidal Wetlands<sup>*</sup>:</label>
+          <div class="col-sm-8 pl-0">
+            <select class="form-control" formControlName="tidal">
+              <option value="">--Select--</option>
+              <option *ngFor="let list of projectInvoiceList" [value]="list?.invoiceFeeType">
+                ${{ list?.invoiceFee }} - {{ list?.invoiceFeeDesc }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row" *ngIf="lngfprojectInvoiceList?.length">
+          <label for="" class="col-form-label col-sm-4 pr-2 pr-0  fees_invoice_label">Liquefied Natural Gas
+            Facility<sup>*</sup>:</label>
+          <div class="col-sm-8 pl-0">
+            <select class="form-control" formControlName="lngf">
+              <option value="">--Select--</option>
+              <option *ngFor="let list of lngfprojectInvoiceList" [value]="list?.invoiceFeeType">
+                ${{ list?.invoiceFee }} - {{ list?.invoiceFeeDesc }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="float-right">
+              <h4 class="amount_paid">Amount Due: ${{ amountDue}}</h4>
+            </div>
+          </div>
+        </div>
+        <div>
+          <hr />
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div *ngIf="invoiceId">Invoice #:<a class="invoiceNumberLink" (click)="openinvoiceDocument(invoiceId)">{{ invoiceId }} </a></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="d-flex justify-content-left align-items-left">
+              <div class="d-flex justify-content-start align-items-start">
+                <div class="mr-2 lh-25">
+                  <input type="checkbox" formControlName="paymentReceived" />
+                </div>
+                <div class="d-flex justify-content-start align-items-left flex-wrap lh-25">
+                  <div class="mr-2">Payment received by check #</div>
+                  <div class="mr-2">
+                    <input type="text"  mask='9999999999' maxlength="10" class="w-80" formControlName="checkNo" />
+                  </div>
+                  <div class="mr-2">on</div>
+                  <div class="mr-2">
+                  <input type="date"  class="form-input datepicker w-90" formControlName="date" />
+                  </div>
+                  <div class="mr-2">for the amount of: $</div>
+                  <div class="mr-2">
+                    <input type="text" mask='9999999999' class="w-81"  formControlName="amount" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <div class="d-flex justify-content-start align-items-center flex-wrap lh-25">
+        <div class="mr-2"><label>Notes:</label> 
+          <div>
+            <textarea class="placeholderFont ml-33"
+              placeholder="Enter additional check payment information or returned check information here"
+              maxlength="500" cols="98" rows="3" formControlName="notes" (keyup)="noteschange()"></textarea>
+            <span class="counter-brief"> {{ selectionForm.controls.notes.value ?
+              selectionForm.controls.notes.value.length : 0 }} /
+              500</span>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="(userRoles?.includes(UserRole.Override_Admin) || userRoles?.includes(UserRole.System_Admin) || (userRoles?.includes(UserRole.Analyst) && InvoiceStatus==='Cancelled') ) && (InvoiceStatus != ''  && (InvoiceStatus ==='Payment Pending' || InvoiceStatus==='Cancelled'))"
+        class="d-flex justify-content-start align-items-center flex-wrap lh-25">
+        <div class="mr-2">
+          <label for="Cancel invoice">Reason for Cancellation<sup *ngIf="InvoiceStatus!=='Cancelled'">*</sup>:</label>
+          <div>
+            <textarea class="placeholderFont ml-33" maxlength="250" cols="98" rows="3" formControlName="cancellationReason"></textarea>
+            <span class="counter-brief"> {{ selectionForm.controls.cancellationReason.value ?
+              selectionForm.controls.cancellationReason.value.length : 0 }} /
+              250</span>
+          </div>
+        </div>
+        <span
+        class="addr-error-msg custom"
+        *ngIf="!showSameDateCancelError && (!selectionForm.controls.cancellationReason.value || selectionForm.controls.cancellationReason.value.length === 0) && cancelInvoiceClicked">
+        {{errorMsgObj?.REASON_REQD ||'Error: Your Reason for Cancellation is Required.'}}</span
+      >
+        <span
+        class="addr-error-msg custom"
+        *ngIf="showSameDateCancelError && cancelInvoiceClicked">
+        {{errorMsgObj?.INVOICE_CANCEL_NOT_ALLD}}</span
+      >
+      </div>
+      <fieldset [disabled]="invoiceId">
+        <div class="row" *ngIf="!invoiceId">
+          <div class="col-12">
+            <div class="d-flex justify-content-start align-items-start flex-column">
+              <div *ngIf="formSubmitted && selectionForm.get('checkNo')?.errors?.required" class="inv-error-msg">
+                {{errorMsgObj?.CHECK_NUM_REQD || 'Error: Check # is Required.'}}
+
+              </div>
+              <div *ngIf="formSubmitted &&  selectionForm.get('checkNo')?.errors?.maxlength" class="inv-error-msg">
+                {{errorMsgObj?.INV_CHECK_MAX_LENGTH || 'Error: Check # cannot exceed 10.' }}
+              </div>
+              <div *ngIf="formSubmitted && selectionForm.get('checkNo')?.errors?.pattern" class="inv-error-msg">
+                {{errorMsgObj?.INV_CHECK_NUM_INVALID || 'Error: Check # is Invalid.'}}
+              </div>
+              <div *ngIf="formSubmitted && selectionForm.get('amount')?.errors?.required" class="inv-error-msg">
+                {{errorMsgObj?.INV_AMOUNT_REQD || 'Error: Amount is required.'}}
+              </div>
+              <div *ngIf="formSubmitted && selectionForm.get('amount')?.errors?.pattern" class="inv-error-msg">
+                {{errorMsgObj?.INV_AMOUNT_INVALID ||'Error: Amount is invalid.'}}
+              </div>
+              <div *ngIf="formSubmitted && selectionForm.get('date')?.errors?.required" class="inv-error-msg">
+                {{errorMsgObj?.CHECK_DT_RCVD_REQD ||'Error: Date Received Required.'}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <ng-container *ngIf="generateInvoice || invoiceId">
+          <hr />
+          <div class="row">
+            <div class="col-12">
+              <div class="d-flex justify-content-start align-items-start">
+                <div class="mr-2 lh-25">
+                  <input type="checkbox" formControlName="reconciled" />
+                </div>
+                <div class="d-flex justify-content-start align-items-start flex-wrap lh-25 flex-column">
+                  <div>Payment reconciled in FIMS</div>
+                  <div class="d-flex justify-content-start align-items-start">
+                    <div class="mr-2">Date Received On</div>
+                    <div class="mr-2"><input type="date" class="form-input datepicker" formControlName="reconciledDate">
+                    </div>
+                    <div class="mr-2">for the amount of: $ </div>
+                    <div class="mr-2"><input type="text" formControlName="reconciledAmount"></div>
+                  </div>
+                  <div>
+                    <div>Reference # <input type="text" formControlName="reconciledRef" /></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container> -->
+      </fieldset>
+    </form>
+  </div>
+  <div class="col-md-12 generate_invoice mt-15">
+    <div class="text-center">
+      <button type="button" *ngIf="!generateInvoice && !invoiceId" [disabled]="selectionForm.invalid || isInvoiceSaved"
+        (click)="onGenerateInvoice()" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload">
+        Generate Invoice
+      </button>
+      <button
+        type="button"
+        *ngIf="invoiceId && (userRoles?.includes(UserRole.Override_Admin) || userRoles?.includes(UserRole.System_Admin)) && InvoiceStatus === 'Payment Pending'"
+        (click)="onCancelInvoice()"
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      >
+        Cancel Invoice
+      </button>
+      <!-- <button
+        type="submit"
+        [disabled]="selectionForm.invalid"
+        (click)="onSave()"
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      >
+        Save
+      </button> -->
+
+      <!-- <button
+    *ngIf="isInvoiceSaved"
+    type="button"
+    (click)="makePayment()"
+    
+    class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+    
+  >
+  Make Payment
+
+    
+  </button> -->
+
+  <div class="float-right mr-2" *ngIf="showServerError">
+    <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+  </div>
+      <button type="button" *ngIf="invoiceId" (click)="onSaveClick()"
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload margin toLowerCase"
+        [disabled]="!enableSave">
+        Save
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="onCancelClicked($event)">
+        Close
+      </button>
+      <!-- <button
+      *ngIf="isInvoiceSaved"
+      type="button"
+      (click)="onPrint()"
+      class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+    >
+      Print
+    </button> -->
+    </div>
+  </div>
+</div>
+
+
+
+<app-pending-changes-popup #pendingPopup (onOkClick)="onConfirmExit($event)"></app-pending-changes-popup>

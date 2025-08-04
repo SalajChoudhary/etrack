@@ -1,0 +1,80 @@
+<div class="component"> 
+  <div class="component-body">
+      <p-table class="xyx" styleClass="p-datatable-lg" [value]="rows" scrollHeight="260px" aria-describedby="A table which allows the user to select a project to continue to work on"
+      [scrollable]="rows?.length>6?true:false">
+      <caption> Dashboard Resume Entry</caption>
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="table-header-primary" [pSortableColumn]="'sicCode'"
+            [ngStyle]="{'width':'90px','color':'#65666B'}"></th>
+          <th class="table-header-primary" [pSortableColumn]="'naicsCode'" [ngStyle]="{'width':'120px'}">Project ID
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{'width':'16%'}">Facility
+            Name</th>
+          <th class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{'width':'16%'}">Facility
+            Address</th>
+          <th class="table-header-primary" [pSortableColumn]="'lastModified'"
+            [ngStyle]="{'width':'12%','word-wrap':'break-word'}">Municipality
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{'width':'13%'}">Applicant
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{'width':'12%'}">Created Date
+          </th>
+      
+          <th class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{'width':'9%'}">
+            <!-- <img width="20px" height="20px" alt="filter" src="assets/icons/funnel-cross.jpg"> -->
+            &nbsp; <img class="export-icon" alt="export" src="assets/icons/export.png" style="cursor: 'pointer';">
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row let-i="rowIndex">
+        <tr>
+          <td class="table-body btn-colum" [ngStyle]="{'width':'90px','color':'#65666B'}">
+            <button id="resume{{i}}" (click)="navigate(row?.projectId)" [ngbTooltip]="'Delete application'"
+              class="btn btn-sm btn-primari nextbutton upload">Resume</button>
+          </td>
+          <td class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'120px'}">
+            {{row?.projectId}}</td>
+      
+          <td class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'16%'}">
+            {{row?.facility?.facilityName}}
+          </td>
+          <td class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'16%'}">
+            {{row?.facility?.locationDirections}}</td>
+          <td class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'12%'}">
+            {{row?.facility?.municipality}}</td>
+          <td class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'13%'}">
+            {{row?.applicant}}</td>
+          <td class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'12%'}">
+            {{row?.createDate}}</td>
+          <td class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'8%'}">
+            <button (click)="onDeleteApplication(row)" class="btn"  placement="right" >
+              <img src="assets/icons/delete-icon.svg" alt="Delete icon"/>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+      </p-table>
+  </div>
+  <div class="component-footer">
+      <!-- <p *ngIf="totalRecords" class="pl-3 pt-2 pb-2"><strong> # Records: {{totalRecords}}</strong></p> -->
+  </div>
+</div>
+
+<!-- <app-delete-confirm-popup [openModal]="deleteIsClicked" [deleteApplicant] ="deleteProject" [bodyText] ="deletePopupBodyText"></app-delete-confirm-popup> -->
+<!-- <app-custom-modal-popup
+#confirmDeleteModal
+(modalClosed)="confirmDeleteModalClosed($event)"
+[modalConfig]="modalConfig"
+>
+<ng-container *ngIf="deleteProjectId">
+<div> Are you sure you want to delete this project {{deleteProjectId}}</div>
+<div>
+  <button (click)="onConfirmDelete(false)">No</button>
+  <button (click)="onConfirmDelete(true)">Yes</button>
+</div>
+</ng-container>
+
+
+</app-custom-modal-popup> -->
+

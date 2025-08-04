@@ -1,0 +1,806 @@
+<div class="shadow p-3 bg-white rounded roww">
+  <div class="row">
+    <form
+      [formGroup]="searchForm"
+      class="form-inline search-form"
+      name="document-form"
+    >
+      <div class="col-12 pl-0 pr-0 d-flex">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12 pl-0 pr-0">
+              <div class="dec-form pl-0 mt-2">
+                <div style="text-align: center; padding: 5px 0px 30px 0px">
+                  <strong class="header-3b"> Keyword Maintenance </strong>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Error messages added in config's -->
+      <!-- <div class="col-12">
+        <div class="float-right" *ngIf="showServerError">
+          <app-server-error-message
+            [serverErrorMessage]="serverErrorMessage"
+          ></app-server-error-message>
+        </div>
+      </div> -->
+      <div class="row col-12">
+        <div class="col-1 "></div>
+        <div class="col-6 pl-0 mt-1" style="float: left">
+          <label style="float: left" for="inlineRadio1"
+          aria-label="Select Keyword Category"
+            >Choose Keyword Category*:&nbsp;</label
+          >
+          <select
+            class="form-control"
+            aria-label="Keyword Dropdown"
+            type="text"
+            style="width: 50%"
+            formControlName="searchItemText"
+          >
+            <option value=" ">--ALL--</option>
+            <option
+              *ngFor="let op of keywordDropdownList"
+              [ngValue]="op.keywordCategoryId"
+            >
+              {{ op.keywordCategory }}
+            </option>
+          </select>
+        </div>
+        <div class="col-3 pr-1" style="text-align: right">
+          <button
+            type="button"
+            aria-label="add category button"
+            (click)="openAddCategory()"
+            class="btn btn-sm btn-primari nextbutton upload mb-2"
+          >
+            {{categoryIsAll ? 'Add' : 'Edit'}} Category
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-1">
+
+    </div>
+    <div class="col-10 text-blue ml-5 pl-3" style="font-style: italic !important;">
+        Choose ALL to add new Category
+    </div>
+</div>
+
+  <div class="row mt-4">
+    <div class="col-1"></div>
+
+    <div class="col-7" style="text-align: left">
+      <span>Keywords Associated with Category<span *ngIf="selectedCategory?.length>0">&nbsp;</span>{{selectedCategory}}:</span>
+    </div>
+    <div class="col-2" style="text-align: right">
+      <button
+        [disabled]="addButtonDisabled || categoryIsAll"
+        aria-label="Add Keyword Button"
+        type="button"
+        (click)="openAddKeyword()"
+        class="btn btn-sm btn-primari nextbutton upload mb-2"
+      >
+        Add Keyword
+      </button>
+    </div>
+    <div class="col-1"></div>
+  </div>
+  <div class="row">
+    <div class="col-2"></div>
+    <div class="col-8 mt-2">
+      <!-- [scrollable]="categoryList?.length > 10 ? true : false"
+        scrollHeight="350px" -->
+      <p-table
+        id="upload_sign_table"
+        styleClass="p-datatable-lg"
+        class="w"
+        [scrollable]="categoryList?.length > 7 ? true : false"
+        scrollHeight="300px"
+        #dataTable [value]="categoryList"
+      >
+        <ng-template pTemplate="header">
+          <tr role="rowgroup">
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="none"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '25%',
+                position: 'relative'
+              }"
+              
+            >Category            
+            <p-columnFilter  class="p-ml-auto" 
+            [field]="'keywordCategory'"
+            display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false"
+            [matchMode]="'in'" [showOperator]="false"
+            [showClearButton]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect [(ngModel)]="filterValues" [options]="getFilterList(filtersList)"
+                placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+              
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="none"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '40%',
+                position: 'relative'
+              }"
+            >
+              Keyword Text
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="none"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Start Date
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="none"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              End Date
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="none"
+              pSortableColumn=""
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '10%',
+                position: 'relative'
+              }"
+            >
+              <img
+                ngbtooltip="Reset filters"
+                placement="left"
+                alt="filter"
+                src="assets/icons/funnel-cross.jpg"
+                class="filter-icon ng-star-inserted"
+                style="height: auto; width: 20px; cursor: pointer"
+                (click)="resetFilters()"
+              />
+              <img
+                src="assets/icons/export.png"
+                alt="Export Icon"
+                style="height: auto; width: 25px; cursor: pointer"
+                (click)="exportToExcel()" />
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-i="rowIndex">
+          
+          <tr role="rowgroup">
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left', 'width': '26%','word-wrap': 'break-word' }"
+            >
+              {{ item?.categoryText }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left','width': '40%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.keywordText }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left', 'width': '15%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.startDate }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left','width': '15%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.endDate }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left', 'width': '8%', 'word-wrap': 'break-word' }"
+            >
+              <img
+                (click)="openAddKeyword(item)"
+                src="assets/icons/editicon.svg"
+                alt="editicon"
+              />
+            </td>
+           
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td style="text-align:center ;" colspan="100">No Records Available.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+     
+    </div>
+    <div class="col-1"></div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-1"></div>
+    <div class="col-4" style="text-align: left">
+      <span>Keywords Associated with Permit Type: </span>
+    </div>
+    <div class="col-5" style="text-align: right">
+      <button
+     
+      [disabled]="keywordDataEmpty || categoryIsAll"
+        type="button"
+        aria-label="Add Permit Type/Keyword Button"
+        (click)="openAddPermitKeyword()"
+        class="btn btn-sm btn-primari nextbutton upload mb-2"
+      >
+        Add Permit Type/Keyword
+      </button>
+    </div>
+    <div class="col-2"></div>
+  </div>
+  <div class="row">
+    <div class="col-2"></div>
+    <div class="col-8 mt-2">
+      <!-- [scrollable]="permitList?.length > 10 ? true : false"
+        scrollHeight="350px" -->
+      <p-table
+        id="upload_sign_table"
+        styleClass="p-datatable-lg no-header-scoll"
+        class="w"
+        [scrollable]="permitList?.length > 7 ? true : false"
+        scrollHeight="300px"
+        #permitTable [value]="permitList"
+      >
+        <ng-template pTemplate="header">
+          <tr role="rowgroup">
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="permitTypeCode"
+              class="table-header-primary "
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '25%',
+                position: 'relative'
+              }"
+
+            >
+            <div class="row">
+            <div class="justify-center mt-1">Permit Type &nbsp;</div>
+              <div class="justify-center" [ngStyle]="{'text-align': 'right'}"><p-columnFilter class="p-column-filter-menu-button" 
+            [field]="'permitTypeCode'"
+            display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false"
+            [matchMode]="'in'" [showOperator]="false"
+            [showClearButton]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect [(ngModel)]="filterValues" [options]="getPermitFilterList(permitFiltersList)"
+                placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+        </div>
+      </div>
+          </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="keywordText"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '45%',
+                position: 'relative'
+              }"
+            >
+              Keyword Text
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="startDate"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Start Date
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="endDate"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              End Date
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="none"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '10%',
+                position: 'relative'
+              }"
+            >
+              <img
+                ngbtooltip="Reset filters"
+                placement="left"
+                alt="filter"
+                src="assets/icons/funnel-cross.jpg"
+                class="filter-icon ng-star-inserted"
+                style="height: auto; width: 20px; cursor: pointer"
+                (click)="resetPermitFilters()"
+              />
+              <img
+                src="assets/icons/export.png"
+                alt="Export Icon"
+                style="height: auto; width: 25px; cursor: pointer"
+                (click)="permitExportToExcel()"
+              />
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-i="rowIndex">
+          <tr role="rowgroup">
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left','width': '26%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.permitTypeCode }}  
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left','width': '44%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.keywordText }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left','width': '15%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.startDate }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left','width': '15%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.endDate }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left','width': '8%', 'word-wrap': 'break-word' }"
+            >
+              <img (click)="openAddPermitKeyword(item)" src="assets/icons/editicon.svg" alt="editicon" />
+            </td>
+            
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td style="text-align:center ;" colspan="10">No Records Available.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div class="col-2"></div>
+  </div>
+</div>
+
+<!-- Add Category Pop up  -->
+<app-custom-modal-popup
+  #addCategoryPopup
+  [modalConfig]="addCategoryConfig"
+  (modalClosed)="closeModal($event)"
+>
+  <ng-container>
+    <div class="modal-header-confirmation pl-2 text-center"></div>
+    <div class="modal-body-confirmation" style="text-align: center">
+      <p class="header-3b typo-2">Add/Edit Keyword Category*</p>
+    </div>
+    <form [formGroup]="keywordCategoryForm">
+      <div class="form-group align-center lh">
+        <input
+          aria-label="Keyword Text"
+          style="width: 20rem"
+          maxlength="30"
+          minlength="3"
+          id="addCategory"
+          formControlName="keywordCategory"
+        />
+        <div
+        class="addr-error-msg pl-2"
+        *ngIf="
+          addCategoryClicked &&
+          !keywordCategoryForm.controls['keywordCategory'].valid && 
+          !keywordCategoryForm.controls['keywordCategory'].errors?.minlength
+        "
+      >
+      {{errorMsgObj?.KEYWORD_CATG_REQD}}
+      </div>
+      <div
+        class="addr-error-msg pl-2"
+        *ngIf="
+          addCategoryClicked &&
+          keywordCategoryForm.controls['keywordCategory'].errors?.minlength
+        "
+      >
+      Error: Min 3 characters required for Category.
+      </div>
+      </div>
+      
+    </form>
+    <div class="row">
+      <div class="col-12 text-blue t-center mb-2" style="font-style: italic !important;">
+        Edit Category above or if blank Add a new Category
+      </div>
+    </div>
+
+    <div class="modal-footer-confirmation model-footer-reduced">
+      <button
+        (click)="addCategory()"
+        aria-label="Add Category Save Button"
+        type="button"
+        class="btn btn-sm btn-primari nextbutton upload mb-2 mr-2"
+      >
+        Save
+      </button>
+
+      <button
+        (click)="onCategoryCancelClicked()"
+        type="button"
+        aria-label="Close Add Category pop-up"
+        class="btn btn-sm btn-outline-dark closebutton mb-2"
+      >
+        Cancel
+      </button>
+    </div>
+    <div class="float-right mr-4" *ngIf="showServerError && addCategoryClicked">
+      <app-server-error-message
+        [serverErrorMessage]="serverErrorMessage"
+      ></app-server-error-message>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+
+<!-- Add Keyword Pop Up -->
+<app-custom-modal-popup
+  #addKeywordPopup
+  [modalConfig]="addKeywordConfig"
+  (modalClosed)="closeModal($event)"
+>
+  <ng-container>
+    <div class="modal-header-confirmation pl-2 text-center"></div>
+    <div class="modal-body-confirmation" style="text-align: center">
+      <p class="header-3b typo-2">Add/Edit Keyword</p>
+    </div>
+    <form [formGroup]="keyWordForm" *ngIf="openedKeywordForm">
+      <div class="form-group col-12 align-center lh">
+        <label> Category:&nbsp;</label>
+        <!-- <input style="width: 20rem" id="categoryId" formName="categoryText" /> -->
+        <div class="form-group mb-2 mr-2 search-input-cont">
+          <select
+            class="form-control"
+            style="width: 19.5rem"
+            formControlName="keywordCategoryId"
+            aria-label="Category Drop down list for Adding Keyword"
+            disabled
+          >
+            <option value="">--ALL--</option>
+            <option
+              *ngFor="let op of keywordDropdownList"
+              [value]="op.keywordCategoryId"
+            >
+              {{ op.keywordCategory }}
+            </option>
+          </select>
+        </div>
+        <div
+        class="align-center addr-error-msg pl-2"
+        *ngIf="
+          addKeywordClicked && !keyWordForm.controls['keywordCategoryId'].getRawValue()
+        "
+      >
+      {{errorMsgObj?.KEYWORD_CATG_REQD}}
+      </div>
+      </div>
+     
+      <div class="form-group align-center lh">
+        <label> Keyword*:&nbsp;</label>
+        <input
+          style="width: 20rem"
+          minlength="3"
+          maxlength="50"
+          id="keyword"
+          aria-label="Keyword Text area to associate with Category"
+          formControlName="keywordText"
+        />
+        <div
+        class="align-center addr-error-msg pl-2"
+        *ngIf="addKeywordClicked && !keyWordForm.controls['keywordText'].valid
+        && !keyWordForm.controls['keywordText'].errors?.minlength"
+      >
+      {{errorMsgObj?.KEYWORD_TEXT_REQD}}
+      
+      </div>
+      <div
+        class="align-center addr-error-msg pl-2"
+        *ngIf="addKeywordClicked && keyWordForm.controls['keywordText'].errors?.minlength"
+      >
+      Error: Min 3 characters required for Keyword.      
+      </div>
+      </div>
+      
+      <div class="row form-group align-center 1h">
+        <div class="col-sm-6 no-padding-left">
+          <div [ngStyle]="{'text-align': 'right'}">
+            <label class="header-1n">Start Date*:&nbsp;</label>
+            <input
+              type="date"
+              class="w-90"
+              formControlName="startDate"
+              aria-label="Start Date"
+              required
+            />
+          </div>
+         
+        </div>
+        <div class="col-sm-6 no-padding-left">
+          <div>
+            <label class="header-1n">End Date:&nbsp;</label>
+            <input
+              type="date"
+              class="w-90"
+              aria-label="End Date"
+              formControlName="endDate"
+            />
+          </div>
+          
+        </div>
+        <div class="col-12">
+          <p class="align-center addr-error-msg" *ngIf="dateError && addKeywordClicked">
+            {{ dateError }}
+          </p>
+        </div>
+        <div class="float-right" *ngIf="showServerError && addKeywordClicked">
+          <app-server-error-message
+            [serverErrorMessage]="serverErrorMessage"
+          ></app-server-error-message>
+        </div>
+      </div>
+    </form>
+    <div class="row">
+      <div class="col-12 text-blue t-center mb-2" style="font-style: italic !important;">
+        Remove this Keyword by entering an End Date
+      </div>
+    </div>
+    <div class="modal-footer-confirmation model-footer-reduced">
+      <button
+        (click)="addKeyword()"
+        type="button"
+        aria-label="Add Keyword"
+        class="btn btn-sm btn-primari mb-2 mr-2 upload"
+      >
+        Save
+      </button>
+
+      <button
+        (click)="onKeywordTextCancelClicked()"
+        type="button"
+        aria-label="Close Add Keyword"
+        class="btn btn-sm btn-outline-dark closebutton mb-2"
+      >
+        Cancel
+      </button>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+
+<!-- Add Permit/Keyword Popup -->
+<app-custom-modal-popup
+  #addPermitKeywordPopup
+  [modalConfig]="addpermitKeywordConfig"
+  (modalClosed)="closeModal($event)"
+>
+  <ng-container>
+    <div class="modal-header-confirmation pl-2 text-center"></div>
+    <div class="modal-body-confirmation" style="text-align: center">
+      <p class="header-3b typo-2">Add/Edit Permit Type Keyword</p>
+    </div>
+    <form [formGroup]="permitKeyWordForm" *ngIf="openedPermitForm">
+      <div class="form-group col-12 align-center lh">
+        <label> Permit Type*:&nbsp;</label>
+        <!-- <input style="width: 20rem" id="categoryId" formName="categoryText" /> -->
+        <div class="form-group mb-2 mr-2 search-input-cont">
+          <select
+            class="form-control"
+            style="width: 19.5rem"
+            aria-label="Select Permit Type"
+            formControlName="permitTypeCode"
+          >
+            <option value="">--Select--</option>
+            <option
+              *ngFor="let permit of availableTransTypes"
+              [value]="permit.permitType"
+            >
+              {{ permit.permitTypeDesc }}
+            </option>
+          </select>
+        </div>
+        <div
+        class="addr-error-msg pl-2"
+        *ngIf="addPermitClicked && !permitKeyWordForm.controls['permitTypeCode'].valid"
+      >
+      {{errorMsgObj?.PERMIT_REQD}}      
+      </div>
+      </div>
+      <div class="form-group align-center lh">
+        <label> Keyword*:&nbsp;</label>
+        <div class="form-group mb-2 mr-2 search-input-cont">
+          <select
+            class="form-control"
+            style="width: 19.5rem"
+            aria-label="Select Keyword"
+            formControlName="keywordId"
+          >
+            <option value="">--Select--</option>
+            <option *ngFor="let op of categoryListSortedByKeyword" [value]="op.keywordId">
+              {{ op.keywordText }}
+            </option>
+          </select>
+        </div>
+        <div
+        class="addr-error-msg pl-2"
+        *ngIf="addPermitClicked && !permitKeyWordForm.controls['keywordId'].valid"
+      >
+      {{errorMsgObj?.KEYWORD_TEXT_REQD}}      
+      </div>
+      </div>
+      <div class="row form-group align-center 1h">
+        <div class="col-sm-6 no-padding-left">
+          <div [ngStyle]="{'text-align': 'right'}">
+            <label class="header-1n">Start Date*:&nbsp;</label>
+            <input
+              type="date"
+              class="w-90"
+              aria-label="Select Start Date"
+              formControlName="startDate"
+            />
+          </div>
+        </div>
+        <div class="col-sm-6 no-padding-left">
+          <div>
+            <label class="header-1n">End Date:&nbsp;</label>
+            <input
+              type="date"
+              class="w-90"
+              aria-label="Select End Date"
+              formControlName="endDate"
+            />
+          </div>
+        </div>
+        <div class="col-12">
+          <p class="addr-error-msg" *ngIf="permitDateError && addPermitClicked">
+            {{permitDateError}}
+          </p>
+        </div>
+        <div class="float-right" *ngIf="showServerError && addPermitClicked">
+          <app-server-error-message
+            [serverErrorMessage]="serverErrorMessage"
+          ></app-server-error-message>
+        </div>
+        <!-- <div class="col-12">
+                <button class="btn btn-sm btn-primari float-right"   [disabled]="form.invalid" (click)="onSave($event)">Save</button>
+            </div> -->
+      </div>
+    </form>
+    <div class="row">
+      <div class="col-12 text-blue t-center mb-2" style="font-style: italic !important;">
+        Remove this Permit Type/Keyword by entering an End Date
+      </div>
+    </div>
+    <div class="modal-footer-confirmation model-footer-reduced">
+      <button
+        (click)="addPermitKeyword()"
+        type="button"
+        class="btn btn-sm btn-primari mb-2 mr-2 upload"
+      >
+        Save
+      </button>
+
+      <button
+        (click)="onPermitTypeCancelClicked()"
+        type="button"
+        class="btn btn-sm btn-outline-dark closebutton mb-2"
+      >
+        Cancel
+      </button>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+
+<app-pending-changes-popup #pendingPopup (onOkClick)="onPendingChangesOkclick($event)" (onCloseClicked)="ngOnDestroy()">
+</app-pending-changes-popup>

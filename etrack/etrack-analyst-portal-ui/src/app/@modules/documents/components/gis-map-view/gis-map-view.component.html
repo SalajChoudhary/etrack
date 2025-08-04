@@ -1,0 +1,36 @@
+<div [class]="mapStyleClass">
+<div #mapViewDisplay></div>
+<div id="textTool" #textTool class="esri-component esri-widget">
+  <div
+    class="esri-widget--button esri-interactive esri-icon-comment" style="border-bottom:solid 1px rgba(110,110,110,.3);"
+    id="textButton" #textButton
+    type="button"
+    title="Add text"
+  ></div>
+  <div
+    class="esri-widget--button esri-interactive esri-icon-trash"
+    id="resetButton" #resetButton
+    type="button"
+    title="Delete text"
+  ></div>
+</div>
+<div id="textInputDiv" #textInputDiv class="esri-widget">
+  <label class="esri-feature-form__label">
+    <input
+      type="text"
+      class="esri-input"
+      id="textInput" #textInput
+      value="new text alert"
+    />
+  </label>
+</div>
+<div id="toolbarDiv" class="esri-component esri-widget" #toolbarDiv aria-label="toolbar to measure distance and area">
+  <div id="distance" #distance class="esri-widget--button esri-interactive esri-icon-measure-line" title="Distance measurement tool" (click)="distanceMeasurement()" style="border-right: none;
+  border-bottom: 1px solid rgba(110,110,110,.3);" role="button" alt="measure distance" aria-label="A button to measure distance" aria-pressed="false">
+  </div>
+</div>
+<div id="printButton" class="esri-component esri-widget" #printButton>
+  <div id="printItemInfo" #printItem class="esri-widget--button esri-icon-question" title="Please zoom out to see print option" style="border-right: none;border-bottom: 1px solid rgba(110,110,110,.3);" [hidden]="!printHide"></div>
+  <div id="printItem" #printItem class="esri-widget--button esri-icon-printer" title="Print" (click)="printMap()" style="border-right: none;border-bottom: 1px solid rgba(110,110,110,.3);" [hidden]="printHide"></div>
+</div>
+</div>

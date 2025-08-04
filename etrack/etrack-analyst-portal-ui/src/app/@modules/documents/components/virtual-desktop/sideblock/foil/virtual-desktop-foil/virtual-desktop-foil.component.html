@@ -1,0 +1,58 @@
+<!-- <h4 class="text-center title">FOIL Request</h4> -->
+<div>
+  <form
+    [formGroup]="form"
+    (submit)="onAdd($event)"
+    class="d-flex align-items-center my-2"
+  >
+    
+    <div class="header-1b  mr-4">FOIL Request</div>
+    <div *ngIf="!userIsProgramReviewer">
+      <!-- <input type="text" [hidden]="showBlankInput" class="mr-4" disabled /> -->
+      <input
+        type="text"
+        class="mr-4"
+        formControlName="foilRequestNumber"
+        mask="000000-000000"
+        [prefix]="foilRequestPrefix"
+        [showMaskTyped]="false"
+        [dropSpecialCharacters]="false"
+      />
+    </div>
+    <div *ngIf="!userIsProgramReviewer ">
+      <button
+        class="btn btn-sm btn-outline-dark nextbutton upload"
+        type="submit"
+        [disabled]="form.controls.foilRequestNumber.value.length == 14? false:true"
+      >
+        Add
+      </button>
+    </div>
+  </form>
+</div>
+<div class="clearfix"></div>
+<app-virtual-desktop-foil-table
+  [rows]="rows"
+  (remove)="onRemove($event)"
+  [userIsProgramReviewer]="userIsProgramReviewer"
+></app-virtual-desktop-foil-table>
+
+<div class="addr-error-msg">
+  <span
+    *ngIf="foilRequestNumberCtrl?.errors?.required && addClicked"
+    class="text-italic"
+    >It is HIGHLY recommended that the FOIL Request # be supplied.</span
+  >
+  <span *ngIf="foilRequestNumberCtrl?.errors?.minlength && addClicked">{{
+    errorMsgObj?.FOIL_MIN_LENGTH_REQD
+  }}</span>
+  <span *ngIf="foilRequestNumberCtrl?.errors?.maxlength && addClicked">{{
+    errorMsgObj?.FOIL_MIN_LENGTH_REQD
+  }}</span>
+  <span *ngIf="foilRequestNumberCtrl?.valid && isDuplicateEntry && addClicked"
+    >{{errorMsgObj?.BRIDGE_ID_EXIST}}</span
+  >
+</div>
+<!-- <div class="d-flex justify-content-end align-items-center" *ngIf="!userIsProgramReviewer">
+  <button class="btn btn-sm btn-primari mt-2"  [disabled]="!form.get('foilRequest')?.value" (click)="onSave()">Save</button>
+</div> -->

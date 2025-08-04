@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "zipCode": {
+      "type": "string",
+      "maxLength": 5,
+      "description": "description here",
+      "errorMessage": "ERROR"
+    },
+    "zipCodeWithoutTrim": {
+      "type": "string",
+      "maxLength": 5
+    },
+    "zipCodeWithoutRestrict": {
+      "type":"string",
+      "maxLength": 5
+    },
+    "areYouOk":
+    {
+      "type": "boolean"
+    },
+    "question_2": {
+      "title": "please select a date before submitting",
+      "description": "selecting a date is required",
+      "type": "string",
+      "format": "date"
+  }
+  },
+  "required": ["zipCode", "areYouok"]
+}

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PermitCoverSheetReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4051b494-fea0-4ab7-96f9-acc73ba16ab1">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PermitCoverSheetReport"/>
+	<subDataset name="ContactsList" uuid="050cf714-74cc-4078-8a8d-18c7f46a71e5">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PermitCoverSheetReport"/>
+		<queryString language="json">
+			<![CDATA[permit.applicants]]>
+		</queryString>
+		<field name="name" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="name"/>
+			<fieldDescription><![CDATA[name]]></fieldDescription>
+		</field>
+		<field name="address" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="address"/>
+			<fieldDescription><![CDATA[address]]></fieldDescription>
+		</field>
+		<field name="citystatezip" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="citystatezip"/>
+			<fieldDescription><![CDATA[citystatezip]]></fieldDescription>
+		</field>
+		<field name="taxpayerid" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="taxpayerid"/>
+			<fieldDescription><![CDATA[taxpayerid]]></fieldDescription>
+		</field>
+		<field name="telephone" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="telephone"/>
+			<fieldDescription><![CDATA[telephone]]></fieldDescription>
+		</field>
+		<field name="email" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="email"/>
+			<fieldDescription><![CDATA[email]]></fieldDescription>
+		</field>
+		<field name="relationship" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="relationship"/>
+			<fieldDescription><![CDATA[relationship]]></fieldDescription>
+		</field>
+	</subDataset>
+	<queryString language="json">
+		<![CDATA[permit]]>
+	</queryString>
+	<field name="decId" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="decId"/>
+		<fieldDescription><![CDATA[decId]]></fieldDescription>
+	</field>
+	<field name="facilityName" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="facilityName"/>
+		<fieldDescription><![CDATA[facilityName]]></fieldDescription>
+	</field>
+	<field name="projectId" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="projectId"/>
+		<fieldDescription><![CDATA[projectId]]></fieldDescription>
+	</field>
+	<field name="newPermits" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="newPermits"/>
+		<fieldDescription><![CDATA[newPermits]]></fieldDescription>
+	</field>
+	<field name="modification" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="modification"/>
+		<fieldDescription><![CDATA[modification]]></fieldDescription>
+	</field>
+	<field name="renewal" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="renewal"/>
+		<fieldDescription><![CDATA[renewal]]></fieldDescription>
+	</field>
+	<field name="proposedUseCode" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="proposedUseCode"/>
+		<fieldDescription><![CDATA[proposedUseCode]]></fieldDescription>
+	</field>
+	<field name="proposedStartDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="proposedStartDate"/>
+		<fieldDescription><![CDATA[proposedStartDate]]></fieldDescription>
+	</field>
+	<field name="proposedEndDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="proposedEndDate"/>
+		<fieldDescription><![CDATA[proposedEndDate]]></fieldDescription>
+	</field>
+	<field name="facility" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="facility"/>
+		<fieldDescription><![CDATA[facility]]></fieldDescription>
+	</field>
+	<field name="applicants" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicants"/>
+		<fieldDescription><![CDATA[applicants]]></fieldDescription>
+	</field>
+	<field name="contacts" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="contacts"/>
+		<fieldDescription><![CDATA[contacts]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="652" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="342" width="551" height="121" uuid="e28b20f3-67c3-4b67-8917-1fadf06d9199"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="-1" y="202" width="551" height="130" uuid="4ca4a020-8e3b-4cfe-8a51-e9109d893508"/>
+			</rectangle>
+			<subreport>
+				<reportElement x="85" y="206" width="215" height="104" uuid="4fa678aa-3176-48fe-8f8c-9af41c0e0cc6"/>
+				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("facility")]]></dataSourceExpression>
+				<subreportExpression><![CDATA["Facility.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="2" y="206" width="68" height="14" uuid="79afa767-c6f9-4ebb-9366-19235b1e42cd"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Facility:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="125" width="70" height="20" uuid="53600c5d-bf91-4c61-875d-8f3c5d8cae03"/>
+				<text><![CDATA[New:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="152" width="70" height="20" uuid="07ab3592-c29e-47be-8c66-61de5d750b95"/>
+				<text><![CDATA[Modification:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="179" width="70" height="20" uuid="442e6995-f844-48fd-ba8b-a037c59adca1"/>
+				<text><![CDATA[Renewal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="232" y="125" width="90" height="20" uuid="e814c70a-0650-4b49-a9cc-467ede3eb96f"/>
+				<text><![CDATA[Proposed Use :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="155" width="104" height="20" uuid="54cc71af-8099-4864-8aee-c69ac5f6b867"/>
+				<text><![CDATA[Proposed Start Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="153" width="105" height="20" uuid="2bd47b56-4c61-4983-a845-537469b0162f"/>
+				<text><![CDATA[Proposed End Date:]]></text>
+			</staticText>
+			<image>
+				<reportElement x="3" y="1" width="550" height="50" uuid="51b04dcf-cbe3-4788-8bc7-b3e10fa494b0"/>
+				<imageExpression><![CDATA["C:/Users/mxmahali/Documents/etrack-doc/eTrack_logo.JPG"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="309" y="125" width="108" height="20" uuid="5196b3ab-84b8-4b04-a2ca-ac9d69991d88"/>
+				<textFieldExpression><![CDATA[$F{proposedUseCode}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="324" y="153" width="91" height="19" uuid="f6c4626d-f838-438e-8fc6-a1e7360e05a0"/>
+				<textFieldExpression><![CDATA[$F{proposedStartDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="490" y="153" width="61" height="17" uuid="9c32c5c6-43f7-4a74-9675-af52adf344a1"/>
+				<textFieldExpression><![CDATA[$F{proposedEndDate}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="2" y="348" width="200" height="72" uuid="658386a8-b462-4cff-8be0-e38c342bf3f8">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("applicants")]]></dataSourceExpression>
+				<subreportExpression><![CDATA["Applicants.jasper"]]></subreportExpression>
+			</subreport>
+			<rectangle>
+				<reportElement x="0" y="478" width="551" height="102" uuid="854ef27b-027b-49cc-ab57-9eb167a709aa"/>
+			</rectangle>
+			<textField>
+				<reportElement x="70" y="125" width="100" height="15" uuid="e6709ca9-3166-423c-ba86-4787eec2286d"/>
+				<textFieldExpression><![CDATA[$F{newPermits}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="76" y="154" width="100" height="14" uuid="b30a2c42-3933-4d3d-9fdf-7fdc3b1ab559"/>
+				<textFieldExpression><![CDATA[$F{modification}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="83" y="180" width="77" height="19" uuid="037196f1-6320-455e-94cc-907174a1e6c7"/>
+				<textFieldExpression><![CDATA[$F{renewal}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="478" width="210" height="70" uuid="b2f3a98c-0d9e-4bb0-ad3b-2d0625f6e51d"/>
+				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("contacts")]]></dataSourceExpression>
+				<subreportExpression><![CDATA["contactsReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<componentElement>
+				<reportElement x="1" y="-67" width="545" height="100" uuid="909beea8-b0d4-41db-92ed-08a102358132"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="ContactsList" uuid="3bf2bfd3-3c39-4858-8459-6f4c2551e4e2">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("permit.contacts")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="100" width="545">
+						<textField>
+							<reportElement x="0" y="16" width="100" height="20" uuid="1a48f4fb-73fd-41e0-a3ed-ba698e225f10"/>
+							<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="220" y="17" width="80" height="23" uuid="03a8f610-0867-4cf4-aa4d-4879324f81f5"/>
+							<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="220" y="45" width="80" height="25" uuid="67ab5795-73d1-460f-bd7a-b00c01613568"/>
+							<textFieldExpression><![CDATA[$F{citystatezip}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="110" y="16" width="90" height="25" uuid="d2db0b8e-9d28-4ad4-8fe2-d4a794beca70"/>
+							<textFieldExpression><![CDATA[$F{taxpayerid}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="110" y="47" width="90" height="26" uuid="c204e771-e653-477d-aae9-19a27462e5ff"/>
+							<textFieldExpression><![CDATA[$F{telephone}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="50" width="100" height="23" uuid="62441f62-9e0b-455f-a2b6-a3c1732def81"/>
+							<textFieldExpression><![CDATA[$F{email}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="320" y="16" width="100" height="20" uuid="125f4af0-78e4-4cf2-8634-8b8c77f0b584"/>
+							<textFieldExpression><![CDATA[$F{relationship}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="132" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

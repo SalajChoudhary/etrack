@@ -1,0 +1,39 @@
+{
+    "publicTypeCode": "I",
+    "propertyRelationships": [
+        "1"
+    ],
+    "individual": {
+        "firstName": "TestFirstName",
+        "middleName": "Middle",
+        "lastName": "LastName",
+        "suffix": "S"
+    },
+    "address": {
+        "adrType": "0",
+        "streetAdr1": "Street Address 1",
+        "streetAdr2": "Address 2",
+        "city": "City",
+        "state": "State",
+        "zipCode": "24234",
+        "postalCode": "postalCode",
+        "country": "USA"
+    },
+    "contact": {
+        "cellNumber": "2423234222",
+        "workPhoneNumber": "3543543533",
+        "workPhoneNumberExtn": "23423",
+        "homePhoneNumber": "7364354312",
+        "emailAddress": "clear@gmail.com"
+    },
+    "organization": {
+        "busOrgName": "Business Org Name",
+        "govtAgencyName": "gov agency name",
+        "isIncorporated": "Y",
+        "taxPayerId": "2432432423",
+        "incorporationState": "ST",
+        "incorporateCountry": "USA",
+        "businessVerified": "Y"
+    },
+    "dba": "dafdsalklkdfa dafakladkfl"
+}

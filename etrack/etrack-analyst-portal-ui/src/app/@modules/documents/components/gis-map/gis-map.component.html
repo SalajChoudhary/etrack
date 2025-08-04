@@ -1,0 +1,20 @@
+<div class="parent">
+<div #mapViewNode autofocus><img #loadingDiv class="loading" src="/assets/icons/loading.gif" aria-label="loading map" alt="loading..."/></div>
+<div id="toolbarDiv" class="esri-component esri-widget" #toolbarDiv aria-label="toolbar to measure distance and area">
+  <div id="distance" #distance class="esri-widget--button esri-interactive esri-icon-measure-line" title="Distance measurement tool" (click)="distanceMeasurement()" style="border-right: none;
+  border-bottom: 1px solid rgba(110,110,110,.3);" role="button" alt="measure distance" aria-label="A buton to measure distance" aria-pressed="false">
+  </div>
+</div>
+<div id="workAreaDiv" class="esri-component esri-widget" #workAreaDiv aria-label="toolbar to create work area" [hidden]="!isPolygonExist">
+  <div id="workArea" #workArea class="esri-widget--button esri-interactive" title="Add work area(s)" (click)="toggleWorkAreaSketch()" style="border-right: none;
+  border-bottom: 1px solid rgba(110,110,110,.3);" role="button" alt="Add work area(s)" aria-label="Add work area(s)" aria-pressed="false">
+  <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16"><path d="M10 4.069V9h-.9V3.927C9.1 2.509 8.057 1.79 6 1.79s-3.1.719-3.1 2.137v7.259L6 14.294l1.282-1.286a2.007 2.007 0 0 0 .576.63L6 15.5l-4-4.01V4.066C2 1.852 3.791 1 6 1s4 .852 4 3.067zM6 8a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm1-2a1 1 0 1 0-1 1 1 1 0 0 0 1-1zm2 5v1h3v3h1v-3h3v-1h-3V8h-1v3z"></path></svg>
+  </div>
+</div>
+ <div id="approvedPolygonDiv" class="esri-component esri-widget" #approvedPolygonDiv aria-label="delete approved polygon" [hidden]="facilityGraphicsLayer.graphics?.length == 0">
+  <div id="deleteButton" #deleteButton class="esri-widget--button esri-interactive esri-icon-trash"  title="Delete approved polygon" (click)="deleteApprovedPolygon()" style="border-right: none;
+  border-bottom: 1px solid rgba(110,110,110,.3);" role="button" alt="delete approved polygon" aria-label="A button to delete approved polygon" aria-pressed="false">
+  </div>
+</div>
+
+</div>

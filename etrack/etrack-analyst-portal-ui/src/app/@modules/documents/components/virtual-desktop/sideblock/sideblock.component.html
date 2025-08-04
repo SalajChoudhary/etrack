@@ -1,0 +1,245 @@
+<div class="sideblock-wrapper">
+  <div class="card status">
+    <div class="card-body">
+      <div class="mb-3 text-center header-1b" *ngIf="userRoles?.includes(UserRole.DEC_Program_Staff) && !isGi">
+        Review Due: {{ virtualDesktopData?.milestone?.reviewDate }}
+      </div>
+      <ng-container *ngIf="virtualDesktopData?.milestone?.currentStatuses?.length && !isGi">
+        <ng-container *ngFor="let item of virtualDesktopData?.milestone?.currentStatuses">
+          <div class="mb-3 text-center header-1b">
+            <span *ngIf="item?.batchId">{{ item.batchId }} : </span>
+            {{ item.status }}
+            <span *ngIf="item?.statusDate">: {{ item.statusDate }} </span>
+          </div>
+          <div class="text-center text-italic header-1b" *ngIf="item.reason">{{ item.reason }}</div>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="isGi">
+        <div class="mb-3 text-center header-1b">
+          <span>{{virtualDesktopData?.geographicalInquiryResponse?.inquiryCompletedInd === 'Y'
+            ? 'Response Complete'
+            : 'Pending'}}</span>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div *ngIf ="isGi">
+    <div class="body py-3 pl-4 bg-gray gi-info">
+      <div class="header-1b mb-2" *ngIf="virtualDesktopData?.inquiryTypeCategory">
+        {{virtualDesktopData?.inquiryTypeCategory}}
+      </div>
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.projectName">
+      Project Name: {{virtualDesktopData?.contact.projectName}}</div>
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.projectDescription">
+      Project Description: {{virtualDesktopData?.contact.projectDescription}}</div>
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.projectSponsor">
+      Project Sponsor: {{virtualDesktopData?.contact.projectSponsor}}</div>
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.developer">
+      Developer: {{virtualDesktopData?.contact.developer}}</div>
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.owner">
+      Owner: {{virtualDesktopData?.contact.owner}}</div>
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.pscDocketNum">
+      PSC Docket #: {{virtualDesktopData?.contact.pscDocketNum}}</div>
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.efcContact">
+      EFC Contact: {{virtualDesktopData?.contact.efcContact}}</div>
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.dowContact">
+      DOW Contact: {{virtualDesktopData?.contact.dowContact}}</div> 
+      <div *ngIf="virtualDesktopData?.inquiryTypeCategory !== 'SEQR Lead Agency Coordination Request'"
+      class="gi-info">
+        
+        <div class="typo-2" *ngIf="virtualDesktopData?.contact?.requestorName">
+        Requestor: {{virtualDesktopData?.contact.requestorName}}</div>
+        <div class="typo-2" [ngClass]="{'ml-req': virtualDesktopData.contact.requestorName}" 
+          *ngIf="virtualDesktopData?.contact?.street1">
+        {{!virtualDesktopData.contact.requestorName ? 'Requestor: ' : ''}}{{virtualDesktopData?.contact.street1}}</div>  
+        <div class="typo-2" [ngClass]="{'ml-req': (virtualDesktopData.contact.requestorName || virtualDesktopData.contact.street1)}" 
+          *ngIf="virtualDesktopData?.contact?.street2">
+          {{(!virtualDesktopData.contact.requestorName && !virtualDesktopData.contact.street1) ? 'Requestor: ' : ''}}{{virtualDesktopData?.contact.street2}}</div>  
+        <div class="typo-2" [ngClass]="{'ml-req': (virtualDesktopData.contact.requestorName || virtualDesktopData.contact.street1 || virtualDesktopData.contact.street2)}"
+          *ngIf="virtualDesktopData?.contact?.city && virtualDesktopData?.contact?.state">
+          {{(!virtualDesktopData.contact.requestorName && !virtualDesktopData.contact.street1 && !virtualDesktopData.contact.street2) ? 'Requestor: ' : ''}}{{virtualDesktopData?.contact.city}}, {{virtualDesktopData?.contact.state}}{{virtualDesktopData?.contact?.zip ? ', ' : ''}}{{virtualDesktopData?.contact?.zip}}</div>  
+      </div> 
+      <div *ngIf="virtualDesktopData?.inquiryTypeCategory === 'SEQR Lead Agency Coordination Request'"
+      class="gi-info">
+
+        <div class="typo-2" *ngIf="virtualDesktopData?.contact?.leadAgencyName">
+        Lead Agency Name: {{virtualDesktopData?.contact.leadAgencyName}}</div>
+        <div class="typo-2" *ngIf="virtualDesktopData?.contact?.leadAgencyContact">
+        Lead Agency Contact: {{virtualDesktopData?.contact.leadAgencyContact}}</div>
+        <div class="typo-2 ml-seqr" *ngIf="virtualDesktopData?.contact?.street1">
+        {{virtualDesktopData?.contact.street1}}</div>  
+        <div class="typo-2 ml-seqr" *ngIf="virtualDesktopData?.contact?.street2">
+        {{virtualDesktopData?.contact.street2}}</div>  
+        <div class="typo-2 ml-seqr" *ngIf="virtualDesktopData?.contact?.city && virtualDesktopData?.contact?.state">
+        {{virtualDesktopData?.contact.city}}, {{virtualDesktopData?.contact.state}}{{virtualDesktopData?.contact?.zip ? ', ' : ''}}{{virtualDesktopData?.contact?.zip}}</div>  
+      </div>
+      
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.phoneNumber">
+      Phone Number: {{showFormattedPhoneNumber(virtualDesktopData?.contact.phoneNumber)}}</div>  
+      <div class="typo-2" *ngIf="virtualDesktopData?.contact?.email">
+      Email: {{virtualDesktopData?.contact.email}}</div>  
+    </div>
+  </div>
+    <div class="body py-3 pl-4 bg-gray" *ngIf="!isGi">
+      <div class="typo-2">DEC ID: <a [href]="edbDistrictIdUrl" *ngIf="virtualDesktopData?.facility?.decId"
+          target="_blank">{{ virtualDesktopData?.facility?.decId }}</a></div>
+      <div class="typo-2">{{ virtualDesktopData?.facility?.facilityName }}</div>
+      <!-- <div class="body typo-2">
+        <a href="javascript:void(0)" (click)="onViewMapClick()">View Map</a>
+      </div> -->
+    </div>
+  <div class="body py-3 px-4 bg-gray" *ngIf="userCanAddNewApplicationPermits && !isGi">
+
+    <app-add-new-application-permits [isFromDisposed]="isFromDisposed" [errorMsgObj]="errorMsgObj">
+    </app-add-new-application-permits>
+  </div>
+
+  <app-milestones *ngIf="!isGi" [milestone]="virtualDesktopData?.milestone"></app-milestones>
+
+  <mat-accordion *ngIf="!isGi" class="sideblock-accordion mat-expansion--has-toggle-icon-left" multi>
+    <mat-expansion-panel [expanded]="true" hideToggle *ngIf="virtualDesktopData?.contactAgents?.length">
+      <div class="typo-1 ml-4">Contact Info </div>
+      <br>
+      <ng-container *ngIf="virtualDesktopData?.contactAgents?.length">
+        <div class="header-summary typo-2 ml-4">Application Contact:</div>
+        <div class="body  typo-2 ml-4">
+          <div class="my-2" *ngFor="let detail of virtualDesktopData?.contactAgents">
+            <div>
+              <a class="text-primary typo-2" *ngIf="detail?.edbPublicId" [href]="getLrpUrl(detail)" target="_blank">{{
+                detail?.displayName }}</a>
+              <span class="typo-2" *ngIf="!detail?.edbPublicId">{{ detail?.displayName }}</span>
+
+            </div>
+            <div class="typo-2">{{ detail?.street1 }}</div>
+            <div class="typo-2">{{ detail?.city }}, {{ detail?.state }}, {{ detail?.zip }}</div>
+            <div class="typo-2">{{ detail?.businessPhoneNumber | phone }}</div>
+            <div>
+              <div class="text-primary typo-2">
+
+                <a class="typo-2" href="mailto:{{ detail?.emailAddress }}" target="_blank">{{ detail?.emailAddress
+                  }}</a>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </mat-expansion-panel>
+    <mat-expansion-panel [expanded]="true" hideToggle *ngIf="virtualDesktopData?.publics?.length">
+      <div class="header-1b ml-4" *ngIf="!virtualDesktopData?.contactAgents?.length">Contact Info</div>
+      <br>
+      <div class="header-summary typo-2 ml-4">Legally Responsible Party:</div>
+
+      <div class="body typo-2">
+        <div class="my-2 ml-4" *ngFor="let detail of virtualDesktopData?.publics">
+          <div>
+            <div>
+              <a class="text-primary typo-2" *ngIf="detail?.edbPublicId" [href]="getLrpUrl(detail)" target="_blank">{{
+                detail?.displayName }}</a>
+              <span class="typo-2" *ngIf="!detail?.edbPublicId">{{ detail?.displayName }}</span>
+
+            </div>
+          </div>
+          <div class="typo-2">{{ detail?.street1 }}</div>
+          <div class="typo-2">{{ detail?.city }}, {{ detail?.state }}, {{ detail?.zip }}</div>
+          <div class="typo-2">{{ detail?.businessPhoneNumber | phone }}</div>
+          <div>
+            <div class="text-primary typo-2">
+
+              <a class="typo-2" href="mailto:{{ detail?.emailAddress }}" target="_blank">{{ detail?.emailAddress }}</a>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel [expanded]="true" hideToggle *ngIf="virtualDesktopData?.owners?.length">
+      <div class="header-summary typo-2 ml-4">Property Owner:</div>
+
+      <div class="body ml-4 typo-2">
+        <div class="my-2" *ngFor="let detail of virtualDesktopData?.owners">
+          <div>
+            <div>
+              <a class="text-primary typo-2" *ngIf="detail?.edbPublicId" [href]="getLrpUrl(detail)" target="_blank">{{
+                detail?.displayName }}</a>
+              <span class="typo-2" *ngIf="!detail?.edbPublicId">{{ detail?.displayName }}</span>
+            </div>
+          </div>
+          <div class="typo-2">{{ detail?.street1 }}</div>
+          <div class="typo-2">{{ detail?.city }}, {{ detail?.state }}, {{ detail?.zip }}</div>
+          <!-- <div class="typo-2">{{ detail?.zip }}</div> -->
+          <div class="typo-2">{{ detail?.businessPhoneNumber |phone}}</div>
+          <div>
+            <div class="text-primary typo-2">
+              <a class="typo-2" href="mailto:{{ detail?.emailAddress }}" target="_blank">{{ detail?.emailAddress }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel [expanded]="true">
+      <div class="ml-4">
+        <app-virtual-desktop-foil (onFoilChange)="onFoilChange.emit($event)"
+          *ngIf="virtualDesktopData?.dataFetchedFromBackend" [errorMsgObj]="errorMsgObj" [form]="foilRequestForm"
+          [rows]="foilRequestRowsUntouched" (modifiedRows)="onFoilRowsModified($event)"></app-virtual-desktop-foil> <br>
+        <app-litigation-hold [errorMsgObj]="errorMsgObj" [virtualDesktopData]="virtualDesktopData"
+          (onLitigationChange)="onLitigationChange.emit($event)" [saveClicked]="saveClicked" [form]="litigationForm">
+        </app-litigation-hold>
+
+        <form
+        [formGroup]="giIdForm"
+        (submit)="onAdd($event)"
+        class="d-flex align-items-center my-2"
+      >
+        <div class="header-1b  mr-4">GI ID:</div>
+        <div *ngIf="!userIsProgramReviewer">
+          <input
+            type="text"
+            class="mr-4"
+            formControlName="giId"
+            mask="000000"
+            [prefix]="giIdPrefix"
+            [showMaskTyped]="false"
+            [dropSpecialCharacters]="false"
+            (change)="minLengthError = false; isDuplicateEntry=false; showServerError=false"
+          />
+        </div>
+        <div *ngIf="!userIsProgramReviewer ">
+          <button
+            class="btn btn-sm btn-outline-dark nextbutton upload"
+            type="submit"
+          >
+            Add
+          </button>
+        </div>
+      </form>
+      </div>
+      <div class="col-12 right">
+        <span class="addr-error-msg" *ngIf="addClicked && !giIdForm.controls['giId'].value">{{errorMsgObj?.GI_INQUIRY_MUST_BE_10}}</span>
+        <span class="addr-error-msg" *ngIf="addClicked && minLengthError">{{errorMsgObj?.GI_INQUIRY_MUST_BE_10}}</span>
+        <span class="addr-error-msg" *ngIf="addClicked && isDuplicateEntry">{{errorMsgObj?.GI_INQUIRY_ALREADY_EXIST}}</span>
+        <app-server-error-message [serverErrorMessage]="serverErrorMessage" *ngIf="showServerError && addClicked"></app-server-error-message>
+     </div>
+      <div class="ml-4">
+        <p-table
+          class="removeBoxShadow"
+          styleClass="p-datatable-lg has-no-rounded-headers"
+          [value]="rows"
+          scrollHeight="160px"
+          [scrollable]="rows?.length > 3 ? true : false"
+          [totalRecords]="rows.length"
+          [sortOrder]="1"
+        >
+          <ng-template pTemplate="body" let-row let-i="rowIndex">
+            <tr role="rowgroup">
+              <td scope="cell" role="row" class="table-body">
+                <div ><a class="click-link" (click)="onClick(row.giId)">{{ row.giId }}</a></div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

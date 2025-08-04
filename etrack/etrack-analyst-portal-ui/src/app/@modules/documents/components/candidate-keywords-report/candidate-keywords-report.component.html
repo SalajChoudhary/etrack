@@ -1,0 +1,352 @@
+<div class="col-12 pl-0 pr-0 d-flex">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12 pl-0 pr-0">
+          <div style="text-align: center; padding: 5px 0px 30px 0px">
+            <strong class="header-3b">Candidate Keywords Report</strong>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12 pl-0 pr-0">
+            <p-table
+        id="upload_sign_table"
+        styleClass="p-datatable-lg no-header-scoll"
+        class="w"
+        [scrollable]="candidateKeywordsList?.length > 10 ? true : false"
+        scrollHeight="400px"
+        #permitTable [value]="candidateKeywordsList"
+      >
+        <ng-template pTemplate="header">
+          <tr role="rowgroup">
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="permitTypeCode"
+              class="table-header-primary "
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '33%',
+                position: 'relative'
+              }"
+            >
+            Candidate Keyword
+          </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="keywordText"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '17%',
+                position: 'relative'
+              }"
+            >
+              Total Usage</th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_0"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 0
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_1"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 1
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_2"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 2
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_3"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 3
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_4"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 4
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_5"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 5
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_6"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 6
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_7"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 7
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_8"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 8
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="ascending"
+              pSortableColumn="region_9"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '15%',
+                position: 'relative'
+              }"
+            >
+              Region 9
+            </th>
+            <th
+              scope="col"
+              role="columnheader"
+              aria-sort="none"
+              class="table-header-primary"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '10%',
+                position: 'relative'
+              }"
+            >
+            
+              <img
+                src="assets/icons/export.png"
+                alt="Export Icon"
+                style="height: auto; width: 25px; cursor: pointer"
+                (click)="candidateReportExportToExcel()"
+              />
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-i="rowIndex">
+          <tr role="rowgroup">
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'left','width': '33%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.keyword }}  
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '17%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.totalUsage }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+              {{ item?.region0 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region1 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region2 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region3 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region4 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region5 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region6 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region7 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region8 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '15%', 'word-wrap': 'break-word' }"
+            >
+            {{ item?.region9 }}
+            </td>
+            <td
+              scope="col"
+              role="cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{ 'text-align': 'center','width': '8%', 'word-wrap': 'break-word' }"
+            >
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td style="text-align:center ;" colspan="10">No Records Available.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+        </div>
+      </div>
+    </div>
+  </div>

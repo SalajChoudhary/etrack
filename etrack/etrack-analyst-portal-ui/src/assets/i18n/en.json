@@ -1,0 +1,13 @@
+{
+    "HOME": {
+      "TITLE": "This is the title!!!",
+      "SELECT": "Change language"
+    },
+    "DASHBOARD":{
+      "TAB1":"Applicaton",
+      "TAB2":"Spatial Inquiries",
+      "TAB3":"Lead Agency Coordination Request",
+      "MYAPPLICATIONS":"Active Projects"
+    }
+}
+  

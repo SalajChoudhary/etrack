@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import dec.ny.gov.etrack.gis.util.JWTTokenConverter;
+import dec.ny.gov.etrack.gis.util.MultitenantResolver;
+
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+<span class="nc" id="L22">public class SecurityConfig extends WebSecurityConfigurerAdapter {</span>
+
+  @Autowired
+  MultitenantResolver resolver;
+  
+  @Value(&quot;${okta.auth.url}&quot;)
+  private String oktaAuthURL;
+
+
+  /**
+   * Create an instance of JwtDecoder.
+   * 
+   * @param properties - {@link OAuth2ResourceServerProperties}
+   * 
+   * @return - Instance of JwtDecoder.
+   */
+  @Bean
+  public JwtDecoder customDecoder(OAuth2ResourceServerProperties properties) {
+<span class="nc" id="L40">    NimbusJwtDecoder jwtDecoder =</span>
+<span class="nc" id="L41">        NimbusJwtDecoder.withJwkSetUri(properties.getJwt().getJwkSetUri()).build();</span>
+<span class="nc" id="L42">    jwtDecoder.setClaimSetConverter(new JWTTokenConverter());</span>
+<span class="nc" id="L43">    return jwtDecoder;</span>
+  }
+
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+<span class="nc" id="L48">    http.cors().and().antMatcher(</span>
+        &quot;/etrack-gis/ITSAddress,&quot;
+        + &quot;/etrack-gis/EsriAddresses,&quot;
+        + &quot;/etrack-gis/counties,&quot;
+        + &quot;/etrack-gis/taxParcel,&quot;
+        + &quot;/etrack-gis/municipalities,&quot;
+        + &quot;/etrack-gis/DECPolygonByTaxId,&quot;
+        + &quot;/etrack-gis/DECPolygonByAddress,&quot;
+        + &quot;/etrack-gis/DECPolygonByDecId,&quot;
+        + &quot;/etrack-gis/applicantPolygon*,&quot;
+        + &quot;/etrack-gis/spatial-polygon*,&quot;
+        + &quot;/etrack-gis/delete-spatial-polygon*,&quot;
+        + &quot;/etrack-gis/save-spatial-inquiry,&quot;
+        + &quot;/etrack-gis/spatial-inquiry*,&quot;
+        + &quot;/etrack-gis/analystPolygon*,&quot;
+        + &quot;/etrack-gis/submitedPolygon*,&quot;
+        + &quot;/etrack-gis/applicantPolygon,&quot;
+        + &quot;/etrack-gis/analystPolygon,&quot;
+        + &quot;/etrack-gis/submitedPolygon,&quot;
+        + &quot;/etrack-gis/facility*,&quot;
+        + &quot;/etrack-gis/decId*,&quot;
+        + &quot;/etrack-gis/deletePolygon*,&quot;
+        + &quot;/etrack-gis/delete-analyst-polygon*,&quot;
+        + &quot;/etrack-gis/delete-submittal-polygon*,&quot;
+        + &quot;/etrack-gis/address,&quot;
+        + &quot;/etrack-gis/upload,&quot;
+        + &quot;/etrack-gis/workarea-polygon*,&quot;
+        + &quot;/etrack-gis/delete-workarea-polygon*&quot;
+<span class="nc" id="L76">        + &quot;&quot;).authorizeRequests().antMatchers(&quot;*&quot;)</span>
+<span class="nc" id="L77">    .hasAuthority(&quot;*&quot;).anyRequest().authenticated().and().oauth2ResourceServer().jwt();</span>
+<span class="nc" id="L78">  }</span>
+ 
+  /**
+   * Prepare Authentication Manager details.
+   * 
+   */
+  @Override
+  public void configure(AuthenticationManagerBuilder auth) throws Exception {
+<span class="nc" id="L86">    resolver.addTrustedIssuer(oktaAuthURL);</span>
+<span class="nc" id="L87">    auth.parentAuthenticationManager(resolver.resolve(oktaAuthURL));</span>
+<span class="nc" id="L88">  }</span>
+
+  /**
+   * CORS configuration.
+   */
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+<span class="nc" id="L95">      web.ignoring().antMatchers(</span>
+              &quot;/etrack-gis/upload-polygon-efind&quot;,
+              &quot;/v2/api-docs&quot;,
+              &quot;/configuration/ui&quot;,
+              &quot;/swagger-resources/**&quot;,
+              &quot;/configuration/security&quot;,
+              &quot;/swagger-ui.html&quot;,
+              &quot;/webjars/**&quot;);
+<span class="nc" id="L103">  }</span>
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

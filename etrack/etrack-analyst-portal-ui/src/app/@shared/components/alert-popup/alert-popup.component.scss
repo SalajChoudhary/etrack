@@ -1,0 +1,121 @@
+::ng-deep {
+    .modal-sm {
+      max-width: 500px !important;
+      min-width: 450px !important;
+    }
+}
+
+.action-delete {
+    color: #787575;
+    font-size: 17px;
+    font-weight: normal;
+    margin-top: auto;
+    cursor: pointer;
+    border: none;
+    outline: none;
+  }
+
+  .btn-no-border-transparent{
+    border:none;
+    background: transparent;
+    color: white;
+  }
+
+  .ml-61-percent{
+    margin-left: 61%;
+  }
+
+  .ml-64-percent{
+    margin-left: 64%;
+  }
+  .ml-65-percent{
+    margin-left: 64.3%;
+  }
+  .ml-62-percent{
+    margin-left: 61.7%;
+  }
+
+  .ml-4-percent{
+    margin-left: 3.3%;
+  }
+
+  .red{
+    color:red;
+  }
+
+  .pointer:hover{
+    cursor: pointer;
+  }
+
+  .modal-dialog .modal-content {
+    // position: relative;
+    // top: 0px;
+    // right: 0px;
+    margin-left: 102% !important;
+  }
+
+  .ml-100{
+    margin-left: 100%;
+  }
+
+ .alert-modal{
+   position: relative;
+    // top: 0px;
+    // right: 0px;
+    margin-left: 100%;
+ }
+
+ .p{
+  margin: auto;
+ }
+
+ ::ng-deep .custom-modal{
+  margin-left: 100%;
+ }
+
+ .right{
+  float: right;
+ }
+
+ .link{
+  cursor:pointer;
+     color:#007bff;
+    // text-decoration:underline;
+ }
+
+
+ .font-14{
+  font-size: 14px;
+  vertical-align: baseline;
+ }
+
+ .line-height{
+  //line-height: revert !important;
+ }
+ .font-size{
+  font-weight: bold;
+  font-size: medium;
+ }
+
+ .mt-2{
+  margin-top: 0 rem !important;
+ }
+ .modal-header-confirmation-with-alerts{ 
+  background-color: #073763;
+  color:white; 
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+ }
+
+ .modal-header-confirmation-without-alerts{ 
+  background-color: #073763;
+  color:white; 
+  border-radius: 17px !important;
+ }
+
+ .modal-body-confirmation-without-alerts{
+  background-color: #073763;
+ }
+ .mt-2, .my-2 {
+  margin-top: 0rem !important;
+}

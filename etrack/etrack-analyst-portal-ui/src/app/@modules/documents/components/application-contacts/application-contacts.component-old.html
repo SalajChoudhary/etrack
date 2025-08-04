@@ -1,0 +1,341 @@
+
+<div class="content-wrapper mt-3">
+  <!-- <app-validate-banner class="DEMO" *ngIf="isValidate" [validated]="applicationContactsValidated"
+    [showBottomBorder]="false"></app-validate-banner> -->
+</div>
+<div class="form-container">
+  <form [formGroup]="applicationContactsForm" (ngSubmit)="openWarningModal()" class="formHeight">
+
+
+    <fieldset [disabled]="isReadOnly" class="mb-5">
+      <div class="col-8 offset-2 note-header py-3 mt-3 box-shadow border-radius-5" >
+        
+        <div class=" note-text header-1n">
+          This project requires the following application forms to be uploaded in the next step.
+        </div>
+        <ng-container *ngIf="allContacts?.length<2 && !(modPermits?.length || extPermits?.length)">
+          <div class=" note-text header-1n" >
+           Return to the Permit Selection and/or Contact/Agent screen to make any corrections needed.
+          </div>
+        </ng-container>
+        <ng-container *ngIf="allContacts?.length<2 && (modPermits?.length || extPermits?.length)">
+          <div class=" note-text header-1n" >
+            Please enter the request type details listed below by clicking on the Modification and/or Extension Details link(s). Return to the Permit Selection and/or Contact/Agent screen to make any corrections needed.
+          </div>
+        </ng-container>
+        <ng-container *ngIf="allContacts?.length>1 && !(modPermits?.length || extPermits?.length)">
+          <div class="note-text header-1n" >
+            Please assign the available contact agent for each permit. Return to the Permit Selection screen to make any corrections needed.
+          </div>
+        </ng-container>
+        <ng-container *ngIf="allContacts?.length>1 && (modPermits?.length || extPermits?.length)">
+          <div class="note-text header-1n" >
+            Please enter the request type details listed below by clicking on the Modification and/or Extension Details link(s), and if applicable, assign the available contact/agent. Return to the Permit Selection and/or Contact/Agent screen to make any corrections needed.
+          </div>
+        </ng-container>
+      
+      </div>
+      <div class="col-10 offset-1">
+        <!-- <h4 style="font-weight: 500;">You are applying for the following new permit(s):</h4> -->
+        <ng-container formArrayName="nonJaf">
+          <ng-container *ngFor="let field of nonJAFArray?.controls;let i=index;">
+            <div class="field-row" [formGroupName]="i">
+              <h4 class="i typo-1">{{fields && fields[i].label}}</h4>
+              <select *ngIf="allContacts?.length>1 || allContacts?.length===0" class="w-210" [attr.aria-label]="fields && fields[i].label" [formControlName]="fields && fields[i].id">
+                <option ngValue="">
+                  — Assign Contact/Agent —
+                </option>
+                <option [ngValue]="contact?.roleId" *ngFor="let contact of allContacts">
+                  {{contact?.displayName}}
+                </option>
+              </select>
+              <span *ngIf="allContacts?.length===1" class="w-210 typo-2">{{allContacts && allContacts[0]?.displayName}}</span>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+      <div class="col-10 offset-1" *ngIf="!EAValidated">
+        <!-- <h4 style="font-weight: 500;">eTrack Request Form</h4> -->
+        <ng-container formArrayName="ext">
+          <ng-container *ngFor="let field of extArray?.controls;let i=index;">
+            <div class="field-row" [formGroupName]="i">
+              <h4 class="input-header typo-1">eTrack Request Form</h4>
+              <button class="btn btn-link italic typo-2" type="button" (click)="openModExtModal('EXT', field)" aria-label="A button to extend a permit">Extension Details</button>
+              <div>
+                <p style="color:orange" class="completeText typo-2" [style.visibility]="isComplete(field, 'EXT') ? 'visible' : 'hidden'" >COMPLETE</p>
+              </div>
+              <select *ngIf="allContacts?.length>1 || allContacts?.length===0" class="w-210" [attr.aria-label]="extFields && extFields[i].label" [formControlName]="extFields && extFields[i].id">
+                <option ngValue="">
+                  — Assign Contact/Agent —
+                </option>
+                <option [ngValue]="contact?.roleId" *ngFor="let contact of allContacts">
+                  {{contact?.displayName}}
+                </option>
+              </select>
+              <span *ngIf="allContacts?.length===1" class="w-210">{{allContacts && allContacts[0]?.displayName}}</span>
+            </div>
+            <div class="permit-options">
+              <p>
+                <span *ngFor="let permitCode of groupedBatchExtPermits[extFields[i].id]">- {{permitCode?.permitTypeDesc}}<br></span>
+              </p>
+            </div>
+          </ng-container>
+        </ng-container>
+
+      </div>
+      <div class="col-10 offset-1" *ngIf="!EAValidated">
+        <!-- ///  <h4 style="font-weight: 500;">eTrack Request Form</h4> -->
+        <ng-container formArrayName="mod">
+          <ng-container *ngFor="let field of modArray?.controls;let i=index;">
+            <div class="field-row" [formGroupName]="i">
+              <h4 class="input-header typo-1">eTrack Request Form</h4>
+              <button class="btn btn-link italic typo-2" type="button" (click)="openModExtModal('MOD', field)" aria-label="A button to modify a permit">Modification Details</button>
+              <!-- <p style="color:blue">Modification</p> -->
+              <div>
+                <p class="mb-0 completeText typo-2" style="color:orange" [style.visibility]="isComplete(field, 'MOD') ? 'visible' : 'hidden'">COMPLETE</p>
+              </div>
+              <select *ngIf="allContacts?.length>1 || allContacts?.length===0" class="w-210" [attr.aria-label]="modFields && modFields[i].label" [formControlName]="modFields && modFields[i].id">
+                <option ngValue="">
+                  — Assign Contact/Agent —
+                </option>
+                <option [ngValue]="contact?.roleId" *ngFor="let contact of allContacts">
+                  {{contact?.displayName}}
+                </option>
+              </select>
+              <span *ngIf="allContacts?.length===1" class="w-210">{{allContacts && allContacts[0]?.displayName}}</span>
+            </div>
+            <div class="permit-options">
+              <p>
+                <span *ngFor="let permitCode of groupedBatchModPermits[modFields[i].id]">- {{permitCode?.permitTypeDesc}}<br></span>
+
+              </p>
+            </div>
+          </ng-container>
+        </ng-container>
+
+      </div>
+
+      <div class="col-10 offset-1" *ngIf="!EAValidated">
+        <!-- <h4 style="font-weight: 500;"></h4> -->
+        <ng-container formArrayName="trans">
+          <ng-container *ngFor="let field of transArray?.controls;let i=index;">
+            <div class="field-row" [formGroupName]="i">
+              <h4 class="input-header typo-1">Transfer Application/Permit</h4>
+              <!-- <select class="w-210" [formControlName]="transFields && transFields[i].id">
+                <option ngValue="">
+                  — Assign Contact/Agent —
+                </option>
+                <option [ngValue]="contact?.roleId" *ngFor="let contact of allContacts">
+                  {{contact?.displayName}}
+                </option>
+              </select> -->
+
+            </div>
+            <div class="permit-options">
+              <p>
+                <span *ngFor="let permitCode of groupedBatchTransPermits[transFields[i].id]">- {{permitCode?.permitTypeDesc}}<br></span>
+
+              </p>
+            </div>
+          </ng-container>
+        </ng-container>
+        <!-- *ngIf="supplementalForms?.length>0" -->
+        <div class="field-row" *ngIf="supplementalForms?.length>0" >
+          <h4 class="input-header typo-1">Joint Application Form </h4>
+          <select *ngIf="allContacts?.length>1 || allContacts?.length===0" class="w-210" formControlName="jaf" aria-label="jaf field">
+            <option ngValue="">
+              — Assign Contact/Agent —
+            </option>
+            <option [ngValue]="contact?.roleId" *ngFor="let contact of allContacts">
+              {{contact?.displayName}}
+            </option>
+          </select>
+          <span *ngIf="allContacts?.length===1" class="w-210 typo-2">{{allContacts && allContacts[0]?.displayName}}</span>
+        </div>
+        <div class="permit-options">
+          <p>
+            <span *ngFor="let permitCode of supplementalForms">- {{permitCode?.supplementalFromLabel}}<br></span>
+
+          </p>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="footer-row">
+      <div class="col-md-12 bottom-button-container">
+        <!-- <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent('Property Owners')"  matStepperPrevious>Back</button> -->
+        <app-validate-checkbox *ngIf="isValidate" category="PROJ-INFO" activityId="12"
+          [(validatedModel)]="applicationContactsValidated"></app-validate-checkbox>
+        <button type="submit" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload">
+          Next
+        </button>
+        <button type="button" (click)="close()" class="btn btn-sm btn-outline-dark closebutton mb-2">
+          Close
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<ng-template #warningModal let-modal>
+  <div class="modal-header-confirmation pl-2 text-center modal-header-dec-reduced">
+  </div>
+  <div class="modal-body-confirmation " style="text-align: center;">
+    <p class="delete-cnf-message typo-2 ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red"
+        class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+
+        <path
+          d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+
+        <path
+          d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+
+      </svg>&nbsp; &nbsp;<span class="typo-2">Contact/Agents have not been associated to any application.</span>
+    </p>
+    <div class="ml-35 typo-2" *ngFor="let contact of leftOutContacts">{{contact.displayName}}</div>
+    <br>
+    <p class="ml-35 typo-2">Please correct or choose to remove them from this project.</p>
+  </div>
+  <div class="modal-footer-confirmation model-footer-reduced">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 okButton"
+      (click)="modal.dismiss('Cross click')">
+      Correct
+    </button>
+
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2" (click)="onRemove()">
+      Remove
+    </button>
+  </div>
+
+</ng-template>
+<app-pending-changes-popup #pendingPopup (onOkClick)="okClicked()"></app-pending-changes-popup>
+
+
+<app-custom-modal-popup #modExtRequestModal [modalConfig]="modalConfig">
+  <ng-container>
+    <div class="text-center">
+      <div *ngIf="isModRequest">
+        <p class="font-24 mt-2 typo-2">Permit Modification Request For Project ID {{projectId}}</p>
+        <!-- <div *ngFor="let permit of modList; let i = index"> -->
+          <!-- <div class="row"> -->
+            <div class="col-12 text-left">
+            <p class="text-left font-16 typo-2">Permit(s):</p>
+            </div>
+            <div class="col-12 text-left">
+              <table
+              class="table table-borderless mb-0"
+              aria-label="A table which shows the permits you have applied for"
+              aria-describedby="A table which shows the permits you have applied for"
+            >
+              <tbody role="rowgroup">
+                <ng-container *ngFor="let permit of modList; let i = index; let last = last">
+                  <tr
+                    scope="col"
+                    role="cell"
+                  >
+                    <td class="permit-desc text-black pt-0 font-16" [ngStyle]="{'width': '320px'}">
+                      {{ permit?.permitTypeDesc }}
+                    </td>
+                    <td class="permit-desc text-black  pt-0 p-0 font-16"  [ngStyle]="{'width': '161px'}">
+                      {{ permit?.programIdFormatted }}
+                    </td>
+            
+                    <td class="permit-desc text-black pt-0 p-0 font-16" [ngStyle]="{'width': '165px'}">
+                   <span *ngIf="!i">
+                    {{permit.effectiveStartDate}}-{{permit.effectiveEndDate}}
+                      </span>
+                    </td>
+                  </tr>
+                  <!-- <tr>
+                    <td colspan="4">
+                      <div *ngIf="!last" class="shadow-div"></div>
+                    </td>
+                  </tr> -->
+                </ng-container>
+              </tbody>
+            </table>
+        
+            </div>
+        <p class="text-left ml-3 font-16 mb-0 typo-2" >Permit Description:</p>
+        <span class="text-left font-16 color-gray typo-2">{{permitDescription}}</span>
+        <p class="text-left ml-3 font-16 typo-2">Describe the proposed modification*:</p>
+      </div>
+
+    <div *ngIf="isExtRequest">
+      <p  class="font-24 mt-2 typo-2">Permit Extension Request For Project ID {{projectId}}</p>
+      <div class="col-12 text-left">
+        <p class="text-left  font-16 typo-2">Permit(s):</p>
+        </div>
+      <div class="col-12 text-left">
+        <table
+        class="table table-borderless mb-0"
+        aria-label="A table which shows the permits you have applied for"
+        aria-describedby="A table which shows the permits you have applied for"
+      >
+        <tbody role="rowgroup">
+          <ng-container *ngFor="let permit of extList; let i = index; let last = last">
+            <tr
+              scope="col"
+              role="cell"
+            >
+              <td class="permit-desc text-black pt-0 font-16" [ngStyle]="{'width': '320px'}">
+                {{ permit?.permitTypeDesc }}
+              </td>
+              <td class="permit-desc text-black  pt-0 p-0 font-16"  [ngStyle]="{'width': '161px'}">
+                {{ permit?.programIdFormatted }}
+              </td>
+      
+              <td class="permit-desc text-black pt-0 p-0 font-16" [ngStyle]="{'width': '165px'}">
+             <span *ngIf="!i">
+              {{permit.effectiveStartDate}}-{{permit.effectiveEndDate}}
+                </span>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>  
+    
+    <p class="text-left font-16 mb-0 typo-2" >Permit Description:</p>
+    <span class="text-left font-16 color-gray typo-2">{{permitDescription}}</span>
+    <p class="text-left font-16 typo-2">Reason for Extension*:</p>
+      </div>
+  </div>
+    <textarea aria-label="A text area to explain why you need a permit extension." maxlength="3000" cols="100" rows="10" [(ngModel)]="reasonForModExt"></textarea>
+    <span class="counter-brief">{{reasonForModExt.length}}/3000</span>
+    <div class="form-check form-check-inline ml-56-percent mt-2">
+      <p class="mb-0 mr-2 font-16">Estimated Completion Date*:</p>
+      <input type="date" [(ngModel)]="estCompletionDate">
+    </div>
+    <div class="text-left ml-3">
+    <span class="addr-error-msg typo-2" *ngIf="modExtPopupIsSubmitted && showEstComplDateRequiredError">{{errorMsgObj?.ESTMD_COMPLN_DATE_REQD}}</span>
+    <span class="addr-error-msg typo-2" *ngIf="modExtPopupIsSubmitted && showEstComplDateInvalidError">{{errorMsgObj?.ESTMD_COMPLN_DATE_GT_CURR}}</span>
+    <span class="addr-error-msg typo-2" *ngIf="modExtPopupIsSubmitted && showEstComplDatePermitTermLimitError">{{errorMsgObj?.ESTMD_COMPLN_DATE_LT_PT_TERM</span>
+    <span class="addr-error-msg typo-2" *ngIf="modExtPopupIsSubmitted && showModDescRequiredError">{{errorMsgObj?.PROPOSED_MOD_DESC_REQD}}</span>
+    <span class="addr-error-msg typo-2" *ngIf="modExtPopupIsSubmitted && showExtReasonRequiredError">{{errorMsgObj?.EXTN_REASON_REQD}}</span>
+
+  </div>
+  </div>
+    <div class="bottom-button-container">
+      <button
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+        (click)="modExtModalSubmit()"
+      >
+        OK
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-dark closebutton mb-2"
+        (click)="onCancelClicked()"
+      >
+        Cancel
+      </button>
+    </div>
+  
+  </ng-container>
+</app-custom-modal-popup>
+<app-pending-changes-popup
+  #pendingChangesPopup
+  (onOkClick)="onPendingChangesOkclick()"
+  (onCloseClicked)="pendingChangesCancelClicked()"
+></app-pending-changes-popup>

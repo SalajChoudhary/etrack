@@ -1,0 +1,66 @@
+.note-header {
+  border-radius: 25px;
+  background-color: white;
+  margin-top: 0px;
+  background-color: rgb(202, 209, 204) !important;
+  border-radius: 31px;
+  margin-bottom: 20px;
+}
+.note-text {
+  background-color: rgb(202, 209, 204) !important;
+  border-radius: 35px;
+  border-bottom: 1px solid black;
+  box-shadow: 0 4px 4px 0 #d4d2d2, 0 6px 10px 0 #d4d2d2;
+}
+
+.sign-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+.content-wrapper {
+  // min-height: 400px;
+}
+.roww {
+  min-height: calc(100vh - 260px);
+}
+.footer-row {
+  justify-content: center;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  //background-color: #CAD1CC;
+  margin-top: 20px !important;
+}
+.mt-1percent {
+  padding-top: 1% !important;
+  background-color: white;
+}
+.header {
+  min-height: 20% !important;
+}
+
+.stepperCol {
+  max-height: 100px;
+  background: white !important;
+}
+.center-align {
+  text-align: center;
+}
+.end-align {
+  text-align: end;
+}
+.btn-upload {
+  font-size: inherit;
+  font-style: italic;
+}
+.btn-upload:active,
+.btn-upload:hover {
+  text-decoration: none;
+}
+.disabled-row {
+  opacity: 0.5;
+}
+
+.lablled-row {
+  min-height: 105px !important;
+}

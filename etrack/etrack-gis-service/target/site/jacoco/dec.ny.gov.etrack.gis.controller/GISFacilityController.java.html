@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GISFacilityController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.controller</a> &gt; <span class="el_source">GISFacilityController.java</span></div><h1>GISFacilityController.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.controller;
+
+import java.util.UUID;
+import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.databind.JsonNode;
+import dec.ny.gov.etrack.gis.exception.BadRequestException;
+import dec.ny.gov.etrack.gis.model.ProjectDetail;
+import dec.ny.gov.etrack.gis.service.GISFacilityService;
+import dec.ny.gov.etrack.gis.util.Validator;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@RestController
+<span class="nc" id="L25">public class GISFacilityController {</span>
+
+  @Autowired
+  private GISFacilityService gisFacilityService;
+  
+<span class="nc" id="L30">  private static final Logger LOGGER = LoggerFactory.getLogger(GISFacilityController.class.getName());</span>
+  
+  /**
+   * Persist the requested Facility details by the user.
+   * 
+   * @param userId - user who initiates this request.
+   * @param jwtToken - JWT Token.
+   * @param projectDetail - Project/Facility details.
+   * 
+   * @return - Updated Project details includes newly created project id.
+   */
+  @PostMapping(&quot;/facility&quot;)
+  @ApiOperation(value=&quot;Save the Facility details into eTrack.&quot;)
+  public ProjectDetail saveFacilityDetail(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken,
+      @RequestBody ProjectDetail projectDetail) {
+
+<span class="nc" id="L48">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L49">    LOGGER.info(&quot;Entering into saveFacilityDetail. User Id {} Context Id {}&quot;, userId, contextId);</span>
+<span class="nc" id="L50">    Validator.isProjectValid(userId, contextId, projectDetail);</span>
+<span class="nc" id="L51">    return gisFacilityService.saveFacilityDetail(userId, contextId, jwtToken, projectDetail);</span>
+  }
+
+  /**
+   * Update the amended Facility details by the user.
+   * 
+   * @param userId - user who initiates this request.
+   * @param jwtToken - JWT Token.
+   * @param projectDetail - Project/Facility details.
+   * 
+   * @return - Updated Project details.
+   */
+  @PutMapping(&quot;/facility&quot;)
+  @ApiOperation(value=&quot;Update the Facility details into eTrack requested by the user/staff during data entry or review process.&quot;)
+  public ProjectDetail updateFacilityDetails(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken,
+      @RequestBody ProjectDetail projectDetail) {
+
+<span class="nc" id="L70">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L71">    LOGGER.info(&quot;Entering into update Facility details. User Id {} Context Id {}&quot;, userId,</span>
+        contextId);
+<span class="nc" id="L73">    Validator.isProjectValid(userId, contextId, projectDetail);</span>
+<span class="nc bnc" id="L74" title="All 4 branches missed.">    if (projectDetail.getProjectId() == null || projectDetail.getProjectId() &lt;= 0) {</span>
+<span class="nc" id="L75">      throw new BadRequestException(&quot;PROJECT_ID_EMPTY&quot;, &quot;Project Id cannot be empty&quot;,</span>
+          projectDetail);
+    }
+<span class="nc" id="L78">    return gisFacilityService.updateFacilityDetail(userId, contextId, jwtToken, projectDetail);</span>
+  }
+
+  /**
+   * Retrieve the Project/Facility details for the input project id.
+   * 
+   * @param userId - User who initiates this request.
+   * @param jwtToken - JWT Token.
+   * @param projectId - Project Id.
+   * 
+   * @return - Project details.
+   */
+  @GetMapping(&quot;/facility&quot;)
+  @ApiOperation(value=&quot;Retrieve the facility details for the input project to display in the step 1.&quot;)
+  public ResponseEntity&lt;ProjectDetail&gt; getFacilityDetail(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken,
+      @RequestHeader @ApiParam(example = &quot;123213&quot;, value=&quot;Project Id&quot;) final Long projectId) {
+
+<span class="nc" id="L97">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L98">    LOGGER.info(&quot;Entering into getFacilityDetail. User Id {} Context Id {}&quot;, userId, contextId);</span>
+<span class="nc bnc" id="L99" title="All 4 branches missed.">    if (projectId == null || projectId &lt;= 0) {</span>
+<span class="nc" id="L100">      throw new BadRequestException(&quot;PROJECT_ID_EMPTY&quot;, &quot;Project Id cannot be empty&quot;, projectId);</span>
+    }
+<span class="nc" id="L102">    return gisFacilityService.retrieveFacilityInfo(userId, contextId, jwtToken, projectId);</span>
+  }
+  
+  /**
+   * Retrieve the history of the Facility details i.e Data from enterprise and changes made during
+   * the submission..
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param jwtToken - JWT Token.
+   * @param userId - User Id who initiates this request.
+   * @param projectId - Project Id.
+   * 
+   * @return - History of the facility details.
+   */
+  @GetMapping(&quot;/facility/view&quot;)
+  @ApiOperation(value=&quot;Retrieve the initial details stored in the enterprise which helps the &quot;
+      + &quot;reviewer to compare if any changes made by the user while submitting the project.&quot;)
+  public ResponseEntity&lt;JsonNode&gt; retrieveFacilityHistory(HttpServletResponse response,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken,
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId, 
+      @RequestHeader @ApiParam(example = &quot;123213&quot;, value=&quot;Project Id&quot;) final Long projectId) {
+    
+<span class="nc" id="L124">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L125">    LOGGER.info(&quot;Entering into retrieveFacilityHistory User Id {} Context Id: {} &quot;, userId,</span>
+        contextId);
+<span class="nc" id="L127">    return gisFacilityService.retrieveFacilityHistory(userId, contextId, jwtToken, projectId);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,57 @@
+.modal-header-confirmation {
+    position: relative;
+    flex: 1 1 auto;
+    // padding-bottom:  0.5rem;
+    // padding-top:1rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    margin: 0;
+  }
+  
+  .modal-footer-confirmation {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    padding-top: 0;
+    // padding-right: 170px;
+    // border-top: 1px solid #dee2e6;
+    border-bottom-right-radius: calc(0.3rem - 1px);
+    border-bottom-left-radius: calc(0.3rem - 1px);
+  }
+  
+  .modal-body-confirmation {
+    position: relative;
+    flex: 1 1 auto;
+    padding-bottom: 0.5rem;
+    padding-top: 0;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    margin: 0;
+  }
+  
+  .okButton {
+    width: 61px;
+  }
+  .disableSelect {
+    pointer-events: none;
+  }
+  
+  .button-width {
+    min-width: 70px;
+  }
+  .b-box {
+    border: 1px solid black;
+    box-shadow: 2px 5px black;
+  }
+::ng-deep {
+    .modal-pending-pop{
+      max-width: 420px !important;
+      min-width: 420px !important;
+      margin-top: 12rem !important;
+    }
+    .modal-content {
+      border: 1px solid #919ea2;
+    }
+  }

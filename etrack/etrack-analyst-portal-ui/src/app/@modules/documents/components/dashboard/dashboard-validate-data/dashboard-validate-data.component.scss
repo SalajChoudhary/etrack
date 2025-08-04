@@ -1,0 +1,21 @@
+.component{
+    position:relative;
+    height: calc(100vh - 215px);
+    .component-footer{
+        position:absolute;
+        left:0;
+        bottom:0;
+        width: 100%;
+        z-index: 10;
+        background: white;
+    }
+}
+.grid-box .p-datatable .p-datatable-tbody > tr:nth-child(even)  {
+    background-color:  #f8f9fa !important;
+  }
+
+  ::ng-deep .xyx {
+    .p-datatable table {
+        box-shadow: none !important;
+    }
+  }

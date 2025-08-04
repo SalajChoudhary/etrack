@@ -1,0 +1,107 @@
+.top-header {
+    width: 100%;
+    margin: 2px;
+    margin-left: 0px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 18px;
+    padding: 8px;
+    font-weight: 600;
+  }
+  .font-weight {
+    font-weight: 600 !important;
+  }
+  .italic{
+    font-style: italic;
+  }
+
+  .h-28{
+    height: 28%;
+  }
+  .italic{
+    font-style: italic;
+  }
+
+  .ml-7{
+    margin-left: 15.6rem;
+  }
+
+  .w-100{
+      width: 125px!important;
+  }
+  .w-272 {
+    width: 272px!important;
+  }
+  .r-align{
+      text-align: right;
+  }
+  .bold{
+    font-weight: 600;
+  }
+  .margin-l{
+    margin-left:7rem !important;
+  }
+
+
+  .t-width{
+      width: 98%;
+  }
+  .w-260{
+      width: 260px;
+  }
+  .counter-brief{
+    display: block;
+  text-align: right;
+  margin-right: 3%;
+  margin-top: -28px;
+  position: inherit;
+}
+.mtop-3{
+margin-top: 4px;
+}
+
+::ng-deep{
+    .container{
+        width: 100% !important;
+        max-width: 1400px !important;
+    }
+}
+.modal-head{
+    text-align: left;
+    font-weight: 500 !important;
+    padding-left: 5px;
+}
+.modal-footer{
+    text-align: right;
+    padding-right:10px;
+    border:none;
+    //border-top: 1px solid black !important;
+}
+.mtop-5{
+    margin-top: 5px;
+}
+@media(max-width:1023px){
+    .full-width{
+        width: 82%;
+    }
+  }
+  @media(min-width:1024px){
+    .full-width{
+        width: 86%;
+    }
+  }
+
+  .description{
+    padding: 15px;
+    border: 1px solid #65666b;
+  }
+  .title{
+    font-weight: bold;
+  }
+  .lh{
+    line-height: 1.8rem;
+  }
+
+  .w-80 {
+    max-width: 80%
+  }

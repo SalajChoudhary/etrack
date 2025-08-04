@@ -1,0 +1,252 @@
+
+
+@import "../../../../variables";
+
+.icons-holder {
+  position: absolute;
+  right: 5px;
+  display: flex;
+}
+.icons-holder mat-icon {
+  margin-right: 10px;
+}
+.icons-holder .user-name {
+  color: #000;
+  font-size: 16px;
+  margin-right: 25px;
+}
+nav.primary {
+  background: $primary;
+}
+.navbar-brand,
+.navbar-brand:hover {
+  color: #fff;
+}
+.navbar {
+  background-color: #233E2A !important;
+}
+.navbar {
+  color: white !important;
+}
+.btn-nav-title{
+  color: #fff;
+  border: none;
+  outline:none;
+}
+.btn-nav-title:focus{
+  box-shadow:none;
+}
+.primary-logo{
+  width: 210px;
+  position: relative;
+  left: 20px;
+  top: 18px;
+  height: 40px;
+}
+
+.bell_icon{
+  margin-left: 20px;
+  margin-top:15px
+}
+@media only screen and (max-width: 992px){
+  .primary-logo{
+    width: 150px;
+    position: relative;
+    left: 15px;
+    top: 25px;
+    height: 40px;
+  }
+}
+.nav-btns-holders div span.btn-text{
+  top: 22px;
+  left: 12px;
+}
+.nav-btns-holders{
+  //margin-left: 60px;
+  position: relative;
+  top: 1px;
+  display: flex;
+  text-align: center;
+  //left: 170px;
+  //width:800px;
+}
+.light-div{
+  // background: #ded8d8;
+  background: transparent;
+  cursor:pointer;
+  // font-size: 20px !important;
+  // font-weight: 500 !important;
+}
+
+.light-div-validate{
+  background: transparent;
+  cursor: default;
+  // font-size: 20px !important;
+  // font-weight: 500 !important;
+}
+.dark-div{
+  // background:#aaa3a3;
+  background: transparent;
+  // font-weight: 500 !important;
+  // font-size: 20px !important;
+  color: #233E2A;
+  
+  .btn-text{
+    padding-bottom: 5px;
+    border-bottom: 4px solid #233E2A;
+  
+    }
+}
+
+.dark-div-tab{
+  // background:#aaa3a3;
+  cursor: default !important ;
+  border-bottom: 2px solid black;
+}
+
+.nav-btns-holders div{
+  // width: 130px;
+  // border-radius: 14px;
+  margin-left: 15px;
+  margin-bottom:10px;
+  margin-top: 10px;
+  // height: 66px;
+  border-radius:0px;
+  // border: 1px solid #b2afaf;
+  padding-left:13px;
+  
+}
+.nav-btns-holders .btn-text{
+  position: relative;
+  display: table-cell;
+  top: 12px;
+  // max-width: 104px;
+  margin-left: -32px;
+  //font-weight: 500;
+  text-align: center;
+}
+.nav-icons {
+  position: absolute;
+  right: 10px;
+}
+.nav-icons span {
+  margin: 10px;
+}
+.nav-icons .username {
+  display: contents;
+  font-size: 15px;
+}
+.nav-icons .username span {
+  border-right: 1px solid #fff;
+  padding-right: 12px;
+}
+.user-circle{
+  display: inline-flex;
+  background-color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  margin: 0;
+  padding-top: 5px;
+  padding-left: 5px;
+}
+.breadcrumbs span{
+  margin:10px;
+  border-right: 1px solid #000;
+  padding-right: 10px;
+}
+.breadcrumbs span:last-child{
+  border:none;
+}
+.breadcrumbs span.active{font-weight:600;}
+.typograph span{
+  float: right;
+  font-size: 16px;
+}
+.heading-cont h2{margin:0;}
+.heading-cont h2.first,.heading-cont span{
+  color:#233E2A;
+}
+.border-btm-green{
+  border-bottom: 4px solid #233E2A;
+}
+
+::ng-deep .apply-for-permit .modal-dialog .modal-header{
+  background: #233E2A !important;
+  color: #fff;
+  height: 55px;
+  margin-right: -1px;
+}
+::ng-deep .apply-for-permit .modal-dialog .modal-body{
+  margin-right: -1px;
+}
+
+::ng-deep .apply-for-permit .modal-dialog{
+  max-width:900px;
+}
+::ng-deep .apply-for-permit .span2{
+  margin-left: 33px;
+  margin-right: 110px;
+}
+::ng-deep .apply-for-permit .span1{
+ font-weight: 400;
+}
+.min-height-500{
+  min-height: 500px;
+}
+.nav-content-holder {
+  // margin-left: 60px;
+  position: relative;
+  // top: 20px;
+  text-align: center;
+  // left: 170px;
+  // width: 800px;
+  padding-top:1.6rem;
+  //margin-right: 24% !important;
+  padding-bottom: 1.7rem;
+}
+.nav-content-holders {
+  // margin-left: 60px;
+  position: relative;
+  // top: 20px;
+  text-align: center;
+  // left: 170px;
+  // width: 800px;
+  padding-top:10px;
+  margin-right: 24% !important;
+}
+.nav-content-pop{
+  position: relative;
+  // top: 20px;
+  text-align: center;
+  // left: 170px;
+  // width: 800px;
+  padding-top:10px;
+  margin-right: 40% !important;
+}
+
+.sub-header-container{
+  min-height: 80px;
+  display: flex;
+}
+.address-heading{
+  font-weight: 500;
+  font-size: large;
+}
+
+.address-head-left{
+  padding-left: 122px;
+}
+
+.pt-3, .py-3 {
+  padding-top: 0rem !important;
+}
+
+.curserHover{
+  cursor: pointer;
+}
+
+::ng-deep .modal-25vw {
+  min-width: 25vw !important;
+  max-width: 25vW !important;
+}

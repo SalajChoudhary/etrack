@@ -1,0 +1,134 @@
+<p-table #docTable class="table-header-primary" [value]="rowData" [autoLayout]="true" styleClass="p-datatable-lg" [paginator]="true" [rows]="20"
+    [rowsPerPageOptions]="[5,10,15,20]" [showCurrentPageReport]="true"  [filters]="filters" 
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} documents" [scrollable]="true"
+    scrollHeight="55vh" aria-describedby="A table that shows a users projects.">
+    <ng-template pTemplate="header">
+      <tr role="rowgroup" class="height-max filter">
+        <th scope="col" role="row" class="table-header-primary" [pSortableColumn]="'docCategory'">Type
+          <p-columnFilter  class="p-ml-auto" type="text" field="doctypeLabel"  matchMode="in" display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showClearButton]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect  [(ngModel)]="doctypeLabel" [options]="doctypeLabelFilteringList" placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+              </ng-template>
+          </p-columnFilter></th>
+
+        <th scope="col" role="row" class="table-header-primary" [pSortableColumn]="'docSubTypeLabel'">Sub-Type
+          <p-columnFilter class="p-ml-auto" type="text" matchMode="in" field="docSubTypeLabel"  display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+          <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+            <p-multiSelect [(ngModel)]="docSubTypeSelect" [options]="docSubTypeFilteringList"  placeholder="Select" (onChange)="filter($event.value)">
+            </p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+
+        <th scope="col" role="row" class="table-header-primary" [pSortableColumn]="'documentName'">Document Name
+          <p-columnFilter class="p-ml-auto" type="text" field="documentName"  display="menu" matchMode="in" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false"  [showOperator]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect  [(ngModel)] ="docName" [options]="documentNameFilteringList" placeholder="Select"  (onChange)="filter($event.value)">
+              </p-multiSelect>
+              </ng-template>
+          </p-columnFilter>
+        </th>
+
+        <th scope="col" role="row" class="table-header-primary" [ngStyle]="{'text-align': 'center'}" [pSortableColumn]="'description'">Description
+          <p-columnFilter class="p-ml-auto" type="text" field="description"  display="menu" matchMode="in" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false"  [showOperator]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect [(ngModel)] ="docDescription" [options]="documentDescriptionFilteringList" [virtualScroll]="true" styleClass="descriptionField" placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+              </ng-template>
+          </p-columnFilter></th>
+
+        <th scope="col" role="row" class="table-header-primary" [ngStyle]="{'text-align': 'center'}" [pSortableColumn]="'files'"># Files
+          <p-columnFilter class="p-ml-auto" type="text" field="fileCounts" matchMode="in" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false"  display="menu"  [showOperator]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect  [(ngModel)]="docFileCount" [options]="filesCountFilteringList" placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+              </ng-template>
+          </p-columnFilter>
+        </th>
+
+        <th scope="col" role="row" class="table-header-primary" [ngStyle]="{'text-align': 'center'}" [pSortableColumn]="'uploadDateTime'">Upload Date | <br/>Time
+          <p-columnFilter type="text" field="uploadDate"  matchMode="in" display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect  [(ngModel)]="docUploadTime" [options]="documentUploadDateTimeFilteringList" placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+              </ng-template>
+          </p-columnFilter></th>
+
+           <th scope="col" role="row" [ngStyle]="{'text-align': 'center'}" class="table-header-primary" [pSortableColumn]="'projectId'">Project ID
+            <p-columnFilter class="p-ml-auto" type="text" field="projectId" matchMode="in" display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect  placeholder="Select" (onChange)="filter($event.value)" [(ngModel)]="projectId" [options]="projectIdFilteringList" >
+                </p-multiSelect>
+                </ng-template>
+            </p-columnFilter>
+          </th> 
+
+        <th scope="col" role="row" class="table-header-primary" [ngStyle]="{'text-align': 'center'}" [pSortableColumn]="'trackedApplicationId'">App ID
+          <p-columnFilter class="p-ml-auto" type="text" field="trackedApplicationId" matchMode="in" display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect  [(ngModel)]="docAppId" [options]="trackedApplcationIdFilteringList" placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+              </ng-template>
+          </p-columnFilter></th>
+
+        <th scope="col" role="row" class="table-header-primary" [ngStyle]="{'text-align': 'center'}" [pSortableColumn]="'documentReleasableCode'">DEP Rel Det
+             <p-columnFilter class="p-ml-auto" type="text" field="documentReleasableDesc" matchMode="in" display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect  [(ngModel)]="docDepRelDet" [options]="documentReleasableDescFilteringList"  placeholder="Select"  (onChange)="filter($event.value)">
+              </p-multiSelect>
+              </ng-template>
+          </p-columnFilter></th>
+
+        <th scope="col" role="row" class="table-header-primary" [ngStyle]="{'text-align': 'center'}">
+          <img *ngIf="(componentType === 'documents') && rowData?.length>0" style="cursor:pointer;" width="20px" height="20px"
+            alt="filter" src="assets/icons/funnel-cross.jpg" (click)="resetFilters()">
+          <span class="ml-2" *ngIf="(componentType === 'documents')">
+            <img src="assets/icons/export.png" (click)="exportToExcel()"  alt="Export Icon" style="height: auto; width: 25px; cursor: pointer;" />
+          </span>
+          
+        </th>
+        <th style="width: 17px;"></th>
+</tr>
+
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+        <tr>
+            <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word'}">{{item.doctypeLabel}}</td>
+            <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word'}">{{item.docCategory == '10' ? item.otherDocSubCategory : item.docSubTypeLabel}}</td>
+            <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'left','word-wrap':'break-word'}"><a href="javascript:;"
+                (click)="openModalFun(item.documentId)">{{item.documentName}}</a></td>
+                <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'center','word-wrap':'break-word'}">{{item.description}}</td>
+                <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'center'}">{{item.files?.length}}</td>
+
+                <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'center'}">
+                  {{item.uploadDateTime | date: "MM/dd/yyyy" }}<br>                {{item.uploadDateTime | date: "hh:mm a" }}</td>
+                  <!-- <td *ngIf="canShowProjectId" scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'center'}">{{item?.projectId}</td> -->
+                  <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'center'}"><a routerLink="./" (click)="setLocal(item,$event)">{{item?.projectId}}</a></td>
+            <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'center'}">{{item?.trackedApplicationId}}</td>
+            <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align':'center'}">{{item.documentReleasableDesc}}</td>
+
+            <td scope="col" role="cell" class="table-body" [ngStyle]="{'text-align': 'center'}">
+                <div role ="cell" class="actions-btn-cont justify-content-center" *ngIf="userRole !== UserRole['DEC_Program_Staff']">
+                    <button (click)="editClickedFun(item.documentId)" style="cursor: pointer;">
+                        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#90730e"
+                            class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path
+                                d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                            <path fill-rule="evenodd"
+                                d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                        </svg> -->
+                        <img  src="assets/icons/editicon.svg" alt="An edit icon" style="width: 1.5em;">
+                    </button>
+                    <button (click)="deleteClickedFun(item)" [disabled]="item.deleteDisabled || (!item.documentReviewedInd && item.queryResultId)" [ngClass]="{'cursor-pointer': !item.deleteDisabled}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                          </svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

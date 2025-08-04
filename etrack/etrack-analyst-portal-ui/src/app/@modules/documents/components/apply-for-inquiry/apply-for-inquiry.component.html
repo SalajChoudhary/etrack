@@ -1,0 +1,155 @@
+<app-analyst-sub-header [showAddress]="false" [showButton]="true" (openWarningModalEmitter) = "open()">
+
+</app-analyst-sub-header>
+<div class="inquiry-container">
+ <div class="shadow mb-5 light-green rounded">
+      <div class="accord-container">
+        <a class="d-flex accord active" [class.disabledaccord]="isStepDisabled(0)" id="stepOne" routerLink="/geographic-inquiry" [ngClass]="{ 'pointer-events-none': isStepDisabled(0) }">
+        <div class="step header-1n">Step 1</div>
+        <div class="text-cont">
+          <p class="text-decoration-none text-black header-1b">Area of Interest and Inquiry Details</p>
+          <span class="text-decoration-none text-black header-1n">Identify the area of interest on a map, reason for inquiry and enter request details</span
+          >
+        </div>
+        <div class="icon-holder ml-auto mr-4" tabindex="-1" [hidden]="!getStatusOfStep(0)"
+          [routerLink]="['/inquiry-documentation']">
+            <img class="mt-50" src="assets/icons/check2-square.svg"  alt="check2-square" />
+          </div>
+      </a>
+
+        <a class="d-flex accord active" [class.disabledaccord]="isStepDisabled(1)"
+        [routerLink]="isStepDisabled(1)?[]:['/inquiry-documentation']" [ngClass]="{'pointer-events-none':isStepDisabled(1) }">
+          <div class="step">Step 2</div>
+          <div class="text-cont">
+            <p class="text-decoration-none text-black header-1b">Supporting Documents</p>
+            <span class="text-decoration-none text-black header-1n">Upload additional inquiry materials </span>
+          </div>
+          <div class="icon-holder ml-auto mr-4" [hidden]="!getStatusOfStep(1)">
+            <img class="mt-50" src="assets/icons/check2-square.svg"  alt="check2-square" />
+          </div>
+        </a>
+        <div class="text-right">
+          <button  *ngIf="isAllStepsCompleted" (click)="onSubmitClicked()"
+          class="btn btn-sm btn-primari nextbutton mr-2 upload"
+          type="button"
+          id="submitBtn">
+          SUBMIT INQUIRY
+        </button>
+          <button
+          class="btn btn-sm btn-outline-dark closebutton mr-93"
+          aria-label="A close button in Main Navigation."
+          (click)="returnToDash()">
+          Close
+        </button>
+        </div>
+        <div class="clearfix">
+          <div class="margin-left-56" *ngIf="showServerError">
+            <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+          </div>
+        </div>
+      </div>
+</div>
+</div>
+<app-success-popup successMsg="Successfully Submitted Inquiry" #successPopup (onOkClick)="onSuccesPopupOkClicked()"></app-success-popup>
+<app-custom-modal-popup #warningModal [modalConfig]="warningConfig">
+  <ng-container>
+    <div class="modal-body center-align">
+      <div class="text-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="25"
+          height="25"
+          fill="red"
+          class="bi bi-exclamation-triangle float-left"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+          />
+          <path
+            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
+          />
+        </svg>
+        <span class="text-left mt-2 typo-2"
+          >You are about to leave the inquiry entry process for this
+          geographical inquiry</span
+        >
+        <br />
+        <span class="typo-2">and start a new one.</span>
+      </div>
+    </div>
+    <div class="text-center ml-23 typo-2">
+      <span class=""
+        >Click <strong>OK</strong> to continue and begin application entry for
+        another geographical inquiry.</span
+      >
+      <br />
+      <span class="mb-5 typo-2"
+        >Click <strong>Cancel</strong> to return to current screen.</span
+      >
+    </div>
+    <div class="modal-footer-confirmation model-footer-reduced">
+      <div class="text-center mt-4">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-dark btn-primari mb-2 mr-2 okButton"
+          (click)="openApplyForInquiryModal()"
+        >
+          OK
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-dark closebutton mb-2"
+          (click)="this.closeModal($event)"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+
+<app-custom-modal-popup #confirmModal [modalConfig]="warningConfig">
+  <ng-container>
+    <div class="modal-body center-align">
+      <div class="text-center">
+        <span class="text-left mt-2 typo-2"
+          >Are you sure you are ready to submit your inquiry?</span
+        >
+      </div>
+    </div>
+    <div class="text-center ml-23 typo-2">
+      <span class=""
+        >Click <strong>OK</strong> to continue to submit.</span
+      >
+      <br />
+      <span class="mb-5 typo-2"
+        >Click <strong>Cancel</strong> to return to current screen.</span
+      >
+    </div>
+    <div class="modal-footer-confirmation model-footer-reduced">
+      <div class="text-center mt-4">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-dark btn-primari mb-2 mr-2 okButton"
+          (click)="okClicked()"
+        >
+          OK
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-dark closebutton mb-2"
+          (click)="this.closeModal($event)"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+
+<ng-template #applyForInquiry let-modal>
+  <div class="modal-body">
+  <app-apply-for-permit [userRoles]="userRoles" [restartStepper] = "restartStepper"  (closeBtnClicked)="closeModal($event)"></app-apply-for-permit>
+  </div>
+</ng-template>

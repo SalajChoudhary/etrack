@@ -1,0 +1,71 @@
+.container-fluid {
+  padding-left: 70px !important;
+  padding-right: 70px !important;
+}
+.desc-count {
+  position: absolute;
+  right: 32px;
+  top: 115px;
+}
+div.errors {
+  position: relative;
+  // top: 38px;
+  padding-left: 12px;
+  color: red;
+  display: grid;
+  font-size: medium;
+  text-align: center;
+  margin-top: 10px;
+  margin-left: 5%;
+}
+.heade-text {
+  width: 300px;
+}
+.t-center {
+  text-align: center;
+  display: block !important;
+}
+.form-row {
+  margin-left: 0;
+  margin-right: -31px;
+}
+.footer-row {
+  bottom: 0;
+  width: 100%;
+  //background-color: #CAD1CC;
+  padding: 10px 5px 2px;
+  margin-bottom: 40px;
+}
+
+textarea::-webkit-input-placeholder {
+  font-style: italic;
+}
+
+textarea:-moz-placeholder {
+  /* Firefox 18- */
+  font-style: italic;
+}
+
+textarea::-moz-placeholder {
+  /* Firefox 19+ */
+  font-style: italic;
+}
+
+textarea:-ms-input-placeholder {
+  font-style: italic;
+}
+
+textarea::placeholder {
+  font-style: italic;
+}
+.typo-5 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ml-3percent{
+  margin-left: 3.6%;
+}
+.formHeight{
+  min-height:calc(100vh - 353px);
+}

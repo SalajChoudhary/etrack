@@ -1,0 +1,124 @@
+@import "../../../../variables";
+
+.custom-modal-header {
+  display: flex;
+  // align-items: flex-start;
+  // justify-content: space-between;
+  justify-content: flex-end;
+  align-items: center;
+  //border-bottom: 1px solid #dee2e6;
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
+}
+.remove-left-margin {
+  margin-right: 15px;
+  margin-top: 10px;
+  span {
+    color: black;
+    font-size: 20px;
+    font-weight: normal;
+    margin-top: auto;
+    cursor: pointer;
+  }
+  //position: absolute;
+}
+
+.navbar {
+  background-color: #233e2a !important;
+  color: white !important;
+  width: 100%;
+}
+nav.primary {
+  background: $primary;
+  display: flex;
+  justify-content: space-between;
+}
+
+.navbar-brand,
+.navbar-brand:hover {
+  color: #fff;
+}
+
+.mt-13 {
+  margin-top: 13px;
+}
+::ng-deep {
+  .modal-sm {
+    max-width: 500px !important;
+    min-width: 450px !important;
+  }
+  .modal-md {
+    max-width: 500px !important;
+    min-width: 499px !important;
+    max-height: 185px !important;
+    min-height: 185px !important;
+  }
+  .modal-medium {
+    max-width: 50rem !important;
+    min-width: 40rem !important;
+    max-height: 12rem !important;
+    min-height: 12rem !important;
+  }
+  .modal-lag {
+    max-width: 600px !important;
+    min-width: 599px !important;
+  }
+
+  .modal-info {
+    max-width: 600px !important;
+    min-width: 599px !important;
+  }
+
+  .modal-dms{
+    width: 500px !important;
+    max-width: 500px !important;
+  }
+
+  .modal-appl-info{
+    width: 800px;
+  }
+
+ 
+
+  .modal-alert {
+    max-width: 550px !important;
+    min-width: 549px !important;
+  }
+
+  .modal-missing {
+    max-width: 600px !important;
+    min-width: 599px !important;
+  }
+
+  .modal-vd-reviewer {
+    max-width: 400px !important;
+    min-width: 399px !important;
+  }
+
+  .modal-permit-validate {
+    max-width: 800px !important;
+    min-width: 799px !important;
+  }
+}
+::ng-deep .modal-dialog {
+  min-width: 650px;
+  max-width: 1000px;
+}
+::ng-deep {
+  @media (max-width: 811px) {
+    .responsive-modal {
+      max-width: 650px;
+      min-width: 650px;
+    }
+  }
+}
+::ng-deep .xtra-width .modal-dialog {
+  max-width: 900px !important;
+  min-width: 720px;
+}
+
+.custom-modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  // padding: 1rem;
+}

@@ -1,0 +1,16 @@
+<div class="emailcomposeContainer">
+    <div class="emailContainer">
+        <div class=" displayFlex ">   
+                <div class="close_button">
+                    <button type="button" (click)="activeModel.dismiss('Cross click')">X</button>
+                </div>
+        </div>
+        <div class="email_content">
+                <div class="email_body existingBody">
+                    <div class="black" *ngFor="let historycontent of data">
+                        <div *ngFor="let item of historycontent"class=checkedClass [innerHtml]="item"></div>
+                    </div> 
+                </div>
+        </div>
+    </div>
+</div>

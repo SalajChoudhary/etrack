@@ -1,0 +1,376 @@
+<div class="row">
+  <div class="col-12 px-0">
+      <div class="header-center">
+          <strong class="header-3b">Archive/Purge Document Management</strong>
+        </div>
+  </div>
+</div>
+<form [formGroup]="queryForm" (ngSubmit)="onQueryFormSubmit()">
+
+  <div class="row ml-4 mb-2 px-0 justify-content-end" style="flex-wrap: nowrap !important">
+      <div class="col-2 ml-4">
+          <label class="ml-4">Region*:&nbsp;</label>
+          <select formControlName="region" (change)="onRegionChange()">
+              <option class="text-left" [ngValue]="reg" *ngFor="let reg of regionList">
+                  {{reg}}
+              </option>
+
+          </select>&nbsp;
+      
+      </div>
+      <div class="col-9">
+          <label>Query Name*:&nbsp;</label>
+          <select [ngbPopover]="popOverText" popoverClass="query-popover" formControlName="queryName" style="width: 70%;"
+           triggers="mouseenter:mouseleave" placement="top" (change)="getResultSet()">
+              <option value="" disabled>-- Select --</option>
+              <option
+                  [ngValue]="query_item" *ngFor="let query_item of queriesList">
+                  {{query_item}} - R{{queryForm?.controls?.region?.value}}
+              </option>
+          </select>&nbsp;
+      <button type="button" *ngIf="userIsSystemAdmin" [disabled]="(!queryForm?.controls?.queryName?.value || currentResultSet) ? true : null" 
+        style="float: right; margin-right: 52px !important;" class="btn btn-sm btn-primari" 
+        (click)="onRunClicked()">Run</button>
+
+      </div>
+      <div class="col-1"></div>
+  </div>
+  <div class="row ml-4 justify-content-end">
+      <div class="col-2">
+
+      </div>
+      <div class="col-9 mb-2">
+
+          <label *ngIf="currentResultSet">Result Set Name:&nbsp;</label>
+          <div *ngIf="currentResultSet" class="result-set">
+            {{currentResultSet}}
+          </div>
+          <button *ngIf="currentResultSet && showProcessOrReviewButton" style="float: right; margin-right: 52px !important;" class="btn btn-sm btn-primari"
+           [disabled]="(!currentResultSet || showGrid) ? true : null">{{userIsSystemAdmin ? 'Retrieve' : 'Review'}}</button>
+      </div>
+      <div class="col-1"></div>
+  </div>
+</form>
+<div class="row mt-4" *ngIf="showGrid">
+<div class="col-1">
+
+</div>
+  <div class="col-10 t-center px-0">
+      <strong class="header-3b" style="margin-left: 140px !important">{{selectedQuery}} - Region {{selectedRegion}}</strong>
+        <button (click)="openDownloadFilesDialog()" type="button"
+                  class="btn btn-sm btn-primari mb-2 adddocument"
+                  [disabled]="!(reviewDocuments.length) ? true : null">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-download-lg" viewBox="0 0 16 16">
+                    <path
+                      d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                    <path
+                      d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                  </svg>
+                  Download Documents
+          </button>
+  </div>
+</div>
+<div class="row" *ngIf="showGrid">
+  <div class="col-1"></div>
+  <div class="col-10 px-0 w-77 mr-4">
+      <div class="grid-margin mb-2">
+          <app-dashboard-table #documentsTable filename="purgeArchive" [isMaxHeight]="true" [isRecords]="true"
+              [isPagination]="false" [dataList]="reviewDocuments" [headers]="purgeArchiveHeaders" scrollHeight="55vh"
+              [activeTab]="activeTab" [isReadOnly] = "!userIsSystemAdmin && isReadOnly" [isArchive]="isArchive"
+              [disableRemoveAll]="disableRemoveAll"
+              (removePurgeArchiveDoc)="removePurgeArchiveDoc($event)"
+              (checkAllDocuments)="checkAllReviewDocuments($event)" (deleteDocClicked)="deleteDocClicked($event)"
+              (openDocModal)="openDocModal($event)" (deleteAllRows)="deleteAllDocuments()"
+              (archiveDocClicked)="archiveDocClicked($event)" (archiveAllRows)="archiveAllDocuments()"
+              (removeAllRows)="removeAllDocuments()" (emitFilteredRows)="onDocumentRowsFiltered($event)"
+              (checkDocument)="onDocumentChecked($event)">
+          </app-dashboard-table>
+      </div>
+  </div>
+  <div class="col-1"></div>
+</div>
+<div class="row mt-2" *ngIf="showGrid && showProcessOrReviewButton && !isReadOnly && !userIsSystemAdmin" style="font-style:italic">
+<div class="col-1">
+
+</div>
+<div class="col-10 t-center px-0 w-77">
+
+  <p class="header-1n">
+      Download documents to prepare for {{isArchive ? 'archive' : 'deletion'}}, then place a checkmark to set the documents for {{isArchive ? 'archive' : 'deletion'}}
+  </p>
+  <!-- <p class="header-1n" *ngIf="userIsSystemAdmin">
+    Download documents to prepare for deletion, then click the trashcan to delete
+  </p> -->
+  <p class="header-1n">
+      OR
+  </p>
+  <p class="header-1n">
+      Click the blue arrow to remove the document from this candidate {{isArchive ? 'archive' : 'deletion'}} list and to retain in DMS.
+  </p>
+</div>
+<div class="col-1"></div>
+
+</div>
+<div class="row col-12 justify-content-end mr-2" *ngIf="showServerError">
+<app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+</div>
+<div class="row mt-2" *ngIf="showGrid">
+  <div class="col-11 footer-row">
+      <input *ngIf="showProcessOrReviewButton" 
+      [disabled]="(!canCompleteReview || (!userIsSystemAdmin && isReadOnly) || (userIsSystemAdmin && reviewDocuments.length)) ? true : null" 
+      [(ngModel)]="completeCheckbox" type="checkbox" (change)="onCompleteClicked()">
+      <label *ngIf="showProcessOrReviewButton" class="form-check-label form-check-inline header-1b mr-2 ml-1"
+      [ngClass]="(!canCompleteReview || (!userIsSystemAdmin && isReadOnly) || (userIsSystemAdmin && reviewDocuments.length)) ? 'disabled-text':''">
+          {{userIsSystemAdmin ? 'Process Complete' : 'Review Complete'}}</label>
+      <button *ngIf="!userIsSystemAdmin" type="button" (click)="saveClicked()" 
+        [disabled] = "(isReadOnly || !gridChanged) ? true : null" class="btn btn-primari mr-1 ml-2 ">Save</button>
+      <button type="button" (click)="closeClicked()" style="margin-right: 52px !important"
+        class="btn btn-sm btn-outline-dark closebutton ml-1">Close</button>
+  </div>
+  <div class="col-1"></div>
+</div>
+<app-custom-modal-popup #docModal [modalConfig]="modalConfig">
+  <ng-container>
+    <div class="modal-header text-center modal-header-dec-reduced" style="justify-content: center !important">
+      <h3 class="modal-title modal-basic-title-dec header-1b" id="modal-basic-title">
+        Uploaded File Details
+      </h3>
+    </div>
+
+    <div class="modal-body files-tables" role="Selected Files Table" aria-label="Selected Files Table"
+      aria-describedby="files_tables">
+      <div>
+        <p class="text-center">
+          <strong>Facility: </strong> {{currentModalRow?.decId}} - {{currentModalRow?.facilityName}}
+        </p>
+      </div>
+      <div class="row" style="text-align: center">
+        <p class="w-100">
+          <strong>Document Name: </strong> {{currentModalRow?.documentName}}
+        </p>
+      </div>
+      <p-table [value]="fileList" [autoLayout]="true" styleClass="p-datatable-lg" [scrollable]="true"
+        scrollHeight="55vh">
+        <ng-template pTemplate="header">
+          <tr role="rowheader" aria-label="Selected Document name">
+            <th scope="col" role="columnheader" aria-label="Selected File Name Header" class="table-header-primary"
+              [pSortableColumn]="'name'" [ngStyle]="{ width: '350px' }">
+              File Name
+            </th>
+            <th scope="col" role="columnheader" aria-label="Selected File Date Header" class="table-header-primary"
+              [pSortableColumn]="'lastModified'">
+              File Date
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-i="rowIndex">
+          <tr role="rowheader">
+            <td scope="col" role="cell" aria-label="Selected File Name Cell" class="table-body" [ngStyle]="{
+              width: '350px',
+              'text-align': 'left',
+              'word-wrap': 'break-word'
+            }">
+              <a href="javascript:;" (click)="openFileContent(item)">{{
+                item.fileName
+                }}</a>
+            </td>
+            <td scope="col" role="cell" aria-label="Selected File Date Header" class="table-body"
+              [ngStyle]="{ 'text-align': 'left' }">
+              {{ item.fileDate | date: "MM/dd/yyyy" }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div class="modal-footer model-footer-reduced">
+      <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="closeDocModal()">
+        Close
+      </button>
+    </div>
+  </ng-container>
+</app-custom-modal-popup> 
+
+<app-custom-modal-popup #reviewCompletePopUp *ngIf="reviewCompletePopUpOpen">
+  <ng-container>
+
+      <p class="header-1n text-center mt-2 ml-4 mr-4">
+        You have completed your review.
+        Please ensure that all files are downloaded and all lists are exported.</p>
+      <p class="header-1n text-center mt-4 ml-4 mr-4 text-red">Once processed, the files will not be 
+        recoverable in DMS.
+      </p>
+      <p class="header-1n text-center mt-4 ml-4 mr-4">Please inform your System Administrator
+          that you have completed your review of
+      </p>
+      <p class="header-1n text-center ml-4 mr-4" style="font-style:italic"> {{currentResultSet}}
+      </p>
+      <div class="text-center mb-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="reviewCompleteOkClicked()"
+        >
+          OK
+        </button>
+        <button
+          class="btn btn-sm btn-outline-dark closebutton mb-2 upload"
+          (click)="reviewCompleteCancelClicked()"
+        >
+          Cancel
+        </button>
+      </div>
+    </ng-container>
+</app-custom-modal-popup>
+<app-custom-modal-popup #dmsStatusPopUp *ngIf="dmsStatusPopUpOpen">
+  <ng-container>
+
+      <p class="header-1n text-center mt-2 ml-4 mr-4 mb-3">
+          The following document(s) in DMS may have been deleted
+          since this {{isArchive ? 'archive' : 'purge'}} review process has begun.</p>
+      <div *ngFor="let changedDoc of changedDocs" class="typo-2 ml-4">
+        - {{changedDoc.documentName}}, project id {{changedDoc.projectId}}, DEC ID {{changedDoc.decId}}
+      </div>
+      <p class="header-1n text-center mt-3 ml-4 mr-4 mb-0">
+        Click <strong>OK</strong> to immediately remove from the candidate list</p>
+      <p class="header-1n text-center ml-4 mr-4 mb-0">or</p>
+      <p class="header-1n text-center ml-4 mr-4">
+        Click <strong>Cancel</strong> to return to the candidate list, allowing you to go
+        to DMS to verify</p>
+      <div class="text-center mb-2 mt-4">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="dmsStatusOkClicked()"
+        >
+          OK
+        </button>
+        <button
+          class="btn btn-sm btn-outline-dark closebutton mb-2 upload"
+          (click)="dmsStatusCancelClicked()"
+        >
+          Cancel
+        </button>
+      </div>
+    </ng-container>
+</app-custom-modal-popup>
+
+<!-- System admin popups -->
+<app-custom-modal-popup #processPopUp *ngIf="processPopupOpen">
+  <ng-container>
+
+      <p class="header-1n text-center mt-2 ml-4 mr-4">Please ensure that the reviewed Result Set
+        with Analyst choices has been saved for historical purposes and record keeping.
+      </p>
+      <div class="text-center mb-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="processPopupOkClicked()"
+        >
+          OK
+        </button>
+      </div>
+    </ng-container>
+</app-custom-modal-popup>
+
+<app-custom-modal-popup #processCompletePopUp *ngIf="processCompletePopUpOpen">
+  <ng-container>
+
+      <p class="header-1n text-center mt-2 ml-4 mr-4 mb-0">Your process of this result set is complete.</p>
+      <p class="header-1n text-center mt-3 ml-4 mr-4 mb-0">Would you like to delete the result set?</p>
+      <p class="header-1n text-center ml-4 mr-4">{{currentResultSet}}</p>
+
+      <div class="text-center mb-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="processCompleteDeleteClicked()"
+        >
+          Delete
+        </button>
+        <button
+          class="btn btn-sm btn-outline-dark closebutton mb-2 upload"
+          (click)="processCompleteCancelClicked()"
+        >
+          Cancel
+        </button>
+      </div>
+    </ng-container>
+</app-custom-modal-popup>
+
+<app-custom-modal-popup #informAnalystPopUp *ngIf="informAnalystPopUpOpen">
+<ng-container>
+
+    <p class="header-1n text-center mt-2 ml-4 mr-4">Please inform a designated regional analyst to review the Result Set below</p>
+    <p class="header-1n text-center ml-4 mr-4" style="font-style:italic">{{currentResultSet}}</p>
+
+    <div class="text-center mb-2 mt-3">
+      <button
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+        (click)="informAnalystOkClicked()"
+      >
+        OK
+      </button>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+
+<app-custom-modal-popup #noRecordsPopUp *ngIf="noRecordsPopUpOpen">
+<ng-container>
+
+    <p class="header-1n text-center mt-2 ml-4 mr-4">No documents meet the criteria for</p>
+    <p class="header-1n text-center ml-4 mr-4" style="font-style:italic">{{queryForm?.controls?.queryName?.value}} - R{{queryForm?.controls?.region?.value}}</p>
+    <div class="text-center mb-2 mt-3">
+      <button
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+        (click)="noRecordsOkClicked()"
+      >
+        OK
+      </button>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+
+<app-custom-modal-popup #downloadModal *ngIf="downloadModalOpen">
+
+<ng-container>
+  <div class="modal-header t-center modal-header-dec-reduced">
+    <h2 id="modal-basic-title" class="modal-title modal-basic-title-dec header-1b">
+      Download Documents/Files
+    </h2>
+  </div>
+  <div class="modal-body">
+    <div class="grid-box">
+      <div class="row">
+        <div class="col-12 grid-margin">
+          <div *ngIf="downloadSubmited && downloadErrors.length > 0" class="alert alert-danger model-reduced-alert typo-2">
+            Failed to download file(s) : {{ downloadErrors.toString() }}
+          </div>
+          <div *ngIf="downloadSubmited && downloadErrors.length == 0"
+            class="alert alert-primary model-reduced-alert typo-2">
+            {{ numberFilesDownloaded }} file(s) successfully downloaded
+          </div>
+    
+          <div *ngIf="!downloadSubmited && (numFilesSelected > 0)" class="alert alert-primary model-reduced-alert typo-2">
+           {{numFilesSelected}} file(s) selected
+          </div>
+          <app-dashboard-table #downloadFilesTable filename="purgeArchiveDownload" scrollHeight="45vh" [isRecords]="true" [isMaxHeight]="true"
+            [isPagination]="false" [dataList]="downloadFilesList" [headers]="purgeArchiveDownloadHeaders"
+            [activeTab]="activeTab" (emitFilteredRows)="onDownloadRowsFiltered($event)"
+            (checkAllDocuments)="checkAllDownloadDocuments($event)">
+
+          </app-dashboard-table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer model-footer-reduced">
+    <button type="button" class="btn btn-sm btn-primari mb-2 mr-2 upload"
+      (click)="downloadFilesFromSelected()" [disabled]="!fileSelectedForDownload ? true : null">
+      Download
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton button-width mb-2 mr-2" (click)="
+    closeDownloadFilesDialog()
+    ">
+    Close
+    </button>
+  </div>
+</ng-container>
+</app-custom-modal-popup>

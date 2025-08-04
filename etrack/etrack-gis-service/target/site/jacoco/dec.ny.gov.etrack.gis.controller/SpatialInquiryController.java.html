@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpatialInquiryController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.controller</a> &gt; <span class="el_source">SpatialInquiryController.java</span></div><h1>SpatialInquiryController.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.controller;
+
+import java.util.Arrays;
+import java.util.UUID;
+import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.databind.JsonNode;
+import dec.ny.gov.etrack.gis.model.GISServiceResponse;
+import dec.ny.gov.etrack.gis.model.PolygonAction;
+import dec.ny.gov.etrack.gis.service.SpatialInquiryService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@RestController
+<span class="nc" id="L27">public class SpatialInquiryController {</span>
+  
+  @Autowired
+  private SpatialInquiryService spatialInquiryService;
+  
+<span class="nc" id="L32">  private static Logger LOGGER = LoggerFactory.getLogger(SpatialInquiryController.class.getName());</span>
+  private static final String MANTORY_VAL_MISSING_LOG_INFO = &quot;Mandatory value is missing {} &quot;;
+
+  /**
+   * Save/Amend the Spatial Polygon details.
+   * 
+   * @param featureMap - Feature map details.
+   * @param value - pjson value.
+   * @param action - Save/Update action.
+   * 
+   * @return - Store the Spatial Inquiry details.
+   */
+  @PostMapping(value = &quot;/spatial-polygon/{action}&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Save/Update the Applicant/User Spatial Inquiry Applicant Polygon into eTrack.&quot;)
+  public Object saveSpatialInquiryApplicantPolygon(
+      final @RequestPart(value = &quot;features&quot;) Object featureMap,
+      final @RequestPart(value = &quot;f&quot;) String value, 
+      @PathVariable @ApiParam(example = &quot;S&quot;, value=&quot;S-Save, U-Update&quot;) final PolygonAction action) {
+
+<span class="nc" id="L51">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L52">    LOGGER.info(&quot;Entering into saveSpatialInquiryApplicantPolygon Context Id: {} &quot;, contextId);</span>
+<span class="nc" id="L53">    return spatialInquiryService.spatialInquiryApplicantPolygon(Arrays.asList(featureMap), value, action.name(),</span>
+        contextId);
+  }
+
+  /**
+   * Retrieve the Spatial Polygon details from GIS service for the Spatial Inquiry id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param spatialInquiryId - Spatial Inquiry Id.
+   * 
+   * @return - Spatial Polygon details.
+   */
+  @GetMapping(value = &quot;/spatial-polygon/{spatialInquiryId}&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Retrieve the Spatial Inquiry Polygon details for the input inquiry id.&quot;)
+  public String getSpatialPolygonByInquiryId(HttpServletResponse response,
+      @PathVariable @ApiParam(example = &quot;12313&quot;, value=&quot;Sptial Inquiry id.&quot;) final String spatialInquiryId) {
+
+<span class="nc" id="L70">    String contextId = UUID.randomUUID().toString();</span>
+
+<span class="nc" id="L72">    LOGGER.info(&quot;Entering into getSpatialPolygonByApplicationId. Context Id {}&quot;, contextId);</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">    if (!StringUtils.hasLength(spatialInquiryId)) {</span>
+<span class="nc" id="L74">      LOGGER.info(MANTORY_VAL_MISSING_LOG_INFO, spatialInquiryId);</span>
+<span class="nc" id="L75">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L76">      return null;</span>
+    }
+<span class="nc" id="L78">    return spatialInquiryService.getSpatialPolygonByApplicationId(spatialInquiryId, contextId);</span>
+  }
+
+  /**
+   * Delete the Spatial Inquiry details for the input object id.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param objectId - Object Id to be deleted.
+   * 
+   * @return - Deleted Spatial Inquiry Polygon details.
+   */
+  @PostMapping(value = &quot;/delete-spatial-polygon/{objectId}&quot;)
+  @ApiOperation(value=&quot;Delete the Spatial Inquiry Polygon details for the input inquiry id.&quot;)
+  public Object deleteSpatialInquiryPolygonByObjId(HttpServletResponse response,
+      @PathVariable @ApiParam(example = &quot;222342&quot;, value=&quot;Spatial Inquiry Polygon Object Id&quot;) final String objectId) {
+
+<span class="nc" id="L94">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L95">    LOGGER.info(&quot;Entering into deleteSpatialInquiryPolygonByObjId Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L96">    return spatialInquiryService.deleteSpatialInqPolygonByObjId(objectId, contextId);</span>
+  }
+
+  /**
+   * Persist the Spatial Inquiry details.
+   * 
+   * @param userId - User who initiates this request.
+   * @param jwtToken - JWT Token
+   * @param spatialInqPolygon - Spatial Inquiry Polygon details to be persisted.
+   * 
+   * @return - Persisted Spatial Inquiry Polygon.
+   */
+  @PostMapping(value = &quot;/save-spatial-inquiry&quot;)
+  @ApiOperation(value=&quot;Save the Spatial Inquiry details in eTrack requested by the user.&quot;)
+  public Object saveSpatialInquiryDetails(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken,
+      @RequestBody final JsonNode spatialInqPolygon) {
+
+<span class="nc" id="L115">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L116">    LOGGER.info(&quot;Entering into saveSpatialInquiryDetails Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L117">    return spatialInquiryService.saveSpatialInqDetails(userId, contextId, jwtToken, spatialInqPolygon);</span>
+  }
+
+  /**
+   * Retrieve the Spatial Inquiry associated with this inquiry id.
+   * 
+   * @param userId - User who initiates this request.
+   * @param requestorName - Inquiry Requester name.
+   * @param jwtToken - JWT token
+   * @param inquiryId - Inquiry Id.
+   * 
+   * @return - Returns the Inquiry details.
+   */
+  @GetMapping(value = {&quot;/spatial-inquiry&quot;, &quot;/spatial-inquiry/{inquiryId}&quot;})
+  @ApiOperation(value=&quot;Retrievve the Spatial Inquiry details in eTrack requested by the user and/or inquiry id.&quot;)
+  public Object getSpatialInquiryDetails(
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      @RequestHeader(required = false) @ApiParam(example = &quot;NameString&quot;, value=&quot;Requestor name&quot;) final String requestorName,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken,
+      @PathVariable(required = false) @ApiParam(example = &quot;872934&quot;, value=&quot;Spatial Inquiry Id.&quot;) final Long inquiryId) {
+
+<span class="nc" id="L138">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L139">    LOGGER.info(&quot;Entering into getSpatialInquiryDetails Context Id: {}&quot;, contextId);</span>
+<span class="nc" id="L140">    return spatialInquiryService.getSpatialInquiryDetails(userId, contextId, jwtToken, inquiryId,</span>
+        requestorName);
+  }
+
+  /**
+   * Store the Inquiry response details into GIS.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param userId - User who initiates this request.
+   * @param jwtToken - JWT Token
+   * @param spatialInqPolygonResponse - Spatial Inquiry Polygon Response details to be updated in GIS Layer.
+   * 
+   * @return - Persisted Spatial Inquiry Polygon.
+   */
+  @PostMapping(value = &quot;/upload-inq-response&quot;)
+  @ApiOperation(value=&quot;Upload the Inquiry Response details into GIS.&quot;)
+  public void saveSpatialInquiryResponseDetails(HttpServletResponse response,
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId,
+      @RequestHeader @ApiParam(example = &quot;276316e4-176c-4db0-bc87-dcaa486a5e8c&quot;, value=&quot;Unique UUID to track this request&quot;) final String contextId,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) final String jwtToken,
+      @RequestBody final JsonNode spatialInqPolygonResponse) {
+
+<span class="nc" id="L162">    LOGGER.info(&quot;Entering into saveSpatialInquiryResponseDetails. User Id {}, Context Id: {}&quot;, userId, contextId);</span>
+<span class="nc" id="L163">    GISServiceResponse responseText = spatialInquiryService.saveSpatialInquiryResponseDetails(userId, contextId, jwtToken, spatialInqPolygonResponse);</span>
+<span class="nc" id="L164">    LOGGER.info(&quot;Exiting from saveSpatialInquiryResponseDetails. User Id {}, Context Id: {}. &quot;</span>
+        + &quot;Response Received {}&quot;, userId, contextId, responseText);
+<span class="nc" id="L166">    response.setStatus(HttpStatus.OK.value());</span>
+<span class="nc" id="L167">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

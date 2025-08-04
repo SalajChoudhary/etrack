@@ -1,0 +1,199 @@
+@import "../../../../variables";
+
+.icons-holder {
+  position: absolute;
+  right: 5px;
+  display: flex;
+}
+.icons-holder mat-icon {
+  margin-right: 10px;
+}
+.icons-holder .user-name {
+  color: #000;
+  font-size: 16px;
+  margin-right: 25px;
+}
+
+nav.primary {
+  background: $primary;
+  padding: 0.1rem 1rem !important;
+  min-height: 34px;
+  &.differentHeader {
+    background-color: rgb(7, 55, 99) !important;
+  }
+}
+// .navbar-brand,
+// .navbar-brand:hover {
+//   color: #fff;
+// }
+.navbar {
+  background-color: #233e2a !important;
+  &.differentHeader {
+    background-color: #ded8d8 !important;
+  }
+}
+.navbar {
+  color: white !important;
+}
+.btn-nav-title {
+  color: #fff;
+  border: none;
+  outline: none;
+}
+.btn-nav-title:focus {
+  box-shadow: none;
+}
+.primary-logo {
+  width: 230px;
+  position: absolute;
+  left: 15px;
+  top: 55px;
+}
+
+@media only screen and (max-width: 992px) {
+  .primary-logo {
+    width: 150px;
+    position: absolute;
+    left: 15px;
+    top: 55px;
+  }
+}
+.nav-btns-holders div:nth-child(1) span.btn-text {
+  top: 22px;
+  left: 12px;
+}
+.nav-btns-holders {
+  margin-left: 60px;
+  position: relative;
+  top: 7px;
+  display: flex;
+  text-align: center;
+  left: 170px;
+  width: 800px;
+}
+.text-blue {
+  color: rgb(71, 146, 234);
+}
+.light-div {
+  background: #ded8d8;
+  cursor: pointer;
+}
+.dark-div {
+  background: #aaa3a3;
+  cursor: pointer;
+}
+
+.nav-btns-holders div {
+  width: 130px;
+  border-radius: 14px;
+  margin-left: 30px;
+  height: 66px;
+  border-radius: 10px;
+  border: 1px solid #b2afaf;
+  padding-left: 13px;
+}
+.nav-btns-holders .btn-text {
+  position: relative;
+  display: table-cell;
+  top: 12px;
+  max-width: 104px;
+  margin-left: -32px;
+  font-weight: 500;
+  text-align: center;
+}
+.nav-icons {
+  position: absolute;
+  right: 10px;
+}
+.nav-icons span {
+  margin: 10px;
+}
+.nav-icons .username {
+  display: contents;
+  font-size: 15px;
+}
+.nav-icons .username span {
+  border-right: 1px solid #fff;
+  padding-right: 12px;
+}
+.user-circle {
+  display: inline-flex;
+  background-color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  margin: 0;
+  padding-top: 5px;
+  padding-left: 5px;
+}
+.breadcrumbs span {
+  margin: 10px;
+  border-right: 1px solid #000;
+  padding-right: 10px;
+}
+.breadcrumbs span:last-child {
+  border: none;
+}
+.breadcrumbs span.active {
+  font-weight: 600;
+}
+.typograph span {
+  float: right;
+  font-size: 16px;
+}
+.heading-cont h2 {
+  margin: 0;
+}
+.heading-cont h2.first,
+.heading-cont span {
+  color: #233e2a;
+}
+.border-btm-green {
+  border-bottom: 4px solid #233e2a;
+}
+
+::ng-deep .apply-for-permit .modal-dialog .modal-header {
+  background: #233e2a !important;
+  color: #fff;
+  height: 55px;
+  margin-right: -1px;
+}
+::ng-deep .apply-for-permit .modal-dialog .modal-body {
+  margin-right: -1px;
+}
+
+::ng-deep .apply-for-permit .modal-dialog {
+  max-width: 820px;
+}
+::ng-deep .apply-for-permit .span2 {
+  margin-left: 33px;
+  margin-right: 110px;
+}
+::ng-deep .apply-for-permit .span1 {
+  font-weight: 400;
+}
+::ng-deep .min-height-500 {
+  min-height: 500px;
+}
+
+::ng-deep .mat-badge-content {
+  font-size: 11px !important;
+}
+::ng-deep .mat-badge-medium .mat-badge-content {
+  width: 16px;
+  height: 16px;
+  line-height: 18px;
+}
+::ng-deep .mat-badge-medium.mat-badge-above .mat-badge-content {
+  top: -5px;
+}
+::ng-deep
+  .mat-badge-medium.mat-badge-overlap.mat-badge-after
+  .mat-badge-content {
+  right: -5px;
+}
+
+.pad-top-bottom {
+  padding-top: 0.3125rem;
+  padding-bottom: 0.3125rem;
+}

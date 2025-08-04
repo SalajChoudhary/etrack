@@ -1,0 +1,78 @@
+.w-80{
+    width: 80%;
+}
+
+.w-90 {
+   width: 90%;
+}
+
+.w-66 {
+  width: 66%;
+}
+
+.w-68 {
+  width: 68%;
+}
+
+.footer-row {
+    bottom: 0;
+    width: 100%;
+    //background-color: #CAD1CC;
+    padding: 10px 5px 2px;
+    margin-bottom: 40px;
+  }
+
+ .view{
+    min-height: calc(100vh - 260px);
+ }
+
+ .h-30{
+    height: 30px !important;
+ }
+
+ .h-max {
+    height: 4.5rem !important;
+ }
+
+ .t-center {
+   display: block !important;
+   text-align: center !important;
+ }
+
+ .actions-btn-cont button {
+   background-color: transparent;
+   border: none;
+ }
+
+ .pl-error {
+   padding-left: 17.5rem !important;
+ }
+
+ .black-bar {
+  border-top: 2px solid gray;
+ }
+
+ .col-radio {
+  flex: 0 0 10%;
+  max-width: 10%;
+ }
+
+ .pl-label {
+  padding-left: 0.3125rem !important;
+ }
+
+ .pl-sw-error {
+  padding-left: 8rem !important;
+ }
+
+ .pl-sw-sub-type-error {
+  padding-left: 10rem !important;
+ }
+
+ .pl-permit-error {
+    padding-left: 6.3rem !important;
+ }
+
+ .pl-trans-error {
+    padding-left: 17rem !important;
+ }

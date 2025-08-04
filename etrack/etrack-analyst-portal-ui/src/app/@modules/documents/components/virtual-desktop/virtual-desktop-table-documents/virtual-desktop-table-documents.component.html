@@ -1,0 +1,96 @@
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="header">
+            <h3 *ngIf="documents?.documents?.length && !isGi" class="title text-blue header-1b mb-0"  triggers="mouseenter:mouseleave" #pop="ngbPopover"
+                (mouseenter)="onDocumentHover();" container="body" (click)="NavigateDM()" style="cursor: pointer;"
+                [ngbPopover]="popContent"
+                [popoverTitle]=" popUpDocumentHeader"
+                placement="right"> Documents </h3>
+                <h3 *ngIf="!documents?.documents?.length || isGi" class="title header-1b mb-0"  triggers="mouseenter:mouseleave" #pop="ngbPopover"
+                (mouseenter)="onDocumentHover();" container="body" style="cursor: pointer;"
+                [ngbPopover]="popContent"
+                [popoverTitle]=" popUpDocumentHeader"
+                placement="right"
+                > Documents </h3>
+            <div>
+                <button [hidden]="isReadOnly && !isFromDisposed"
+                [routerLink]="['/document-upload']"
+                [queryParams]="!isGi ? {page: 'virtual-workspace', projectId:projectId}
+                    : {page: 'gi-virtual-workspace', inquiryId:inquiryId}"
+                class="btn btn-sm btn-outline-dark nextbutton mb-2 upload">
+                    Add New
+                </button>
+
+            </div>
+        </div>
+        <hr class="mt-1">
+    </div>
+    <div class="col-12 " >
+        <div class="scrollable">
+            <table aria-labelledby="Documents Table" class="table table-borderless table-striped mb-0  ">
+            <thead class="p-datatable.has-no-rounded-headers" style="background-color:#ded8d8 ;">
+                <tr role="rowgroup" >
+                    <th scope="col" role="cell" [ngStyle]="{width: '30%'}">
+                        Document Name
+                    </th>
+                    <th scope="col" role="cell" [ngStyle]="{width: '40%'}">
+                        Document Description 
+                    </th>
+                    <th scope="col" role="cell" [ngStyle]="{width: '15%'}">
+                      Upload Date
+                    </th>
+                    <th class="text-left " scope="col" role="cell" [ngStyle]="{width: '15%'}">
+                        DEP Rel Det
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr role="rowgroup" *ngFor="let document of documents?.documents">
+                    <td scope="col" role="cell" [ngStyle]="{width: '30%'}">
+                        <div><a href="javascript:void(0)" title="${file}" class="text-blue " (click)="onDocumentTitleClick(document)">{{ document?.documentTitle }} ({{document.fileCount}})</a> </div>
+                        <!-- <div>{{ document?.description }}</div> -->
+                    </td>
+                    <td scope="col" role="cell" [ngStyle]="{width: '40%'}">
+                        
+                        <div>{{ document?.description }}</div>
+                    </td>
+                    <td scope="col" role="cell" [ngStyle]="{width: '15%'}">
+                        <div class="">{{ document?.uploadDate }}</div>
+                    </td>
+                    <td scope="col" role="cell" [ngStyle]="{width: '15%'}">
+                        <div class="text-left " [ngClass]="{'red-bold' :document?.releasableCode == 'Non - Releasable'}">
+                            {{ document?.releasableCode }}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+    
+</div>
+<div class="float-right mr-2" *ngIf="showServerError">
+    <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+  </div>
+
+<ng-template #popContent>
+    <div *ngIf ="showtitle">
+        <div class="my-2">{{ popOverDocument}}</div>
+    </div>
+    <div *ngIf="!showtitle" >
+        <div  *ngFor="let docName of documents?.documentNames">
+            <div class="my-2">{{ docName }}</div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #popTitle>
+    <span class="text-black">Document Names</span>
+</ng-template>
+
+<app-view-document-popup *ngIf="supportDocuments.show" 
+[openModal]="supportDocuments.documentName" 
+[fileList]="supportDocuments.fileList"
+[fullData]="supportDocuments.documentData"
+[fileNameWidth]="'90'"
+[fileDateWidth] = "'10'" [modalSize] = "'md'"
+(fileClicked)="onViewDocumentPopupFileClicked($event)"></app-view-document-popup>

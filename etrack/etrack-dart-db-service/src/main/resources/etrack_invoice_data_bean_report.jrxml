@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="invoice_data_bean_collection_report" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8d35754e-ea12-499d-a8a9-08c2ea0226ba">
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="invoiceNum" class="java.lang.String"/>
+	<field name="invoiceDate" class="java.lang.String"/>
+	<field name="billingSite" class="java.lang.String"/>
+	<field name="facilityName" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="street1" class="java.lang.String"/>
+	<field name="citystatezip" class="java.lang.String"/>
+	<field name="permitType1" class="java.lang.String"/>
+	<field name="permitTypeFee1" class="java.lang.String"/>
+	<field name="permitType2" class="java.lang.String"/>
+	<field name="permitTypeFee2" class="java.lang.String"/>
+	<field name="permitType3" class="java.lang.String"/>
+	<field name="permitTypeFee3" class="java.lang.String"/>
+	<field name="totalAmount" class="java.lang.String"/>
+	<field name="decUrl" class="java.lang.String"/>
+	<field name="payonlinedetail" class="java.lang.String"/>
+	<field name="payonlinedetail1" class="java.lang.String"/>
+	<field name="onlinesubmitterurl" class="java.lang.String"/>
+	<field name="onlineremitto" class="java.lang.String"/>
+	<field name="analystremitto" class="java.lang.String"/>
+	<field name="revenueurl" class="java.lang.String"/>
+	<field name="countryCode" class="java.lang.String"/>
+	<field name="street2" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="55" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image>
+				<reportElement x="2" y="0" width="170" height="50" uuid="6c28809e-4763-48cf-95e7-b5920b0eb8ff">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["../images/DEC_Logo.png"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="180" y="0" width="1" height="50" forecolor="#006633" uuid="55523032-bb41-4c86-a5ad-d94631cdd1cd">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.25"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement x="187" y="10" width="180" height="30" uuid="8885c347-03b5-4593-9923-655a1adea161">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["../images/etrack_secondary-logo.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="88" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="3" width="549" height="28" uuid="f4d68774-3939-4088-aeb8-39e7a6fc5302">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[625 Broadway
+Albany, New York 12233-0001
+
+
+]]></text>
+			</staticText>
+			<textField hyperlinkType="Reference" hyperlinkTarget="Blank">
+				<reportElement mode="Transparent" x="1" y="36" width="549" height="21" forecolor="#3C51BA" backcolor="#FFFFFF" uuid="89947c4f-8343-4204-be5a-47e8ccd58cf4"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{decUrl}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA[$F{decUrl}]]></hyperlinkReferenceExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="57" width="550" height="23" uuid="8436a45a-60d5-4811-9237-6e51cba6b9f2"/>
+				<textElement textAlignment="Center">
+					<font size="18" isBold="true" isItalic="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Invoice]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="90" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="3" y="7" width="97" height="18" uuid="b97aa480-0ca0-479b-ade4-0af13989ae54">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Invoice No.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="29" width="97" height="18" uuid="ec264629-b928-4970-9f93-82e54848078b">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Billing Site:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="49" width="97" height="19" uuid="9e0014d3-8df6-428d-89d4-b49b89308e4c">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Facility Name:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="384" y="7" width="33" height="18" uuid="671c8dfa-65d5-4bd4-a0b6-3bd9926c10a2">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="70" width="550" height="20" backcolor="#BFB8B8" uuid="e0bef904-384e-4255-9531-5a4ab1620a46">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#BFB8B8"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="3" y="70" width="87" height="20" uuid="2e8a46ac-1225-479a-82e2-4922c524913c">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bill To]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="9" width="138" height="17" uuid="b5e4e5ca-5279-4dd0-abd9-1b11ec423152">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{invoiceNum}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="418" y="9" width="84" height="20" uuid="54f70267-7d28-465b-b7f6-705409297481">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{invoiceDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="31" width="138" height="18" uuid="d0b98001-e21b-42b7-b7d2-384d34755884">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{billingSite}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="100" y="51" width="440" height="18" uuid="5424e701-c17a-42a0-8d5c-bfc9d16ddf79">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{facilityName}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="6" width="381" height="21" uuid="d5b07bec-169b-48f2-8a9e-761174cf93e4"/>
+				<graphicElement>
+					<pen lineColor="#BFB8B8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="27" width="550" height="21" uuid="0d6b494a-28fc-45c6-b55b-94b97bbce235">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineColor="#BFB8B8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="48" width="550" height="21" uuid="d08a60d7-6826-4e82-89ee-0944c20ec0f6">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineColor="#BFB8B8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="381" y="6" width="169" height="21" uuid="fedb2ade-8b57-4272-8f52-ef9f6e7f7ad5">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineColor="#BFB8B8"/>
+				</graphicElement>
+			</rectangle>
+		</band>
+		<band height="170">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<printWhenExpression><![CDATA[!($F{street2}==null)]]></printWhenExpression>
+			<textField>
+				<reportElement x="3" y="15" width="530" height="20" uuid="f40d79b6-6a40-4316-9b96-21109ecfd56c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2940dc83-8838-4b4b-8118-b9cc32f22274"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="3" y="75" width="530" height="20" isRemoveLineWhenBlank="true" uuid="4ad12a3f-c3ec-42ca-962d-c1c97ce59e32">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1cc4edc5-5ee7-474a-a2f9-7213f928ba27"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{street2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="45" width="530" height="20" uuid="58e685b0-c642-4290-8729-e179295cfd9f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1cc4edc5-5ee7-474a-a2f9-7213f928ba27"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{street1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="3" y="135" width="530" height="20" isRemoveLineWhenBlank="true" uuid="0cccf08c-ac80-492e-a7f7-7ef8e4144a1b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1cc4edc5-5ee7-474a-a2f9-7213f928ba27"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{countryCode}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="550" height="170" forecolor="#BFB8B8" uuid="8b02c4a5-b4e7-49f2-81c7-842e36396185">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineColor="#BFB8B8"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="3" y="105" width="530" height="20" uuid="bd66a0bf-db13-448d-bf71-82913b176bdb">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="67aa839c-5ed9-4e96-9e03-8a6083077f0b"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{citystatezip}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="135">
+			<printWhenExpression><![CDATA[$F{street2}==null]]></printWhenExpression>
+			<textField>
+				<reportElement x="3" y="15" width="530" height="20" uuid="a929767f-daf5-4f13-b6d8-6090e62d02cb">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2940dc83-8838-4b4b-8118-b9cc32f22274"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="71" width="530" height="20" uuid="c431650a-5772-446a-9a21-da533fc8e7a1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="67aa839c-5ed9-4e96-9e03-8a6083077f0b"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{citystatezip}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="3" y="101" width="530" height="20" isRemoveLineWhenBlank="true" uuid="b220f334-ecae-47bf-898b-6dac2ac4dddd">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1cc4edc5-5ee7-474a-a2f9-7213f928ba27"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{countryCode}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="45" width="530" height="20" uuid="716169cc-8c22-41c7-be8f-6c38ee28cb8e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1cc4edc5-5ee7-474a-a2f9-7213f928ba27"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA[$F{street1}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="550" height="135" forecolor="#BFB8B8" uuid="9af2bfb9-4cca-4853-a891-d33555535467">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+		</band>
+		<band height="335">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="85" width="550" height="249" uuid="bff7e215-4027-4834-bc0c-9094b7b0d840">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<rectangle>
+					<reportElement x="0" y="0" width="550" height="15" backcolor="#BFB8B8" uuid="36fd4106-49fb-4a66-96e9-74eb0749626b">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement x="260" y="16" width="133" height="21" uuid="1ee0e56f-4aa5-4d04-878a-08832ea647b6">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="16" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total Charges:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="444" y="21" width="100" height="15" uuid="797fe9ae-aad4-4990-a105-44ca0884a645">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86147a7f-89d7-404f-86d2-ae026a35a0ac"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{totalAmount}]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement mode="Transparent" x="0" y="15" width="381" height="27" uuid="2c263919-dc78-43ca-888d-6210ab8608b5">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement mode="Transparent" x="381" y="15" width="169" height="27" uuid="c90097e1-a745-4a2b-8691-87ac5634e5f0">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement mode="Transparent" x="0" y="42" width="550" height="207" uuid="73af234f-201a-423f-a2ff-9474ea5500e2">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<textField isBlankWhenNull="true" hyperlinkType="Reference" hyperlinkTarget="Blank">
+					<reportElement isPrintRepeatedValues="false" x="270" y="98" width="153" height="18" isRemoveLineWhenBlank="true" forecolor="#3C51BA" uuid="5602d5b9-a44e-402f-a238-427b6aecbe26">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{onlinesubmitterurl}]]></textFieldExpression>
+					<hyperlinkReferenceExpression><![CDATA["https://etrackonline.dec.ny.gov"]]></hyperlinkReferenceExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" x="170" y="98" width="100" height="18" isRemoveLineWhenBlank="true" uuid="083ba764-6f1f-4a1a-bd66-4a867b5ae0a1">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{payonlinedetail1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="44" width="550" height="18" uuid="02e834b3-bcf8-447f-8d31-e5ddd1ac8758">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Payment due upon receipt.]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" x="0" y="62" width="550" height="18" isRemoveLineWhenBlank="true" uuid="68ec54ee-fea9-40fd-b55f-9babe43c1e94">
+						<property name="com.jaspersoft.layout.grid.weight.fixed" value="false"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{payonlinedetail}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" x="0" y="82" width="550" height="18" isRemoveLineWhenBlank="true" uuid="c3bfe29a-1bb6-4c3d-b3d6-011c1b29ebf3">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{analystremitto}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" x="0" y="119" width="550" height="18" isRemoveLineWhenBlank="true" uuid="4cc8f997-3a8a-4bd8-9560-b52ade190bf6">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{onlineremitto}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="137" width="550" height="63" uuid="daa6f1c6-f90c-4f87-80ec-086bf2481506">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font size="11"/>
+					</textElement>
+					<text><![CDATA[NYS Department of Environmental Conservation
+Division of Management & Budget, 10th Floor
+625 Broadway
+ALBANY, NY 12233-4900]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="10" y="210" width="528" height="32" uuid="eaa8d7ad-9af2-41f0-b391-410f1e3b3919">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font size="11"/>
+					</textElement>
+					<text><![CDATA[Questions regarding payment of this invoice should be directed to the Bureau of Revenue Accounting at (518) 402-9365, or e-mailed to ]]></text>
+				</staticText>
+				<textField hyperlinkType="Reference" hyperlinkTarget="Blank">
+					<reportElement isPrintRepeatedValues="false" x="354" y="224" width="136" height="16" forecolor="#3C51BA" uuid="8abe2f3b-12b7-40da-8fae-7e07c136be56">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{revenueurl}]]></textFieldExpression>
+					<hyperlinkReferenceExpression><![CDATA["mailto:revenue@dec.ny.gov"]]></hyperlinkReferenceExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="0" y="0" width="550" height="21" uuid="21ca026a-49b9-4d44-ba4f-d8dd937f4c65">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<rectangle>
+					<reportElement x="0" y="0" width="550" height="21" backcolor="#BFB8B8" uuid="86221156-6b9b-471e-9d87-7b6ac52d18ec">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+			</frame>
+			<staticText>
+				<reportElement x="3" y="0" width="146" height="22" uuid="455a9bb2-884c-49d0-84b0-45018db640b4">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Application Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="367" y="0" width="180" height="22" uuid="c936714c-593b-4d92-ab60-324b099e43a7">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Application Fee]]></text>
+			</staticText>
+			<frame>
+				<reportElement positionType="Float" x="0" y="22" width="381" height="21" isRemoveLineWhenBlank="true" uuid="e9c1467c-51ee-4423-8b05-e77bb96f0e64">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[!($F{permitType1} == null)]]></printWhenExpression>
+				</reportElement>
+				<rectangle>
+					<reportElement mode="Transparent" x="0" y="0" width="381" height="21" uuid="efc4bd36-8dbb-46bf-af35-d5b58f5128da">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<printWhenExpression><![CDATA[!($F{permitType1} == null)]]></printWhenExpression>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<textField>
+					<reportElement x="3" y="4" width="278" height="14" isRemoveLineWhenBlank="true" uuid="27932a97-8fe5-4cfc-817e-c5c24c87d039">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="77d0b61b-8163-4739-83a7-0294d5c0951b"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{permitType1}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="0" y="43" width="381" height="21" isRemoveLineWhenBlank="true" uuid="0343de23-8ec5-4160-b919-e0dc6569fa52">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[!($F{permitType2} == null)]]></printWhenExpression>
+				</reportElement>
+				<rectangle>
+					<reportElement mode="Transparent" x="0" y="0" width="381" height="21" uuid="83e6c7cf-3e7e-4e7f-a88a-4044c89c59bb">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<textField isBlankWhenNull="true">
+					<reportElement x="3" y="4" width="279" height="14" isRemoveLineWhenBlank="true" uuid="eb3547ab-1bcf-4de6-b402-00fa8d5514db">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="60d17085-2d37-44b8-ab7a-fa3c108bb689"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement markup="none"/>
+					<textFieldExpression><![CDATA[$F{permitType2}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="381" y="22" width="169" height="21" isRemoveLineWhenBlank="true" uuid="c1172a69-c4f3-44d0-8837-84e5423bfd5b">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[!($F{permitTypeFee1} == null)]]></printWhenExpression>
+				</reportElement>
+				<rectangle>
+					<reportElement mode="Transparent" x="0" y="0" width="169" height="21" uuid="090f9720-77a0-4325-934a-eb87f0d45065">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<printWhenExpression><![CDATA[!($F{permitTypeFee1} == null)]]></printWhenExpression>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<textField isBlankWhenNull="true">
+					<reportElement x="63" y="4" width="100" height="14" isRemoveLineWhenBlank="true" uuid="bddc3a03-cfe1-4073-9cb1-2f74ed4d8c8e">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3e13cda2-5cea-40e4-a4e4-26b3405bfc47"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{permitTypeFee1}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="381" y="43" width="169" height="21" isRemoveLineWhenBlank="true" uuid="96b2ad01-6d02-4333-9219-985a6d63db17">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[!($F{permitTypeFee2} == null)]]></printWhenExpression>
+				</reportElement>
+				<rectangle>
+					<reportElement mode="Transparent" x="0" y="0" width="169" height="21" uuid="5e76006e-e164-4812-9b8c-423836d2b789">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<textField isBlankWhenNull="true">
+					<reportElement x="63" y="4" width="100" height="14" isRemoveLineWhenBlank="true" uuid="720dfa78-4a70-45c9-b384-ee4bb984aaa8">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8bfbfee0-c8ac-471e-b20e-d994b555017a"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{permitTypeFee2}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="381" y="64" width="169" height="21" isRemoveLineWhenBlank="true" uuid="59015dda-a2ab-4702-9394-b1dce2b64aa1">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[!($F{permitTypeFee3} == null)]]></printWhenExpression>
+				</reportElement>
+				<rectangle>
+					<reportElement mode="Transparent" x="0" y="0" width="169" height="21" uuid="a57910ed-2e60-48c5-8a3e-f88ab74f9964">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<printWhenExpression><![CDATA[!($F{permitTypeFee3} == null)]]></printWhenExpression>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<textField isBlankWhenNull="true">
+					<reportElement x="63" y="4" width="100" height="14" isRemoveLineWhenBlank="true" uuid="181d315f-5cb4-4e22-968b-452a1c3d3732">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b2d84628-d2be-4a3e-830d-3019eebe1d79"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{permitTypeFee3}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="0" y="64" width="381" height="21" isRemoveLineWhenBlank="true" uuid="c1f64acb-3075-471e-9302-dfd75e85274a">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[!($F{permitType3} == null)]]></printWhenExpression>
+				</reportElement>
+				<rectangle>
+					<reportElement mode="Transparent" x="0" y="0" width="381" height="21" uuid="931afb1c-8e27-4697-bf53-b1e10ccdb778">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<printWhenExpression><![CDATA[!($F{permitType3} == null)]]></printWhenExpression>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#BFB8B8"/>
+					</graphicElement>
+				</rectangle>
+				<textField isBlankWhenNull="true">
+					<reportElement x="3" y="4" width="280" height="14" isRemoveLineWhenBlank="true" uuid="e926d340-dd8d-43b7-b423-7aa2640da7c2">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e29bdca3-4e98-401e-817b-548765528bcc"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement markup="none"/>
+					<textFieldExpression><![CDATA[$F{permitType3}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

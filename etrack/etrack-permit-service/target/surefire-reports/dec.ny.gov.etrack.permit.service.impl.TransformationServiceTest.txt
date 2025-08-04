@@ -1,0 +1,32 @@
+-------------------------------------------------------------------------------
+Test set: dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest
+-------------------------------------------------------------------------------
+Tests run: 26, Failures: 0, Errors: 7, Skipped: 0, Time elapsed: 0.108 s <<< FAILURE! - in dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest
+testTransformPropertyRelationshipToRoleEntityWithOwnerWithNoRoles(dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest)  Time elapsed: 0.001 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest.testTransformPropertyRelationshipToRoleEntityWithOwnerWithNoRoles(TransformationServiceTest.java:302)
+
+testTransformPropertyRelationshipToRoleEntityWithContactAgentWithNoRoles(dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest)  Time elapsed: 0.003 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest.testTransformPropertyRelationshipToRoleEntityWithContactAgentWithNoRoles(TransformationServiceTest.java:242)
+
+testTransformPropertyRelationshipToRoleEntityWithPublicWithRoles(dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest)  Time elapsed: 0.006 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest.testTransformPropertyRelationshipToRoleEntityWithPublicWithRoles(TransformationServiceTest.java:271)
+
+testTransformPropertyRelationshipToRoleEntityWithOwnerWithRoles(dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest)  Time elapsed: 0.003 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest.testTransformPropertyRelationshipToRoleEntityWithOwnerWithRoles(TransformationServiceTest.java:287)
+
+testTransformPropertyRelationshipToRoleEntityWithOwnerAlreadyAsApplicant(dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest)  Time elapsed: 0.004 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest.testTransformPropertyRelationshipToRoleEntityWithOwnerAlreadyAsApplicant(TransformationServiceTest.java:318)
+
+testTransformPropertyRelationshipToRoleEntityWithContactAgentWithRoles(dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest)  Time elapsed: 0.004 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest.testTransformPropertyRelationshipToRoleEntityWithContactAgentWithRoles(TransformationServiceTest.java:255)
+
+testTransformPropertyRelationshipToRoleEntityWithOwner(dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest)  Time elapsed: 0.003 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.TransformationServiceTest.testTransformPropertyRelationshipToRoleEntityWithOwner(TransformationServiceTest.java:334)
+

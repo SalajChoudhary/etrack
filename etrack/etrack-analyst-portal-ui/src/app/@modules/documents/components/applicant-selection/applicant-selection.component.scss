@@ -1,0 +1,108 @@
+@import "../../../../../variables";
+
+mat-horizontal-stepper{
+    margin-top: 55px;
+    min-height:1000px;
+}
+.form-container .form-row{
+    min-height: 100px;
+}
+
+.outer-container{
+    padding-top: 0px;
+}
+.error-cls{
+    color:red;
+}
+span.info{
+    color:blue;
+    padding: 0;
+    margin: 0;
+    font-style: italic;
+}
+.form-name .form-check-label{
+    width:220px;
+}
+.ml-60{
+    margin-left:60px;
+  }
+.head{
+    padding: 0;
+    background: #233E2A;
+    color: #fff;
+    padding-left: 10px;
+    padding-top: 12px;
+}
+.head p{
+    width:50%;
+}
+.business-search-form .form-check{
+    width:100%;
+}
+.business-search-form select{
+    width:125px;
+}
+label.label-inline{
+    min-width:220px;
+}
+.top-header{
+  width: 100%;
+  background: #233E2A;
+  color: #fff;
+  text-align: center;
+  padding: 8px;
+  border-top: solid 2px white;
+  border-bottom: solid 2px white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  //outline: solid 2px black;
+  //margin: 2px;
+  font-size: larger;
+}
+
+.note-text{
+    text-align: center;
+    //color: #007bff;
+    color: black;
+    width: 100%;
+    // padding-top: 15px;
+    padding-bottom: 2%;
+    display: flex;
+    justify-content: center;
+    font-style: italic;
+    font-size: medium;
+}
+.navbar {
+    background-color: #233E2A !important;
+    color: white !important;
+}
+nav.primary {
+    background: $primary;
+}
+
+.navbar-brand,
+.navbar-brand:hover {
+  color: #fff;
+}
+
+.mt-13 {
+    margin-top: 13px;
+}
+
+.bottom-button-container{
+    display: flex;
+    justify-content: end;
+    padding: 0.2rem 2rem;
+}
+
+::ng-deep .application-information  .modal-dialog{
+    min-width:720px;
+}
+
+::ng-deep .applicant-info-search .modal-dialog {
+    min-width:620px;
+}
+
+.btn {
+    min-width: 70px;
+}

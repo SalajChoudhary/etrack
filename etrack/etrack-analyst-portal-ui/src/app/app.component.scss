@@ -1,0 +1,50 @@
+@import "@arcgis/core/assets/esri/themes/light/main.css";
+
+.main-app-container {
+  margin: 0px;
+  padding: 0;
+  width: 100%;
+  // height: 100%;
+}
+.fixed-footer {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+}
+
+.footer-dashboard {
+  left: 0;
+  bottom: 0;
+  background-color: #cad1cc;
+  // position:fixed;
+}
+
+.display-flex {
+  display: flex;
+}
+
+.mb-0 {
+  margin-bottom: 0px !important;
+}
+
+.footer-items {
+  color: black;
+  font-style: italic;
+}
+
+.pr-10 {
+  padding-right: 10px;
+}
+
+.pl-10 {
+  padding-left: 10px;
+}
+
+.pl-25 {
+  padding-left: 25%;
+}
+.footer {
+  flex-shrink: 0;
+  flex-grow: 0;
+}

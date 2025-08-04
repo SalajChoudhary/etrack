@@ -1,0 +1,1029 @@
+<app-analyst-sub-header [showAddress]="false"></app-analyst-sub-header>
+<app-stepper-buttons [selectedIndex]="selectedIndex" [lastIndex]="projectLocationDetailsForm.valid ? 1:2" [startNumber]="1" [endNumber]="2"
+[startName]="'Location'" [endName]="'Applicant Information'" mainNavigation="/apply-for-permit-details"
+ [forwardName]="'Applicant Information'" [showBackArrow]="false"
+[forward]="'/associated-applicants'"></app-stepper-buttons>
+<mat-horizontal-stepper class="child-stepper customStepper has-step-icon-bg--white custom-step-height" #stepper
+[linear]="true" [selectedIndex]="selectedIndex"
+  (selectionChange)="selectionChange($event)" >
+  <ng-template matStepperIcon="done">
+    <img src="assets/icons/check2-square.svg" alt="A square checkbox" />
+  </ng-template>
+  <ng-template matStepperIcon="edit">
+    <img src="assets/icons/edit_square-white.svg" alt="An edit square box" />
+  </ng-template>
+  <mat-step [editable]="true" [stepControl]="canProceedToDetails" [state]="selectedIndex === 0?'edit':''">
+    <ng-template matStepLabel><span class="child-label"> Project Location</span></ng-template>
+    <br>
+    <div class="row" style="background-color:#CAD1CC; text-align:center;border-bottom: 1px solid black;">
+		<p style="padding-top: 1rem; color: #233E2A;" class="col-12 header-1b">Choose how you would like to search for the project location below.</p>
+		<p style="color: #233E2A;" class="col-12 header-1b">On the map, please define the <em>property boundary</em> for this project. This will establish the location for a facility record that the NYSDEC uses for tracking applications and permits.</p>
+	  </div>
+    <div class="float-right mr-2" *ngIf="projectLocationServiceError">
+        <app-server-error-message [serverErrorMessage]="projectLocationServiceErrorMessage"></app-server-error-message>
+    </div>
+    <form [formGroup]="projectLocationForm" (ngSubmit)="onProjectLocationSubmit()">
+      <div class="col-12 pl-0 pr-0 d-flex body-content">
+        <div class="container-fluid" >
+          <div class="row">
+            <div class="col-lg-12 pl-0 pr-0">
+              <div class="dec-form pl-0 mt-2">
+                <fieldset>
+                  <div class="form-check form-check-inline">
+                    <legend class="font-weight" style="margin-left: 0.2rem; padding-right: 1rem">
+                       Do you want to search by a known ID for an existing DEC Facility?
+                    </legend>
+                    <input class="form-check-input" style="margin-bottom: 0.3rem;" type="radio" name="priorPermit" id="Yes" value="Y"
+                     formControlName="priorPermit" (change)="onPriorPermitSelectChange()" />
+                    <label class="form-check-label" style="padding-right: 1rem;margin-bottom: 0.3rem;" for="Yes">Yes
+                    </label>
+                    <input class="form-check-input" style="margin-bottom: 0.3rem;" type="radio" name="priorPermit" id="No" value="N"
+                      formControlName="priorPermit" (change)="onPriorPermitSelectChange()" />
+                    <label class="form-check-label" style="padding-right: 1rem;margin-bottom: 0.3rem;" for="No">No</label>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div
+              *ngIf="projectLocationForm.controls.priorPermit.value === 'N'|| projectLocationForm.controls.searchBy.value === ''">
+              <div class="form-group form-inline">
+                <label class="font-label-bold" for="searchBy">Search By*:</label>
+                <select class="form-control dec-select" style="margin-left: 0.3rem;width: 12rem;" id="searchBy"
+                  formControlName="searchBy">
+                  <option value="">-- SELECT --</option>
+                  <option *ngFor="let searchtype of filteredSearchTypes" [value]="searchtype.id">
+                    {{ searchtype.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group form-inline" *ngIf="projectLocationForm.controls.searchBy.value === 'zoom'" style="margin-right: -15px;margin-left: -10px;">
+                <label  for="county" class="font-label-bold">Zoom to County*:</label>
+                <select class="form-control dec-select" id="county" (change)="onZoomCountyChange($event)">
+                  <option value="">-- SELECT --</option>
+                  <option *ngFor="let county of counties" [value]="county">
+                    {{ county }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div
+              *ngIf="projectLocationForm.controls.searchBy.value == 'shapefile'">
+              <div class="form-group form-inline">
+                <label for="file" class="font-label-bold" style="margin-right: 0.3rem;margin-top: -0.5rem !important;">Choose Shapefile*:</label>
+                <div class="upload-container">
+                  <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" style="margin-right: -0.01rem !important;margin-bottom: -0.1rem !important;"
+                  >Upload</button>
+                  <input type="file" name="file" #inFile id="inFile" (change)="onFileChange($event)" />
+                </div>
+                <button type="button" (click)="clearShapeFile()" class="btn btn-sm btn-outline-dark closebutton mb-2"
+                  style="margin-left: 1rem;">
+                  Clear
+                </button>
+              </div>
+              <span class="file-upload-status" style="opacity:1;" id="upload-status" #uploadstatus>
+                <p class="font-weight" style="margin-left: 1rem;">Add Shapefile as .zip file</p>
+              </span>
+              <div id="fileInfo" #fileInfo></div>
+            </div>
+            <div
+              *ngIf="projectLocationForm.controls.priorPermit.value == 'Y' && projectLocationForm.controls.searchBy.value !== ''">
+              <div class="form-group form-inline">
+                <label class="font-label-bold" for="searchBy">Search By*:</label>
+                <select class="form-control dec-select" style="margin-left: 0.3rem;" id="searchBy"
+                  formControlName="searchBy">
+                  <option value="">-- SELECT --</option>
+                  <option *ngFor="let searchtype of filteredSearchTypes" [value]="searchtype.id">
+                    {{ searchtype.name }}
+                  </option>
+                </select>
+                <input type="text" class="form-control" id="dec_id" aria-describedby="id"
+                  style="margin-left: 1rem; margin-right: 1rem;" formControlName="idValue" [prefix]="prefixForId"
+                  [placeholder]="placeholderForId" [mask]="maskForId" [dropSpecialCharacters]="false" size="12" (keydown.enter)="onIdFormSubmit()"/>
+                <button class="btn btn-sm btn-primari nextbutton mr-2 upload" (click)="onIdFormSubmit()" type="button"
+                  [disabled]="
+                      projectLocationForm.value.idTypeValue?.trim() === ''
+                    ">
+                  Search
+                </button>
+                <button type="button" (click)="clearId()" class="btn btn-sm btn-outline-dark closebutton">
+                  Clear
+                </button>
+              </div>
+              <div *ngIf="
+            projectLocationForm.controls.idValue.invalid &&
+            isSearchedByIdAttempted &&
+            (projectLocationForm.controls.idValue.dirty ||
+              projectLocationForm.controls.idValue.touched)" class="errors col-12">
+                <div *ngIf="projectLocationForm.controls.idValue.errors!.required" class="errors">
+                  <div *ngIf="
+                projectLocationForm.controls.searchBy.value === 'dec_id'
+              " class="errors">{{errorMsgObj?.PRJ_LOC_DEC_ID_REQD}}
+                  </div>
+                  <div *ngIf="
+                projectLocationForm.controls.searchBy.value === 'spdes_id'
+              " class="errors">{{errorMsgObj?.PRJ_LOC_SPDES_ID_REQD}}
+                  </div>
+                  <div *ngIf="
+                projectLocationForm.controls.searchBy.value ===
+                'mine_land_id'
+              " class="errors">{{errorMsgObj?.PRJ_LOC_ML_ID_REQD}}
+                  </div>
+                  <div *ngIf="
+                projectLocationForm.controls.searchBy.value ===
+                'solid_waste_id'
+              " class="errors">{{errorMsgObj?.PRJ_LOC_SW_ID_REQD}}
+                  </div>
+                </div>
+                <div *ngIf="projectLocationForm.controls.idValue.errors!.minlength" class="errors">
+                  <div *ngIf="
+                projectLocationForm.controls.searchBy.value === 'dec_id'
+              " class="errors">{{errorMsgObj?.PRJ_LOC_DEC_ID_MIN_LENG}}
+                  </div>
+                  <div *ngIf="
+                projectLocationForm.controls.searchBy.value === 'spdes_id'
+              " class="errors">{{errorMsgObj?.PRJ_LOC_SPDES_ID_MIN_LENG}}
+                  </div>
+                  <div *ngIf="
+                projectLocationForm.controls.searchBy.value ===
+                'mine_land_id'
+              " class="errors">{{errorMsgObj?.PRJ_LOC_ML_ID_MIN_LENG}}
+                  </div>
+                  <div *ngIf="
+                projectLocationForm.controls.searchBy.value ===
+                'solid_waste_id'
+              " class="errors">{{errorMsgObj?.PRJ_LOC_SW_ID_MIN_LENG}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="projectLocationForm.controls.priorPermit.value == 'Y' && projectLocationForm.controls.searchBy.value !== ''" class="secondary-separator"></div>
+            <div
+              *ngIf="projectLocationForm.controls.searchBy.value === 'address'">
+              <div class="form-group form-inline">
+                <label for="address" class="font-label-bold" style="margin-left: 1.5rem">Address*:</label>
+                <input type="text" class="form-control" id="address" style="margin-left: 0.3rem" size="42"
+                  maxlength="100" aria-describedby="address" formControlName="street" />
+              </div>
+              <div *ngIf="
+                    isAddressSearched &&
+                    projectLocationForm.controls.street.errors
+                  " class="errors">
+                <div *ngIf="projectLocationForm.controls.street.errors!.required" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_ADDRESS_REQD}}
+                </div>
+                <div *ngIf="
+                      projectLocationForm.controls.street.errors!.minlength
+                    " class="errors">{{errorMsgObj?.PRJ_LOC_ADDRESS_MIN_LENG}}
+                </div>
+              </div>
+              <div class="form-group form-inline" >
+                <div class="form-group">
+                  <label for="city1" class="font-label-bold">Town/City*:</label>
+                  <input type="text" class="form-control" style="margin-left: 0.3rem" id="city1" size="15"
+                    formControlName="city" maxlength="65" />
+                </div>
+                <div class="form-group">
+                  <label for="zip1" class="font-label-bold">Zip:</label>
+                    <input type="text" class="form-control" id="zip1" style="margin-left: 0.3rem" maxlength="5" size="3"
+                      formControlName="zip" mask="00000" />
+                </div>
+                <div class="form-group">
+                  <span id="state1" class="font-label-bold" style="padding-right: 0.3rem">State:</span>
+                  <output class="font-weight" aria-labelledby="state1">NY</output>
+                </div>
+                <div class="form-group">
+                  <button class="btn btn-sm btn-primari nextbutton mr-2 upload" type="button"
+                    (click)="onAddressSubmit()" (keydown.enter)="onAddressSubmit()">Search</button>
+                  <button type="button" (click)="clearAddressSearch()"
+                    class="btn btn-sm btn-outline-dark closebutton">Clear</button>
+                </div>
+              </div>
+              <div *ngIf="
+                    isAddressSearched &&
+                    projectLocationForm.controls.city.errors
+                  " class="errors">
+                <div *ngIf="projectLocationForm.controls.city.errors!.required" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_TOWN_REQD}}
+                </div>
+                <div *ngIf="projectLocationForm.controls.city.errors!.minlength" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_TOWN_MIN_LENG}}
+                </div>
+              </div>
+              <div *ngIf="
+                    isAddressSearched && projectLocationForm.controls.zip.errors
+                  " class="errors">
+                <div *ngIf="projectLocationForm.controls.zip.errors!.minlength" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_ZIP_MIN_LENG}}
+                </div>
+              </div>
+            </div>
+            <div
+              *ngIf="projectLocationForm.controls.searchBy.value == 'taxmap'">
+              <div class="row form-inline" >
+                <div class="form-group ">
+                  <label for="county" class="font-label-bold">County*:</label>
+                  <select class="form-control dec-select" id="county" style="margin-left: 0.3rem"
+                    formControlName="county" (change)="onSelectCountyChange($event)">
+                    <option *ngFor="let county of counties" [value]="county">
+                      {{ county }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group" *ngIf="!NYC.includes(selectedCounty?.trim())">
+                  <label for="municipality" class="font-label-bold">Municipality*:</label>
+                  <select [attr.disabled]="
+                      projectLocationForm.value.county === '' ? '' : null
+                    " class="form-control dec-select" id="municipality" style="margin-left: 0.3rem"
+                    formControlName="municipality" (change)="onSelectMunicipalityChange($event)">
+                    <option *ngFor="let municipality of municipalities" [value]="municipality">
+                      {{ municipality }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div *ngIf="
+                  isTaxMapSearched &&
+                  projectLocationForm.controls.county.errors
+                " class="errors">
+                <div *ngIf="projectLocationForm.controls.county.errors!.required" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_COUNTY_REQD}}
+                </div>
+              </div>
+              <div *ngIf="
+                  isTaxMapSearched &&
+                  projectLocationForm.controls.municipality.errors
+                " class="errors">
+                <div *ngIf="
+                    projectLocationForm.controls.municipality.errors!.required
+                  " class="errors">{{errorMsgObj?.PRJ_LOC_MUNCI_REQD}}
+                </div>
+              </div>
+              <div class="row form-inline" >
+                <div class="form-group">
+                  <label for="tax_map_number" class="font-label-bold">Tax Parcel ID / SBL*:
+                  </label>
+                  <input [attr.disabled]="
+                      projectLocationForm.value.municipality === '' && !NYC.includes(selectedCounty?.trim())
+                        ? ''
+                        : null
+                    " type="text" class="form-control" id="tax_map_number" style="margin-left: 0.3rem"
+                    aria-describedby="taxMap-help" formControlName="taxMapNumber" size="10" />
+                  <span id="taxMap-help" class="mr-2 font-weight" style="
+                      margin-left: 0.2rem;
+                      font-style: italic;
+                    ">(As it appears on your tax bill, formatted)</span>
+                </div>
+                <div class="form-group">
+                  <button class="btn btn-sm btn-primari nextbutton mr-2 upload" (click)="taxMapSearch()" (keydown.enter)="taxMapSearch()"
+                    type="button">Search</button>
+                  <button type="button" (click)="clearTaxMap()"
+                    class="btn btn-sm btn-outline-dark closebutton">Clear</button>
+                </div>
+              </div>
+              <div *ngIf="
+                  isTaxMapSearched &&
+                  projectLocationForm.controls.taxMapNumber.errors
+                " class="errors">
+                <div *ngIf="
+                    projectLocationForm.controls.taxMapNumber.errors!.required
+                  " class="errors">{{errorMsgObj?.PRJ_LOC_TAXMAP_REQD}}
+                </div>
+              </div>
+            </div>
+            <div
+              *ngIf="projectLocationForm.controls.searchBy.value === 'zoom' || projectLocationForm.controls.searchBy.value == 'shapefile' || projectLocationForm.controls.searchBy.value == 'taxmap' || projectLocationForm.controls.searchBy.value === 'address'"
+              class="secondary-separator"></div>
+          </div>
+
+          <div class="row">
+            <div class="col-xl-5 col-lg-6 col-md-12 col-sm-12 pl-1 pr-1">
+
+              <div *ngIf="
+                  projectLocationForm.controls.priorPermit.value == 'Y' &&
+                  projectLocationForm.controls.searchBy.value !== ''
+                ">
+                <div class="row" *ngIf="
+                    isSearchedByIdAttempted &&
+                    approvedFacilitiesForDecId?.length == 0 &&
+                    codedAddressesForId?.length === 0 &&
+                    isFacilitySearchedByDecId
+                  ">
+                  <div class="errors">{{errorMsgObj?.PRJ_LOC_ID_NOT_FOUND}}</div>
+                </div>
+                <div class="row" *ngIf="approvedFacilitiesForDecId?.length &&  isSearchedByIdAttempted">
+                  <div class="typo-1 dec-font font-weight" style="margin-left:15px;padding-top: 0.5rem;">
+                    <p class="font-label-bold">Check NYSDEC Facility Records <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                      <title>You may find your location already in NYSDEC facility records. The historic details can be updated to reflect current information.</title>
+                    </svg></p>
+                    <p>We found the following facility match in our records. Please review the map instructions.</p>
+                  </div>
+                  <p-table [value]="approvedFacilitiesForDecId" [(selection)]="selectedFacilityForDecId"
+                    (onRowSelect)="onFacilitySelectForId($event)" (onRowUnselect)="onFacilityUnselectForId($event)"
+                    dataKey="PRIMARY_ID" responsiveLayout="scroll" [paginator]="true" [rows]="5"
+                    [rowsPerPageOptions]="[5, 10]" class="col-12" [alwaysShowPaginator]="false"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} facilities" [showCurrentPageReport]="true">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th id="approvedFacilitiesForDecId_check" class="table-header-primary" style="width: 2rem"></th>
+                        <th id="approvedFacilitiesForDecId_address" class="table-header-primary dec-font">Address</th>
+                        <th id="approvedFacilitiesForDecId_decId" class="table-header-primary dec-font" style="width: 9rem">
+                          DEC ID
+                        </th>
+                        <th id="approvedFacilitiesForDecId_lrp" class="table-header-primary dec-font">
+                          Last Known Applicant
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-facility>
+                      <tr
+                        [style.border-top]="facility.PRIMARY_ID === selectedFacilityForDecId?.PRIMARY_ID ? '3px solid #BFDBFE !important': ''"
+                        [style.border-bottom]="facility.PRIMARY_ID === selectedFacilityForDecId?.PRIMARY_ID ? '3px solid #BFDBFE !important': ''">
+                        <td>
+                          <p-tableRadioButton [value]="facility"></p-tableRadioButton>
+                        </td>
+                        <td class="dec-font">
+                          {{ facility.address }}
+                        </td>
+                        <td class="dec-font">{{ facility.PRIMARY_ID }}</td>
+                        <td class="dec-font">{{ facility.lastKnownAppl}}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+                <div class="row" *ngIf="codedAddressesForId?.length && isSearchedByIdAttempted">
+                  <div class="typo-1 dec-font font-weight" style="margin-left:15px;padding-top: 0.5rem;">
+                    <p class="font-label-bold">Check NYSDEC Facility Records <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                      <title>You may find your location already in NYSDEC facility records. The historic details can be updated to reflect current information.</title>
+                    </svg><p>
+                    <p>We found the following facility match in our records. Please review the map instructions.</p>
+                  </div>
+                  <p-table [value]="codedAddressesForId" [(selection)]="finalSelectedAddress" dataKey="decIdFormatted"
+                    responsiveLayout="scroll" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10]"
+                    class="col-12" [alwaysShowPaginator]="false"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} facilities" [showCurrentPageReport]="true">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th id="codedAddressesForId_check" class="table-header-primary dec-font" style="width: 2rem"></th>
+                        <th id="codedAddressesForId_address" class="table-header-primary dec-font">Address</th>
+                        <th id="codedAddressesForId_decId" class="table-header-primary dec-font" style="width: 9rem">
+                          DEC ID
+                        </th>
+                        <th id="codedAddressesForId_lrp" class="table-header-primary dec-font">
+                          Last Known Applicant
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-address>
+                      <tr
+                         [style.border-top]="address.decIdFormatted === finalSelectedAddress?.decIdFormatted ? '3px solid #BFDBFE !important': ''"
+                         [style.border-bottom]="address.decIdFormatted === finalSelectedAddress?.decIdFormatted ? '3px solid #BFDBFE !important': ''">
+                        <td>
+                          <p-tableRadioButton [value]="address"></p-tableRadioButton>
+                        </td>
+                        <td class="dec-font">{{ address.address }}</td>
+                        <td class="dec-font">{{ address.decIdFormatted }}</td>
+                        <td class="dec-font">{{ address.lastKnownAppl }}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+              </div>
+              <div *ngIf="
+                  projectLocationForm.controls.searchBy.value === 'address'
+                ">
+                <div class="row" *ngIf="addressFacilities?.length ==0 && isAddressSearched
+                                 && projectLocationForm.valid && isSubmitted
+                  ">
+                  <div class="dec-font font-weight" style="margin-bottom: 10px;margin-top: 10px;margin-left: 1rem;">
+                      We did not find any facility matches in our records. Is your search entry correct?<br/>
+                      <input id="not-applicable" type="checkbox" style="margin-left:0.3rem;margin-right:0.4rem"
+                          name="none" (change)="onNotApplicable($event)" [checked]="isNotApplicable()"
+                          [disabled]="selectedAddress.decIdFormatted"/><strong>Yes</strong>, zoom to <strong>{{projectLocationForm.controls.street.value}} {{projectLocationForm.controls.city.value}}</strong> on the map and review the map instructions.</div>
+                </div>
+                <div class="row" *ngIf="addressFacilities?.length && isAddressSearched">
+                  <div *ngIf="addressFacilities?.length ==1" class="typo-1 dec-font font-weight"
+                    style="margin-left:15px;padding-top: 0.5rem;">
+                    <p class="font-label-bold">Check NYSDEC Facility Records <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                      <title>You may find your location already in NYSDEC facility records. The historic details can be updated to reflect current information.</title>
+                    </svg></p>
+                    <p>We found the following facility match in our records for the entered address. If this is incorrect, choose <em>None of the above</em> to zoom to {{projectLocationForm.controls.street.value}} {{projectLocationForm.controls.city.value}} on the map. Please review the map instructions.</p>
+                  </div>
+                  <div *ngIf="addressFacilities?.length !== 1" class="typo-1 dec-font font-weight"
+                    style="margin-left:15px;padding-top: 0.5rem;">
+                    <p class="font-label-bold">Check NYSDEC Facility Records <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                      <title>You may find your location already in NYSDEC facility records. The historic details can be updated to reflect current information.</title>
+                    </svg></p>
+                    <p>We found the following facility matches in our records with a similar address. Please select a match below or if your location is not listed, choose
+                      <em>None of the above</em> to zoom to {{projectLocationForm.controls.street.value}} {{projectLocationForm.controls.city.value}} on the map. Please review the map instructions.</p>
+                  </div>
+                  <p-table [value]="addressFacilities" [(selection)]="selectedAddress"
+                    (onRowSelect)="onAddressSelect($event)" (onRowUnselect)="onAddressUnselect($event)"
+                    dataKey="decIdFormatted" responsiveLayout="scroll" [paginator]="true" [rows]="5"
+                    [rowsPerPageOptions]="[5, 10]" class="col-12" [alwaysShowPaginator]="false" [hidden]="notApplicable"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} facilities" [showCurrentPageReport]="true">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th id="addressFacilities_check" class="table-header-primary dec-font" style="width: 2rem"></th>
+                        <th id="addressFacilities_address" class="table-header-primary dec-font">Address</th>
+                        <th id="addressFacilities_decId" class="table-header-primary dec-font" style="width: 9rem">
+                          DEC ID
+                        </th>
+                        <th id="addressFacilities_lrp" class="table-header-primary dec-font">
+                          Last Known Applicant
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+                      <tr
+                        [style.border-top]="rowData.decIdFormatted === selectedAddress?.decIdFormatted ? '3px solid #BFDBFE !important': ''"
+                        [style.border-bottom]="rowData.decIdFormatted === selectedAddress?.decIdFormatted ? '3px solid #BFDBFE !important': ''">
+                        <td>
+                          <p-tableRadioButton [value]="rowData"></p-tableRadioButton>
+                        </td>
+                        <td class="dec-font">{{rowData.address}}</td>
+                        <td class="dec-font">{{rowData.decIdFormatted }}</td>
+                        <td class="dec-font">{{rowData.lastKnownAppl }}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                  <div *ngIf="isAddressSearched && projectLocationForm.valid && addressFacilities?.length"
+                    class="typo-1 dec-font col-12">
+                    <div style="
+                    padding-top: 0.5rem;
+                    padding-left: 0.7rem;
+                    padding-bottom: 0.1rem;
+                    margin-top: 0px;
+                    font-weight: bold;
+                    background: #ffffff;
+                    border-radius: 10px !important;
+                    color: #495057;
+                    transition: box-shadow 0.2s;
+                    outline-color: #a6d5fa;
+                    border-bottom: 2px solid #D4D2D2 !important;">
+                      <div style="padding-left: 1.2rem;">
+                        <input class="form-check-input" id="not-applicable" type="checkbox" name="none"
+                          (change)="onNotApplicable($event)" [checked]="isNotApplicable()"
+                          [disabled]="selectedAddress.decIdFormatted">
+                        <label style="padding-left: 1rem;" class="dec-font font-weight" for="not-applicable"> None of
+                          the above <em style="font-size: 0.8rem !important;color:#007bff;padding-left: 1rem;">*To choose 'None', first deselect any facility chosen above.</em></label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div *ngIf="projectLocationForm.controls.searchBy.value === 'taxmap'">
+                <div class="row" *ngIf="approvedFacilitiesForTaxMap?.length == 0 &&  projectLocationForm.valid &&
+                    codedAddressesForTaxMap?.length === 0 && isTaxMapSearched"
+                  class="typo-1 dec-font font-weight" style="margin-left:15px;padding-top: 0.5rem;">
+                  <p class="font-label-bold">Check NYSDEC Facility Records <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    <title>You may find your location already in NYSDEC facility records. The historic details can be updated to reflect current information.</title>
+                  </svg></p>
+                  <div class="dec-font font-weight" style="margin-bottom: 10px;margin-top: 10px;margin-left: 1rem;">
+                    We did not find any facility matches in our records. Is your search entry correct?<br/>
+                    <input id="not-applicable-tax-parcel" type="checkbox" style="margin-left:0.3rem;margin-right:0.4rem"
+                        name="none" (change)="onTaxParcelNotAvailable($event)" [checked]="isTaxParcelNotApplicable()"
+                        /><strong>Yes</strong>, zoom to <strong>{{projectLocationForm.controls.taxMapNumber.value}}</strong> on the map and review the map instructions.</div>
+
+                  <p *ngIf="taxParcelLoading">Please Wait. The system is searching for the correct parcel. If not found, the map will zoom to the municipality.</p>
+                </div>
+                <div class="row"
+                  *ngIf="(approvedFacilitiesForTaxMap?.length || codedAddressesForTaxMap?.length) && isTaxMapSearched"
+                  class="typo-1 dec-font font-weight" style="margin-left:15px;padding-top: 0.5rem;">
+                  <p class="font-label-bold">Check NYSDEC Facility Records <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    <title>You may find your location already in NYSDEC facility records. The historic details can be updated to reflect current information.</title>
+                  </svg></p>
+                  <p>We found the following facility match.</p>
+                </div>
+                <div class="row" *ngIf="approvedFacilitiesForTaxMap?.length && isTaxMapSearched">
+                  <p-table [value]="approvedFacilitiesForTaxMap" [(selection)]="selectedFacilityForTaxMap"
+                    (onRowSelect)="onFacilitySelectForTaxMap($event)"
+                    (onRowUnselect)="onFacilityUnselectForTaxMap($event)" dataKey="PRIMARY_ID" responsiveLayout="scroll"
+                    [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10]" class="col-12"
+                    [alwaysShowPaginator]="false" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} facilities" [showCurrentPageReport]="true">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th id="approvedFacilitiesForTaxMap_check" class="table-header-primary" style="width: 2rem"></th>
+                        <th id="approvedFacilitiesForTaxMap_address" class="table-header-primary dec-font">Address</th>
+                        <th id="approvedFacilitiesForTaxMap_decId" class="table-header-primary dec-font" style="width: 9rem">
+                          DEC ID
+                        </th>
+                        <th id="approvedFacilitiesForTaxMap_lrp" class="table-header-primary dec-font">
+                          Last Known Applicant
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-facility>
+                      <tr
+                        [style.border-top]="facility.PRIMARY_ID === selectedFacilityForTaxMap?.PRIMARY_ID ? '3px solid #BFDBFE !important': ''"
+                        [style.border-bottom]="facility.PRIMARY_ID === selectedFacilityForTaxMap?.PRIMARY_ID ? '3px solid #BFDBFE !important': ''">
+                        <td>
+                          <p-tableRadioButton [value]="facility"></p-tableRadioButton>
+                        </td>
+                        <td class="dec-font">
+                          {{ facility.address }}
+                        </td>
+                        <td class="dec-font">{{ facility.PRIMARY_ID }}</td>
+                        <td class="dec-font">{{ facility.lastKnownAppl }}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+
+                <div class="row" *ngIf="codedAddressesForTaxMap?.length && isTaxMapSearched">
+                  <p-table [value]="codedAddressesForTaxMap" [(selection)]="finalSelectedAddress" dataKey="decIdFormatted"
+                    responsiveLayout="scroll" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10]"
+                    class="col-12" [alwaysShowPaginator]="false"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} facilities" [showCurrentPageReport]="true">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th id="codedAddressesForTaxMap_check" class="table-header-primary dec-font" style="width: 2rem"></th>
+                        <th id="codedAddressesForTaxMap_address" class="table-header-primary dec-font">Address</th>
+                        <th id="codedAddressesForTaxMap_decId" class="table-header-primary dec-font" style="width: 9rem">
+                          DEC ID
+                        </th>
+                        <th id="codedAddressesForTaxMap_lrp" class="table-header-primary dec-font">
+                          Last Known Applicant
+                        </th>
+
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-address>
+                      <tr
+                        [style.border-top]="address.decIdFormatted === finalSelectedAddress?.decIdFormatted ? '3px solid #BFDBFE !important': ''"
+                        [style.border-bottom]="address.decIdFormatted === finalSelectedAddress?.decIdFormatted ? '3px solid #BFDBFE !important': ''">
+                        <td>
+                          <p-tableRadioButton [value]="address"></p-tableRadioButton>
+                        </td>
+                        <td class="dec-font">{{ address.address }}</td>
+                        <td class="dec-font">{{ address.decIdFormatted }}</td>
+                        <td class="dec-font">{{ address.lastKnownAppl}}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+              </div>
+            </div>
+
+            <div [ngClass]="
+                projectLocationForm.controls.searchBy.value === 'zoom' || projectLocationForm.controls.searchBy.value === 'shapefile'
+                  ? 'col-12'
+                  : 'col-xl-7 col-lg-6 col-md-12 col-sm-12 map-padding'
+              " style="min-height: calc(100vh - 260px);">
+              <h3 *ngIf="projectLocationForm.controls.searchBy.value === 'zoom'" class="dec-font font-label-bold" style="
+              margin-left: 1px;
+              margin-bottom:10px;
+              margin-top: 10px;
+            ">
+                Please pan or zoom to the correct location and select the parcel(s) or draw to outline the property boundary.
+              </h3>
+              <div *ngIf="addressFacilities?.length && selectedAddress?.isValidLocation ===0 && isAddressSearched"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Please select the correct tax parcel(s) to help update the location for this facility record. A work area can be defined, if necessary. Click Next below to update the details for this DEC Facility.</p>
+              </div>
+
+              <div *ngIf="addressFacilities?.length && selectedAddress?.isValidLocation ===1 && isAddressSearched"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Click <em>Next</em> below to accept this location for DEC Facility {{selectedAddress?.decIdFormatted}}. To update the boundary, select the parcel(s) or draw to outline.</p>
+              </div>
+              <div *ngIf="isNotApplicable()" class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Please pan or zoom to the project location and select the correct parcel(s) or draw to outline the property boundary. Then, if necessary, you can add a defined work area.  Click <em>Next</em> below to create a new DEC Facility for this project.</p>
+              </div>
+
+              <div class="row"
+                *ngIf="approvedFacilitiesForDecId?.length && selectedFacilityForDecId?.isValidLocation ===1 && isSearchedByIdAttempted"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Click <em>Next</em> below to accept this location for DEC Facility {{approvedFacility?.PRIMARY_ID}}. To update the boundary, select the parcel(s) or draw to outline.</p>
+              </div>
+              <div class="row"
+                *ngIf="approvedFacilitiesForDecId?.length && selectedFacilityForDecId?.isValidLocation ===0 && isSearchedByIdAttempted"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>The property boundary for DEC Facility {{approvedFacility?.PRIMARY_ID}} needs to be defined. Please pan or zoom to the correct location and select the parcel(s) or draw to outline the boundary. A work area can be defined, if necessary. Click Next below to update the details for this DEC Facility.</p>
+              </div>
+
+              <div
+                *ngIf="approvedFacilitiesForTaxMap?.length && selectedFacilityForTaxMap?.isValidLocation ===0 && isTaxMapSearched"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Please select the correct tax parcel(s) to help update the location for this facility record. A work area can be defined, if necessary. Click Next below to update the details for this DEC Facility.</p>
+              </div>
+
+              <div
+                *ngIf="approvedFacilitiesForTaxMap?.length && selectedFacilityForTaxMap?.isValidLocation ===1 && isTaxMapSearched"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Click <em>Next</em> below to accept this location for DEC Facility {{selectedFacilityForTaxMap?.PRIMARY_ID}}. To update the boundary, select the parcel(s) or draw to outline.</p>
+              </div>
+
+              <div
+                *ngIf="codedAddressesForTaxMap?.length && isTaxMapSearched && this.finalSelectedAddress?.standardCode"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Please select the correct tax parcel(s) for the project location and click Next below.</p>
+              </div>
+              <div
+                *ngIf="codedAddressesForTaxMap?.length ===0 && approvedFacilitiesForTaxMap?.length==0 && isTaxMapSearched && projectLocationForm?.valid"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Please select the correct tax parcel(s) for the project location and click Next below.</p>
+              </div>
+
+              <div
+                *ngIf="codedAddressesForId?.length && isSearchedByIdAttempted && this.finalSelectedAddress?.standardCode"
+                class="dec-font font-weight" style="margin: 5px;padding-top: 0.5rem;">
+                <p class="font-label-bold">Define the Property Boundary <svg style="margin-top: -1rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>Please select the correct tax parcel even if the outline does not exactly match the underlying features you are viewing.</title>
+                </svg></p>
+                <p>Please pan or zoom to the project location and select the correct parcel(s) or draw to outline the property boundary. Click <em>Next</em> below to create a new DEC Facility for this project.</p>
+              </div>
+
+              <div [hidden]="!this.gisMap?.isFacilityExist || hideMap" style="margin-left: 5px; padding-bottom: 5px;"><em style="font-size: 0.8rem !important;color:#007bff;">Click <svg style="margin-top: -0.5rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="svg-icon"><path d="M12.854 4h1.003l-.79 11.071a1.004 1.004 0 0 1-.999.929H3.932a1.004 1.004 0 0 1-.998-.93L2.143 4h1.003l.786 11h8.136zm-9.78-1H1V2h4V1a1.001 1.001 0 0 1 1-1h4a1.001 1.001 0 0 1 1 1v1h4v1H3.074zM6 2h4V1H6zm3.5 11a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-1 0v7a.5.5 0 0 0 .5.5zm-3 0a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-1 0v7a.5.5 0 0 0 .5.5z"/></svg> to delete facility polygon.</em></div>
+              <em style="font-size: 0.8rem !important;color:#007bff;margin-left: 5px" [hidden]="hideMap">Click to draw <svg style="margin-top: -0.5rem;"  xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="svg-icon"><path d="M15 1L6.833 7 1 4v11h14zm-1 13H2V5.639l4.927 2.534L14 2.976z"/></svg> or select/ unselect <svg style="margin-top: -0.5rem;"  xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="svg-icon"><path d="M13.174 8.976L5 3.012V13.1l2.116-2.902L9 13.928l2.555-1.285-1.838-3.667zm-2.961 3.222l-.77.388L7.27 8.288 6 10.032V4.979l4.106 2.997h-2.01z"/></svg> parcels</em>
+              <div [hidden]="!this.gisMap?.isPolygonExist || hideMap" style="margin-left: 5px; padding-bottom: 5px;"><em style="font-size: 0.8rem !important;color:#007bff;">Then, if necessary, click <svg style="margin-top: -0.5rem;" xmlns="http://www.w3.org/2000/svg" height="16" width="16"><path d="M10 4.069V9h-.9V3.927C9.1 2.509 8.057 1.79 6 1.79s-3.1.719-3.1 2.137v7.259L6 14.294l1.282-1.286a2.007 2.007 0 0 0 .576.63L6 15.5l-4-4.01V4.066C2 1.852 3.791 1 6 1s4 .852 4 3.067zM6 8a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm1-2a1 1 0 1 0-1 1 1 1 0 0 0 1-1zm2 5v1h3v3h1v-3h3v-1h-3V8h-1v3z"></path></svg> to add, update, or remove the project work area.</em><img style="margin-top: -0.5rem;" width="25" height="12" src="../../../../../assets/icons/workarea-poly.png" alt="work area polygon"></div>
+              <app-gis-map [codedAddress]="finalSelectedAddress" [approvedFacility]="selectedFacility"
+                [mapProperties]="mapProperties" [municipality]="true"
+                (selectedTaxParcelGeometry)="onTaxParcelGeometryChange($event)"
+                (sketchedGeometry)="onSketchGeometryChange($event)"
+                (selectedFacilityTaxParcel)="onFacilityTaxParcel($event)"
+                (selectedTaxMapGeometry)="onTaxMapGeometryChange($event)"
+                (selectedFacilityGeometryOnMap)="onFacilityGeometryChange($event)"
+                (updateFacilityGeometry)="updateFacilityGeometry($event)"
+                (uploadedShapeFileGeometry)="uploadedShapeFileGeometry($event)"
+                (workAreaGeometry)="onWorkAreaGeometryChange($event)" [hidden]="hideMap"></app-gis-map>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-row">
+        <div class="col-md-12 bottom-button-container">
+          <button type="submit" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" #nextBtn
+            (click)="showValidationError()">
+            Next
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="cancel()">
+            Close
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="projectLocationDetailsForm" [ngClass]="{ disblestep: canProceedToDetails.invalid }" [state]="selectedIndex === 1 ? 'edit' : ''">
+    <ng-template matStepLabel><span class="child-label"> Facility Details</span></ng-template>
+    <br>
+    <div class="row" style="background-color:#CAD1CC; text-align:center;border-bottom: 1px solid black;">
+      <p *ngIf="isFacilityBoundaryModified()" style="padding-top: 1rem; color: #233E2A;" class="col-12 header-1b">Please review and update the details for the selected facility below.</p>
+      <p *ngIf="!isFacilityBoundaryModified()" style="padding-top: 1rem; color: #233E2A;" class="col-12 header-1b">Please review and enter the facility details for the selected location below.</p>
+      <p style="color: #233E2A;" class="col-12 header-1b">To make corrections to the property boundary or work area, please return to the Project Location screen.</p>
+    </div>
+    <div class="float-right mr-2" *ngIf="serviceError">
+        <app-server-error-message [serverErrorMessage]="serviceErrorMessage"></app-server-error-message>
+    </div>
+    <form [formGroup]="projectLocationDetailsForm" (ngSubmit)="submitConform()">
+      <div class="col-12 pl-0 pr-0 d-flex body-content">
+        <div class="container-fluid">
+          <br>
+          <div class="row">
+            <div class="col-lg-6 col-md-12" style="margin-bottom: 1rem !important;">
+              <app-gis-map-view [mapProperties]="mapProperties" [taxGraphics]="finalTaxGraphic"
+                [facilityGraphic]="facilityGeometry" [sketchGraphics]="finalSketchGraphic"
+                [shapeFileGraphic]="finalShapeFileGraphic" [workAreaGraphic]="finalWorkAreaGraphic" [customTextElements]="customTextElements"></app-gis-map-view>
+            </div>
+            <div class="col-lg-6 col-md-12">
+              <div class="row form-inline" style="margin-left: -1rem !important;">
+                <div class="form-group">
+                  <label for="projectName" class="font-label-bold">Project/Facility Name<svg style="margin-top: -1rem;padding-right:0.3rem;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    <title>A nickname that represents a combination of owner and project type or some other useful reference, i.e Smith Driveway Culvert or DEP College Solar Farm.</title>
+                  </svg> *:</label>
+                  <input type="text" class="form-control" id="projectName" style="margin-left: 0.2rem" size="40"
+                    maxlength="100" formControlName="projectName" />
+                </div>
+              </div>
+
+              <div *ngIf="
+                  isSavedSubmitted &&
+                  projectLocationDetailsForm.controls.projectName.errors
+                " class="errors">
+                <div *ngIf="
+                    projectLocationDetailsForm.controls.projectName.errors!.required
+                  " class="errors">{{errorMsgObj?.PRJ_LOC_NAME_REQD}}
+                </div>
+                <div *ngIf="
+                    projectLocationDetailsForm.controls.projectName.errors!
+                      .minlength
+                  " class="errors">{{errorMsgObj?.PRJ_LOC_NAME_MIN_LENG}}
+                </div>
+                <div *ngIf="
+                    projectLocationDetailsForm.controls.projectName.errors!
+                      .facilityNameInvalid
+                  " class="errors">{{errorMsgObj?.FAC_CONTAN_INVALID_CHAR}}
+                </div>
+              </div>
+              <div class="row form-inline" style="margin-left: -1rem !important;">
+                <div class="form-group">
+                  <label for="address1" class="font-label-bold" style="margin-left: 5.5rem;">Address<svg style="margin-top: -1rem;padding-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    <title>The address should reflect the physical location of the property, which may or may not be a mailing address.</title>
+                  </svg> *:</label>
+                  <input type="text" class="form-control" id="address1" style="margin-left: 0.2rem" size="40" aria-describedby="address1" formControlName="address1" />
+                </div>
+               </div>
+
+              <div *ngIf="
+                  isSavedSubmitted &&
+                  projectLocationDetailsForm.controls.address1.errors
+                " class="errors">
+                <div *ngIf="
+                    projectLocationDetailsForm.controls.address1.errors!.required
+                  " class="errors">{{errorMsgObj?.PRJ_LOC_ADR1_REQD}}
+                </div>
+                <div *ngIf="
+                    projectLocationDetailsForm.controls.address1.errors!.minlength
+                  " class="errors">{{errorMsgObj?.PRJ_LOC_ADR1_MIN_LENG}}
+                </div>
+              </div>
+              <div class="row form-inline" style="margin-left: -1rem !important;">
+                <div class="form-group">
+                  <label for="city" class="font-label-bold" style="margin-left: 6.1rem;">Town/City*:</label>
+                  <input type="text" class="form-control" style="margin-left: 0.2rem" id="city" size="15"
+                    formControlName="city" maxlength="65" />
+                </div>
+                <div class="form-group">
+                  <label for="zip" class="font-label-bold" style="margin-left: 0.2rem">Zip:</label>
+                    <input type="text" class="form-control" id="zip" style="margin-left: 0.2rem" maxlength="5" size="3"
+                      formControlName="zip" mask="00000" />
+                </div>
+                <div class="form-group">
+                  <span id="state" class="font-label-bold" style="margin-left: 0.2rem">State:</span>
+                  <output style="margin-left: 0.2rem" aria-labelledby="state">NY</output>
+                </div>
+              </div>
+              <div *ngIf="
+                  isSavedSubmitted && projectLocationDetailsForm.controls.city.errors
+                " class="errors">
+                <div *ngIf="projectLocationDetailsForm.controls.city.errors!.required" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_DETAIL_TOWN_REQD}}
+                </div>
+                <div *ngIf="projectLocationDetailsForm.controls.city.errors!.minlength" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_TOWN_MIN_LENG}}
+                </div>
+              </div>
+              <div *ngIf="
+                  isSavedSubmitted && projectLocationDetailsForm.controls.zip.errors
+                " class="errors">
+                <div *ngIf="projectLocationDetailsForm.controls.zip.errors!.minlength" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_ZIP_MIN_LENG}}
+                </div>
+              </div>
+
+              <div class="row">
+                <label for="direction" class="font-label-bold" style="margin-left: 1rem">Directions and distance to roads, intersections, bridges and waterbodies<svg style="margin-top: -1rem;padding-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>If the above address is not easily found on a map, please provide specific notes on how to locate this property. Example: ½ mile NE from Co Rte 123 & Main St Intersection</title>
+                </svg> :</label>
+              </div>
+              <div class="row">
+                <div class="form-group" style="display: block !important;padding-left: 1rem !important;">
+                  <textarea id="direction" aria-describedby="direction" formControlName="address2" cols="75"
+                    maxlength="300" class="form-control description" rows="4"></textarea>
+                  <span class="counter-brief">{{projectLocationDetailsForm.controls.address2.value?.length}} /
+                    300</span>
+                </div>
+              </div>
+
+              <div *ngIf="isFacilityBoundaryModified()">
+                <div class="row">
+                  <label for="boundaryChangeReason" class="font-label-bold" style="margin-left: 1rem">Please provide an explanation for changing the property boundary<svg style="margin-top: -1rem;padding-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    <title>Example: The property has been subdivided or There was a lot line adjustment that is not reflected in the current tax map.</title>
+                  </svg> *:</label>
+                </div>
+                <div class="row">
+                  <div class="form-group" style="display: block !important;padding-left: 1rem !important;">
+                    <textarea id="boundaryChangeReason" aria-describedby="boundary chnage reason" formControlName="boundaryChangeReason" cols="75" maxlength="300"
+                    class="form-control description" rows="4"></textarea>
+                    <span class="counter-brief">{{projectLocationDetailsForm.controls.boundaryChangeReason.value?.length}} /
+                      300</span>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="facilitiesAtGeometry !== undefined &&  facilitiesAtGeometry!.length >0 && (selectedFacilityAtGeometry=== undefined || selectedFacilityAtGeometry.PRIMARY_ID===undefined)">
+                <div class="row">
+                  <label for="reason" class="font-label-bold" style="margin-left: 1rem">Please provide an explanation for creating a new facility at the same location as an existing record<svg style="margin-top: -1rem;padding-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    <title>Example: This location is an industrial park with multiple businesses or This project overlaps with other DEC Facilities and is not related.</title>
+                  </svg> *:</label>
+                </div>
+                <div class="row">
+                  <div class="form-group" style="display: block !important;padding-left: 1rem !important;">
+                    <textarea id="reason" aria-describedby="reason" formControlName="reason" cols="75" maxlength="300"
+                      class="form-control description" rows="4"></textarea>
+                    <span class="counter-brief">{{projectLocationDetailsForm.controls.reason.value?.length}} /
+                      300</span>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="facilitiesAtGeometry !== undefined &&  facilitiesAtGeometry!.length >0 && (selectedFacilityAtGeometry=== undefined || selectedFacilityAtGeometry.PRIMARY_ID===undefined) &&
+                  isSavedSubmitted && projectLocationDetailsForm.controls.reason.errors
+                " class="errors">
+                <div *ngIf="projectLocationDetailsForm.controls.reason.errors!.required" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_REASON_REQD}}
+                </div>
+              </div>
+              <br />
+              <mat-divider style="border-top-color: rgba(0, 0, 0, 0.5)"></mat-divider>
+              <br />
+
+              <div class="row">
+                <div class="form-group">
+                  <span id="counties" class="font-label-bold" style="margin-left: 1rem;">County:
+                  </span>
+                  <div style="margin-left: 0.3rem;" title={{projectLocationDetailsForm.controls.countyNames.value}} aria-describedby="counties"> {{
+                    projectLocationDetailsForm.controls.countyNames.value}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <span id="municipalities" class="font-label-bold" style="margin-left: 1rem;">Municipality:
+                  </span>
+                  <div style="margin-left: 0.3rem;" title={{projectLocationDetailsForm.controls.municipalityNames.value}} aria-describedby="municipalities"> {{
+                    projectLocationDetailsForm.controls.municipalityNames.value}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <span id="taxParcels" class="font-label-bold" style="margin-left: 1rem;">Tax Map Number:
+                  </span>
+                  <div style="margin-left: 0.3rem;" title={{projectLocationDetailsForm.controls.taxMap.value}} aria-describedby="taxParcels"> {{
+                    projectLocationDetailsForm.controls.taxMap.value.length ==2000 ? "Multiple Tax Parcels": projectLocationDetailsForm.controls.taxMap.value}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <span id="regions" class="font-label-bold" style="margin-left: 1rem;">Region(s): </span>
+                  <div style="margin-left: 0.3rem;"  aria-describedby="regions" title={{projectLocationDetailsForm.controls.region.value}}>{{ projectLocationDetailsForm.controls.region.value }}</div>
+                </div>
+              </div>
+              <mat-divider style="border-top-color: rgba(0, 0, 0, 0.5)"></mat-divider>
+            </div>
+            <div class="footer-row">
+              <div class="col-md-12 bottom-button-container">
+                <!--Disabled we need to discuss form validation errors
+                   [disabled]="!projectLocationDetailsForm.valid" -->
+                <button type="submit" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" >
+                  Next
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="cancel()">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-step>
+</mat-horizontal-stepper>
+
+<ng-template #facilityConfirmModal let-modal>
+  <div class="modal-body center-align">
+    <div class="text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="green" class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+       <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+       <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+     </svg>
+     <span class="text-left mt-2"><strong>Check NYSDEC Facility Records</strong><br/>We found the following facility records at this location.<br/> Please select the correct record for this project location and click <em>Next</em>.</span>
+   </div>
+  </div>
+ <div class="text-center ml-23" style="padding-left: 1rem;padding-right: 1rem;">
+    <p-table [value]="facilitiesAtGeometry" [(selection)]="selectedFacilityAtGeometry" dataKey="PRIMARY_ID"
+      responsiveLayout="scroll" [paginator]="true" [rows]="3" [rowsPerPageOptions]="[3]" class="col-12"
+      [alwaysShowPaginator]="false" (onRowUnselect)="onFacilitiesAtGeometryUnselect($event)"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} facilities" [showCurrentPageReport]="true">
+      <ng-template pTemplate="header">
+        <tr>
+          <th id="facilitiesAtGeometry_check" class="table-header-primary dec-font" style="width: 1rem"></th>
+          <th id="facilitiesAtGeometry_address" class="table-header-primary dec-font" style="width: 4rem">Address</th>
+          <th id="facilitiesAtGeometry_decId" class="table-header-primary dec-font" style="width: 2rem">
+            DEC ID
+          </th>
+          <th id="facilitiesAtGeometry_lrp" class="table-header-primary dec-font" style="width: 3rem">
+            Last Known Applicant
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-facility>
+        <tr
+          [style.border-top]="facility?.PRIMARY_ID === selectedFacilityAtGeometry?.PRIMARY_ID ? '3px solid #BFDBFE !important': ''"
+          [style.border-bottom]="facility?.PRIMARY_ID === selectedFacilityAtGeometry?.PRIMARY_ID ? '3px solid #BFDBFE !important': ''">
+          <td>
+            <p-tableRadioButton [value]="facility"></p-tableRadioButton>
+          </td>
+          <td class="dec-font">{{facility?.address !=='null' ? facility?.address :""}}</td>
+          <td class="dec-font">{{facility?.PRIMARY_ID !=='null' ? facility?.PRIMARY_ID :""}}</td>
+          <td class="dec-font">{{facility?.OWNER_NAME !=='null' ? facility?.OWNER_NAME:""}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <p class="instruction-font">If this project location is not related to these facilities, please select <em>Skip</em> to create a new DEC Facility.</p>
+  </div>
+  <div class="modal-footer model-footer-reduced" style="justify-content: center;">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="removeReasonValidator();copyFacility();modal.dismiss('Yes')"
+      [disabled]="selectedFacilityAtGeometry?.PRIMARY_ID ===undefined">
+      Next
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="addReasonValidator();modal.dismiss('No')">
+      Skip
+    </button>
+  </div>
+</ng-template>
+<app-pending-changes-popup #pendingPopup (onOkClick)="commonService.navigateToMainPage();"></app-pending-changes-popup>
+
+<ng-template #submitConfirmModal let-modal>
+  <div class="modal-body center-align">
+    <div class="text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="green" class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+       <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+       <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+     </svg>
+     <span class="text-left mt-2">Are you ready to save this location for <strong>{{projectLocationDetailsForm.controls.projectName.value}}</strong>? <br/>No changes to the property location will be possible after you select <strong><em>Yes</em></strong>.</span>
+   </div>
+  </div>
+  <div class="modal-footer model-footer-reduced" style="justify-content: center;">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="modal.dismiss('Cross click');saveAndSubmit()">
+      Yes
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click');saveOnly();">
+      Save For Later
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click');">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+

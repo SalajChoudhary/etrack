@@ -1,0 +1,1007 @@
+<app-analyst-sub-header [showButton]="true"></app-analyst-sub-header>
+<!-- <div class="custom-shadow p-3 mb-2 bg-white rounded">
+  <div class="container-fluid mt-4 mb-4">
+    <div class="row">
+      <div class="col-8 d-flex heading-cont">
+        <div class="mr-5 cursor-pointer cursor-pointer">
+          <h2 class="first" routerLink="/dashboard">Active Projects</h2>
+        </div>
+        <div class="border-btm-green cursor-pointer">
+          <h2>Document Management</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+<div class="shadow mb-5 bg-white rounded heightfix">
+  <div class="container-fluid mt-2 mb-4">
+    <div class="row">
+      <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="form-inline search-form" name="document-form">
+        <div class="col-12 pl-0 pr-0 d-flex">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-lg-12 pl-0 pr-0">
+                <legend class="table-header-primary header-3b">Search By:</legend>
+                <div class="d-flex justify-content-center align-items-center">
+                  <div class="dec-form pl-0 mt-2">
+                    <!-- <fieldset class="border">
+                      <legend class="table-header-primary header-1n">Search By:</legend>
+                    </fieldset> -->
+                    <div class="row">
+                      <div class="form-check form-check-inline ml-4">
+                        <input class="form-check-input" type="radio" name="decId" id="inlineRadio1"
+                          formControlName="decId" value="option1" (change)="
+                          searchTypeDEC = true; accessRadioChanged(true)
+                        " [checked]="searchTypeDEC" />
+                        <label class="form-check-label header-1b" for="inlineRadio1">DEC ID</label>
+                      </div>
+                      <div class="form-check form-check-inline mr-4">
+                        <input class="form-check-input" type="radio" name="decId" id="inlineRadio2"
+                          formControlName="decId" value="option2" (change)="
+                          accessRadioChanged(false); searchTypeDEC = false
+                        " [checked]="!searchTypeDEC" />
+                        <label class="form-check-label header-1b" for="inlineRadio2">Facility Name</label>
+                      </div>
+                      <div class="form-group  mr-2">
+                        <select name="searchMatchType" class="form-control ml-2" formControlName="searchMatchType">
+                          <option value="S">Starts With</option>
+                          <option value="E">Exact</option>
+                          <option value="C">Contains</option>
+                        </select>
+                      </div>
+                      <div class="form-group  mr-2 search-input-cont">
+                        <input type="text" class="form-control ml-2 search-input" (change)="searchTextChange()"
+                          id="decID" [maxlength]="
+                          searchForm.controls.decId.value == 'option1'
+                            ? 12
+                            : 100
+                        " formControlName="searchItemText" [placeholder]="
+                          searchForm.controls.decId.value == 'option1'
+                            ? '9-9999-99999'
+                            : ''
+                        " [mask]="
+                          searchForm.controls.decId.value == 'option1'
+                            ? '0-0000-00000'
+                            : ''
+                        " [dropSpecialCharacters]="false" (keyup.enter)="onSearch()" />
+                      </div>
+                      <div class="btn-conts">
+                        <button (click)="onSearch()" type="button"
+                          class="btn btn-sm btn-primari nextbutton ml-2 upload">
+                          <!-- <p>  [hidden]="!commonService.activateFeature(['PERMISSION1'])"</p> //paste in 118-->
+                          Search
+                        </button>
+                        <button type="button" (click)="clearSearchForm()"
+                          class="btn btn-sm btn-outline-dark closebutton ml-2">
+                          Clear
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="d-flex justify-content-center align-items-center">
+            <div class="search-input-errors">
+              <div class="errors">
+                <span *ngIf="
+                  submitted && SearchResponseReceived && !facilityOptions.length
+                " class="errors typo-2">{{ errorMessages?.NO_MATCHES_FOUND }}</span>
+              </div>
+              <div class="errors">
+                <span *ngIf="submitted && tooManyFacilities" class="errors typo-2">{{
+                  errorMessages?.TOO_MANY_FACILITIES
+                  }}</span>
+              </div>
+              <div class="errors">
+                <span *ngIf="
+                  submitted &&
+                  (searchForm.controls.searchItemText.errors?.required ||
+                    !searchForm.controls.searchItemText.value.trim().length)
+                " class="errors typo-2">{{
+                  searchForm.controls.decId.value == "option1"
+                  ? errorMessages?.DEC_ID_REQ
+                  : errorMessages?.FACILITY_NAME_REQ
+                  }}</span>
+                <span *ngIf="
+                  submitted &&
+                  searchForm.controls.decId.value == 'option2' &&
+                  searchForm.controls.searchItemText.errors?.minThree &&
+                  searchForm.controls.searchMatchType.value != 'E'
+                " class="errors typo-2">{{ errorMessages?.SEARCH_ITEM_LENGTH }}</span>
+                <span *ngIf="
+                  submitted &&
+                  searchForm.controls.decId.value == 'option1' &&
+                  (searchForm.controls.searchItemText.errors
+                    ?.invalidDecSearch ||
+                    searchForm.controls.searchItemText.value.length != 12) &&
+                  searchForm.controls.searchItemText.value.length
+                " class="errors typo-2">{{ errorMessages?.DEC_ID_LENGTH }}</span>
+                <span *ngIf="
+                  submitted &&
+                  searchForm.controls.decId.value == 'option1' &&
+                  searchForm.controls.searchItemText.errors
+                    ?.invalidDecSearchLength
+                " class="errors typo-2">{{ errorMessages?.DEC_ID_LENGTH }}</span>
+                <span *ngIf="
+                  submitted &&
+                  searchForm.controls.decId.value == 'option2' &&
+                  searchForm.controls.searchItemText.value.length &&
+                  searchForm.controls.searchItemText.errors
+                    ?.invalidFacilityCharSearch
+                " class="errors typo-2">{{ errorMessages?.INVALID_SEARCH_PARAM }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 mt-2 pl-0 pr-0" *ngIf="facilityOptions?.length">
+          <div class="d-flex justify-content-center align-items-center">
+            <div class="pl-0 ml-54">
+              <div class="dec-form ml-3">
+                <form class="form-inline">
+                  <div class="form-group mb-2 mr-2 d-flex flex-row">
+                    <label for="facilityName" class="typo-1">Facility*:</label>
+                    <select (change)="onFacilityDropdownChange($event)" name="facility-name-dropdown"
+                      class="form-control ml-2 w-500" placeholder="Select a facility name"
+                      [disabled]="disableFacilityDropdown" [(ngModel)]="facilityNameDropdown">
+                      <option *ngIf="facilityOptions?.length && !removeFacilitySelect" value="0" disabled>
+                        -- SELECT --
+                      </option>
+                      <option *ngFor="let item of facilityOptions" [value]="item.districtId">
+                        {{ item.label }}
+                      </option>
+                    </select>
+                  </div>
+                </form>
+              </div>
+              <div class="errors">
+                <span *ngIf="docFormsubmitted && !districtId" class="errors">{{
+                  searchForm.controls.decId.value == "option1"
+                  ? errorMessages?.DEC_ID_REQ
+                  : errorMessages?.FACILITY_NAME_REQ
+                  }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <app-documents-litigation-banner *ngIf="litigationHoldProjects?.length"
+    [litigationHoldProjects]="litigationHoldProjects"></app-documents-litigation-banner>
+  <fieldset class="border">
+    <legend class="table-header-primary header-3b">Uploaded Documents:</legend>
+    <div class="alert alert-danger" [hidden]="!error" *ngIf="error">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <span class="alert-text">
+            {{ uiMessage }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-primary" [hidden]="!sucessful" *ngIf="sucessful">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <span class="alert-text">
+            {{ uiMessage }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid mt-2">
+      <div class="row">
+        <div class="col-12">
+          <form>
+            <div class="row mt-2">
+              <div class="col-12">
+                <div class="float-right">
+                  <button *ngIf="userRole !== UserRole['DEC_Program_Staff']" (click)="addDocClicked()" type="button"
+                    class="btn btn-sm btn-primari mb-2 mr-2 adddocument" [hidden]="isEdit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                      class="bi bi-plus-lg" viewBox="0 0 16 16">
+                      <path
+                        d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z" />
+                    </svg>
+                    Add Document
+                  </button>
+                  <button (click)="openDownloadFilesDialog()" type="button" [disabled]="!documents.length"
+                    class="btn btn-sm btn-primari mb-2 adddocument" [hidden]="isEdit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                      class="bi bi-download-lg" viewBox="0 0 16 16">
+                      <path
+                        d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                      <path
+                        d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                    </svg>
+                    Download Documents
+                  </button>
+                </div>
+              </div>
+              <div class="col-12 pl-4 mb-4">
+                <app-grid-component *ngIf="userRole" (openModal)="openModal($event)"
+                  (deleteClicked)="deleteClicked($event)" (editClicked)="editClickedFun($event)" [rowData]="formattedDocuments"
+                  [userRole]="userRole" [componentType]="'documents'" [headers]="headers" [filename]="'document'"
+                  [isFromDMS]="true">
+                </app-grid-component>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset *ngIf="showUpload" class="border">
+    <legend class="table-header-primary header-3b" #DocumentDetailsSection>
+      Document Details:
+    </legend>
+
+    <div class="container-fluid mt-2">
+      <div class="row">
+        <div class="col-12">
+          <form [formGroup]="docForm" (ngSubmit)="onDocFormSubmit()">
+            <div class="row">
+              <div class="form-group col-md-6">
+                <label for="inputEmail4" class="typo-1 mr-4 auto">Access Level:</label>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" type="radio" name="accessByDepOnly" value="0"
+                    formControlName="accessByDepOnly" />
+                  <label class="form-check-label typo-2">DEC Only</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" type="radio" name="accessByDepOnly" value="1"
+                    formControlName="accessByDepOnly" />
+                  <label class="form-check-label typo-2">DEC and Applicant</label>
+                </div>
+              </div>
+              <div class="form-group col-md-6 display_block">
+                <label for="" class="mr-2 typo-2">Project ID:</label>
+                <select class="form-control projectIdSelect" formControlName="projectId">
+                  <option *ngIf="projectIdsSet.size > 0" value="" disabled>
+                    -- SELECT --
+                  </option>
+                  <option *ngIf="projectIdsSet.size > 0" value="">
+
+                  </option>
+                  <option *ngFor="let item of projectIdsSet" [ngValue]="item">
+                    {{ item }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="row" #documentFormTopElem>
+              <div class="form-group col col-lg-6 col-12">
+                <label for="inputEmail4" class="mr-2 typo-2">Document Name*:</label>
+                <input type="text" class="form-control" maxlength="100" formControlName="documentName" />
+                <span style="color: #007bff; padding-left: 10px; font-style: italic">
+                  ** A Document Name represents one or a group of related
+                  files.</span>
+                <div class="errors">
+                  <span *ngIf="
+                      docFormsubmitted &&
+                      docForm.controls.documentName.errors?.required
+                    " class="errors typo-2">{{ errorMessages?.DOC_NAME_REQ }}</span>
+                  <span *ngIf="
+                      docFormsubmitted &&
+                      docForm.controls.documentName.errors?.documentNameInvalid
+                    " class="errors typo-2">{{ errorMessages?.INVALID_DOC_NAME }}</span>
+                </div>
+              </div>
+              <div class="form-group col col-lg-6 col-12">
+                <label for="inputEmail4" class="mr-2 typo-2">Document Type*:</label>
+                <select class="form-control" formControlName="docCategory" (change)="onDocumentChange()">
+                  <option value="" disabled>-- SELECT --</option>
+                  <option *ngFor="let item of documentTypes" [ngValue]="item.docTypeId">
+                    {{ item.docTypeDesc }}
+                  </option>
+                </select>
+                <div class="errors typo-2">
+                  <span *ngIf="
+                      docFormsubmitted &&
+                      docForm.controls.docCategory.errors?.required
+                    " class="errors">{{ errorMessages?.DOC_TYPE_REQ }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col col-lg-6 col-12"></div>
+              <div class="form-group col col-lg-6 col-12">
+                <label for="inputEmail4" class="mr-2 typo-2">Sub-Type:</label>
+
+                <select class="form-control" formControlName="docSubCategory">
+                  <option *ngIf="documentSubTypes.length" value="0">
+                    -- SELECT --
+                  </option>
+                  <option *ngFor="let item of documentSubTypes" [ngValue]="item.subTypeId">
+                    {{ item.subTypeDesc }}
+                  </option>
+                </select>
+                <label for="inputOthers" class="mr-2 mt-2 typo-2">Other{{docForm?.controls?.docCategory?.value == 10 ? '*' : ''}}:</label>
+                <input type="text" maxlength="50" formControlName="otherDocSubCategory" class="form-control"
+                  id="inputOthers" />
+                <div class="errors">
+                  <span *ngIf="
+                      docFormsubmitted &&
+                      docForm.controls.docCategory.value == '10' &&
+                      docForm.controls.otherDocSubCategory.errors?.required
+                    " class="errors typo-2">{{ errorMessages?.OTH_SUB_TYPE_REQ }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div class="form-row col col-12 pl-4">
+                <label for="inputEmail4" class="mr-2 typo-2">Document Description:</label>
+                <textarea formControlName="description" rows="5" maxlength="255" class="form-control"></textarea>
+                <span class="desc-count typo-2">{{
+                  docForm.controls.description.value
+                  ? docForm.controls.description.value.length
+                  : 0
+                  }}/255</span>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="form-row col col-9 pl-4">
+                <label for="inputEmail4" class="typo-2">Application ID: </label>
+                <div class="track-app-id col-6 mb-2">
+                  <p>{{ formattedDECId(selectedFacility?.decId) }} /</p>
+                  <div class="row">
+                    <div class="col-4">
+                      <input type="text" formControlName="trackedApplicationId" class="form-control" maxlength="5"
+                        id="trackedApplicationId" [mask]="'00000'" />
+                    </div>
+                    <div class="col-5"><em class="typo-2">(tracked record)</em></div>
+                  </div>
+                </div>
+                <div class="errors">
+                  <span *ngIf="
+                      docFormsubmitted &&
+                      docForm.controls.trackedApplicationId.errors
+                        ?.maxFiveAllowed
+                    " class="errors typo-2">{{ errorMessages?.REG_APP_ID_FORMAT }}</span>
+                </div>
+              </div>
+              <!-- <div class="form-row col col-3 pl-4">
+                <form class="form-inline">
+                  <div class="form-group">
+                    <label  class="typo-2 mr-4">Date: </label>
+                    <p-calendar name="recordDate" formControlName="recordDate" inputId="basic"></p-calendar>
+                  </div>
+                </form>
+                <div class="errors">
+                  <span
+                    *ngIf="
+                      docFormsubmitted &&
+                      docForm.controls.trackedApplicationId.errors
+                        ?.maxFiveAllowed
+                    "
+                    class="errors"
+                    >{{ errorMessages?.REG_APP_ID_FORMAT }}</span
+                  >
+                </div>
+              </div> -->
+            </div>
+            <div class="row mt-4" #documentFormReasonsElem>
+              <div class="form-row col col-12 pl-4">
+                <label for="inputEmail4" class="mr-2 typo-2"><strong>DEP Determination for Release:</strong></label>
+              </div>
+              <div class="form-group col col-12 pl-4 mb-4">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" type="radio" name="documentReleasableCode" value="NODET"
+                    formControlName="documentReleasableCode" (change)="depDeterminationChange()" id="inlineRadio1" />
+                  <label class="form-check-label typo-2">No Determination</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" type="radio" name="documentReleasableCode" value="REL"
+                    formControlName="documentReleasableCode" (change)="depDeterminationChange()" id="inlineRadio2" />
+                  <label class="form-check-label typo-2">Releasable</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" type="radio" name="documentReleasableCode" value="NOREL"
+                    formControlName="documentReleasableCode" (change)="showOptions = true" id="inlineRadio3" />
+                  <label class="form-check-label typo-2">Non - Releasable</label>
+                </div>
+              </div>
+              <div *ngIf="
+                  showOptions &&
+                  docForm.controls.documentReleasableCode.value == 'NOREL'
+                " class="ml_5">
+                <div class="form-group col-12 pl-4" *ngFor="let item of reasons">
+                  <div class="form-check form-check-inline mr-4 ">
+                    <input class="form-check-input" type="checkbox" [value]="item.key" [checked]="
+                        docForm.controls.reasons.value.includes(item.key)
+                      " (change)="onCheckChange($event)" />
+                    <label class="form-check-label typo-2" for="flexCheckDefault">
+                      {{ item.value }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="errors">
+                <span *ngIf="
+                    docFormsubmitted &&
+                    showOptions &&
+                    docForm.controls.documentReleasableCode.value == 'NOREL' &&
+                    docForm.controls.reasons.value?.length < 1
+                  " class="errors typo-2">{{ errorMessages?.NON_REL_SEL_REQ }}</span>
+              </div>
+              <div class="col-12" *ngIf="isEdit">
+                <div class="float-right">
+                  <button type="submit" class="btn btn-sm btn-primari mb-2 mr-2 upload">
+                    Save
+                  </button>
+                  <button type="button" (click)="hideDocForm()"
+                    class="btn closebutton btn-sm btn-outline-secondary mb-2">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+            <hr class="border-bottom" *ngIf="!isEdit" />
+            <div class="form-row mt-2" *ngIf="!isEdit">
+              <div class="row col-12 table-header-primary">
+                <div class="form-row col-6 pl-2 mt-2">
+                  <label for="inputEmail4" class="mr-2 header-3b">Upload File(s)*:</label>
+                </div>
+              </div>
+
+              <div class="container-fluid mt-2">
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                    <div class="pl-4 file-drop-cont">
+                      <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)">
+                        <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector()">
+                          <div class="drag-n-drop-cont">
+                            <div class="text-container mb-2 mt-2">
+                              <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="63" height="64" viewBox="0 0 63 64">
+                                  <g fill="#233E2A" fill-rule="nonzero">
+                                    <path
+                                      d="M42.656 15.135a1.953 1.953 0 0 1-1.391-.578L31.5 4.795l-9.765 9.762a1.97 1.97 0 1 1-2.785-2.785L30.106.616a1.97 1.97 0 0 1 2.785 0l11.157 11.156a1.97 1.97 0 0 1-1.392 3.363z" />
+                                    <path
+                                      d="M31.5 36.791a1.97 1.97 0 0 1-1.969-1.969V2.01a1.97 1.97 0 0 1 3.938 0v32.812a1.97 1.97 0 0 1-1.969 1.969z" />
+                                    <path
+                                      d="M55.781 63.041H7.22A7.225 7.225 0 0 1 0 55.822V41.385a4.599 4.599 0 0 1 4.594-4.594h7.234a4.567 4.567 0 0 1 4.402 3.276l2.814 9.382a.658.658 0 0 0 .628.467h23.656a.658.658 0 0 0 .628-.467l2.814-9.385a4.572 4.572 0 0 1 4.402-3.273h7.234A4.599 4.599 0 0 1 63 41.385v14.437a7.225 7.225 0 0 1-7.219 7.219zM4.594 40.729a.656.656 0 0 0-.657.656v14.437a3.286 3.286 0 0 0 3.282 3.282H55.78a3.286 3.286 0 0 0 3.282-3.282V41.385a.656.656 0 0 0-.657-.656h-7.234a.65.65 0 0 0-.628.467L47.73 50.58a4.628 4.628 0 0 1-4.402 3.274H19.672a4.567 4.567 0 0 1-4.402-3.276l-2.814-9.382a.65.65 0 0 0-.628-.467H4.594z" />
+                                  </g>
+                                </svg> </span><br />
+                              <span class="typo-2">Drag and drop files here</span><br />
+                              <span class="typo-2">Or</span> <br />
+                              <button type="button" (click)="(openFileSelector)" style="background-color: #233E2A">
+                                Browse
+                              </button>
+                            </div>
+                          </div>
+                        </ng-template>
+                      </ngx-file-drop>
+                      <p style="color: #007bff">
+                        <em>Allowed files types include .accdb, .doc, .docx,
+                          .eml, .gif, .jpg, .jpeg, .mdb, .mbox, .msg, .pdf/a,
+                          .pdf, .png, .ppt, .pptx, .rtf, .tif, .txt, .vsd,
+                          .vsdx, .xls, .xlsx, .xml, .zip (Shape files only)</em>
+                      </p>
+                      <p style="color: #007bff">
+                        <em>Note: Files must have the same extension to upload as
+                          a group.</em>
+                      </p>
+                    </div>
+                    <div *ngIf="displayDuplicateErrorMsg
+                    " class="errors typo-2">{{
+                    errorMessages?.DOC_NAME_DUPLICATE }}</div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                    <div class="row mt-0">
+                      <div class="col-12 pl-4 mb-4">
+                        <div class="row">
+                          <div class="errors">
+                            <span *ngIf="docFormsubmitted && rawFiles.length < 1" class="errors typo-2">{{
+                              errorMessages?.FILE_UPLOAD_REQ }}</span>
+                            <span *ngIf="docFormsubmitted && fileTypesArr.length" class="errors typo-2">{{
+                              errorMessages?.SAME_FILE_TYPES_REQ }}</span>
+                            <span *ngIf="
+                                docFormsubmitted &&
+                                fileErrorType.includes('invalidFilesError')
+                              " class="errors typo-2">{{ errorMessages?.INVALID_FILE_EXT }}</span>
+                            <span *ngIf="
+                                docFormsubmitted &&
+                                (fileErrorType.includes('totalSizeError') ||
+                                  fileErrorType.includes('sizeExceededError'))
+                              " class="errors typo-2">{{ errorMessages?.DOC_TOTAL_SIZE_LIMIT }}</span>
+                            <span *ngIf="isSpecialChar || fileNameChar?.length > 0" class="errors typo-2">{{
+                              errorMessages?.FILE_NAME_INVALID }}</span>
+
+
+                            <span *ngIf="
+                                docFormsubmitted &&
+                                fileErrorType.includes('sameFileNameErr')
+                              " class="errors typo-2">{{ errorMessages?.DUP_FILE_NAME_IN_DOC }}</span>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="form-row pl-3 ml-0">
+                            <label for="inputEmail4" class="mr-2 typo-2">File(s) selected for Document Upload*:</label>
+                          </div>
+                        </div>
+
+                        <div class="files-tables" role="Raw Files Table " aria-label="Raw Files Table"
+                          aria-describedby="raw_files">
+                          <p-table [value]="rawFiles" [autoLayout]="true" styleClass="p-datatable-lg"
+                            [scrollable]="true" scrollHeight="55vh">
+                            <caption class="header-1b">
+                              Documents Page
+                            </caption>
+                            <ng-template pTemplate="header">
+                              <tr role="rowgroup" aria-label="Documnet Page Header">
+                                <th scope="col" role="columnheader" aria-label="File Name Header"
+                                  class="table-header-primary" [pSortableColumn]="'name'" [ngStyle]="{ width: '55%' }">
+                                  File Name
+                                </th>
+                                <th scope="col" role="columnheader" aria-label="File Date Header"
+                                  class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{
+                                    width: '19%',
+                                    'text-align': 'left'
+                                  }">
+                                  File Date
+                                </th>
+                                <th scope="col" role="columnheader" aria-label="File Size Header"
+                                  class="table-header-primary" [pSortableColumn]="'size'" [ngStyle]="{
+                                    width: '14%',
+                                    'text-align': 'left'
+                                  }">
+                                  Size
+                                </th>
+                                <th scope="col" role="columnheader" aria-label="File Actions Header"
+                                  class="table-header-primary" [ngStyle]="{ width: '12%' }">
+
+                                </th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-item let-i="rowIndex">
+                              <tr role="rowgroup" aria-label="Document Cell">
+                                <td scope="col" role="cell" aria-label="File Name Cell" class="table-body" [ngStyle]="{
+                                    'text-align': 'left',
+                                    'word-wrap': 'break-word',
+                                    width: '55%'
+                                  }">
+                                  {{ item.name }}
+                                </td>
+                                <td scope="col" role="cell" aria-label="File Date Cell" class="table-body" [ngStyle]="{
+                                    'text-align': 'left',
+                                    'word-wrap': 'break-word',
+                                    width: '19%'
+                                  }">
+                                  {{ item.lastModified | date: "MM/dd/yyyy" }}
+                                </td>
+                                <td scope="col" role="cell" aria-label="File Size Cell" class="table-body" [ngStyle]="{
+                                    'text-align': 'left',
+                                    'word-wrap': 'break-word',
+                                    width: '14%'
+                                  }">
+                                  {{ item.size / 1024 | number: "1.0-0" }}kB
+                                </td>
+
+                                <td scope="col" role="cell" aria-label="File Action Cell" class="table-body"
+                                  style="text-align: center; width: 8%">
+                                  <span class="cursor-pointer" (click)="deleteFile(i)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red"
+                                      class="bi bi-x" viewBox="0 0 16 16">
+                                      <path
+                                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                    </svg>
+                                  </span>
+                                </td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="float-right">
+                    <button type="submit" class="btn btn-sm btn-primari mb-2 mr-2 upload">
+                      Upload
+                    </button>
+                    <button type="button" (click)="hideDocForm()"
+                      class="btn btn-sm closebutton btn-outline-secondary mb-2">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr class="border-bottom" />
+          </form>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+  <app-custom-modal-popup #content [modalConfig]="modalConfig">
+    <ng-container>
+      <div class="modal-header text-center modal-header-dec-reduced">
+        <h3 class="modal-title modal-basic-title-dec header-1b" id="modal-basic-title">
+          Uploaded File Details
+        </h3>
+        <!-- <button type="button" style="color: white" class="close" aria-label="Close"
+        (click)="closeModal()">
+        <span aria-hidden="true">&times;</span>
+      </button> -->
+      </div>
+
+      <div class="modal-body files-tables" role="Selected Files Table" aria-label="Selected Files Table"
+        aria-describedby="files_tables">
+        <div>
+          <p class="text-center">
+            <strong>Facility: </strong>{{ formattedDECId(selectedFacility?.decId) }} -
+            {{ selectedFacility?.facilityName }} -
+            {{ selectedFacility?.municipalityName }}
+          </p>
+        </div>
+        <div class="row" style="text-align: center">
+          <p class="w-100">
+            <strong>Document Name:</strong> {{ selectedDoc.documentName }}
+          </p>
+        </div>
+
+        <p-table [value]="selectedDoc?.files" [autoLayout]="true" styleClass="p-datatable-lg" [scrollable]="true"
+          scrollHeight="55vh">
+          <ng-template pTemplate="header">
+            <tr role="rowheader" aria-label="Selected Document name">
+              <th scope="col" role="columnheader" aria-label="Selected File Name Header" class="table-header-primary"
+                [pSortableColumn]="'name'" [ngStyle]="{ width: '350px' }">
+                File Name
+              </th>
+              <th scope="col" role="columnheader" aria-label="Selected File Date Header" class="table-header-primary"
+                [pSortableColumn]="'lastModified'">
+                File Date
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-i="rowIndex">
+            <tr role="rowheader">
+              <td scope="col" role="cell" aria-label="Selected File Name Cell" class="table-body" [ngStyle]="{
+                width: '350px',
+                'text-align': 'left',
+                'word-wrap': 'break-word'
+              }">
+                <a href="javascript:;" (click)="openFile(item.fileName)">{{
+                  item.fileName
+                  }}</a>
+              </td>
+              <td scope="col" role="cell" aria-label="Selected File Date Header" class="table-body"
+                [ngStyle]="{ 'text-align': 'left' }">
+                {{ item.fileDate | date: "MM/dd/yyyy" }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+      <div class="modal-footer model-footer-reduced">
+        <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="closeModal()">
+          Close
+        </button>
+      </div>
+    </ng-container>
+  </app-custom-modal-popup>
+
+  <app-delete-confirm-popup [openModal]="deleteIsClicked" (onDeleteConfirmed)="deleteDocument()"
+    [bodyText]='confirmDeleteBodyText'></app-delete-confirm-popup>
+  <ng-template #deleteDocumentConfirm let-modal>
+    <div class="modal-header text-center modal-header-dec-reduced">
+      <h2 class="modal-title modal-basic-title-dec typo-2" id="modal-basic-title">
+        Confirm
+      </h2>
+      <button type="button" class="close remove-left-margin" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete the document?</p>
+    </div>
+    <div class="modal-footer model-footer-reduced">
+      <button type="button" class="btn btn-outline-dark" (click)="deleteDocument(); modal.dismiss('Cross click')">
+        Yes
+      </button>
+      <button type="button" class="btn btn-outline-dark" (click)="modal.dismiss('Cross click')">
+        No
+      </button>
+    </div>
+  </ng-template>
+
+  <ng-template #duplicateFileName let-modal>
+    <div class="modal-header text-center modal-header-dec-reduced">
+      <h2 class="modal-title modal-basic-title-dec header-1b" id="modal-basic-title">
+        {{ modalDocumentNameTitle }}
+      </h2>
+      <button type="button" class="close remove-left-margin" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>{{ modalDocumentNameBody }}</p>
+      <p>{{ modalDocumentNameBodyMessage }}</p>
+    </div>
+    <div class="modal-footer model-footer-reduced">
+      <button type="button" class="btn btn-outline-dark" (click)="replaceDocument(); modal.dismiss('Cross click')">
+        Yes
+      </button>
+      <button type="button" class="btn btn-outline-dark" (click)="modal.dismiss('Cross click')">
+        No
+      </button>
+    </div>
+  </ng-template>
+  <ng-template #downloadFiles let-modal>
+    <div class="modal-header text-center modal-header-dec-reduced">
+      <h2 id="modal-basic-title" class="modal-title modal-basic-title-dec header-1b">
+        Download Documents/Files
+      </h2>
+      <button type="button" class="close remove-left-margin" aria-label="Close" (click)="
+          clearSelected(downloadTable);
+          modal.dismiss('Cross click');
+          downloadTable.reset()
+        ">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="downloadSubmited && downloadErrors.length > 0" class="alert alert-danger model-reduced-alert typo-2">
+        Failed to download file(s) : {{ downloadErrors.toString() }}
+      </div>
+      <div *ngIf="downloadSubmited && downloadErrors.length == 0"
+        class="alert alert-primary model-reduced-alert typo-2">
+        {{ numberFilesDownloaded }} file(s) successfully downloaded
+      </div>
+
+      <div *ngIf="!downloadSubmited && selectedFiles.length > 0" class="alert alert-primary model-reduced-alert typo-2">
+        {{ selectedFiles.length }} file(s) selected
+      </div>
+
+      <h4 class="header-1n" style="text-align: center; margin: 0 0 2px 0px">
+        Facility : {{ formattedDECId(selectedFacility?.decId) }} -
+        {{ selectedFacility?.facilityName }} -
+        {{ selectedFacility?.municipalityName }}
+      </h4>
+      <p-table #downloadTable [value]="downloadFilesList" [(selection)]="selectedFiles" [scrollable]="true"
+        scrollHeight="45vh" (onRowSelect)="downloadSubmited = false">
+        <caption>
+          Download Files List
+        </caption>
+        <ng-template pTemplate="header">
+          <tr role="rowgroup" class="table-header-primary">
+            <th scope="col" role="columnheader" aria-sort="none" class="table-check-box table-header-primary">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th scope="col" role="columnheader" aria-label="=Document Name Header" aria-sort="ascending"
+              [pSortableColumn]="'documentName'" class="table-header-primary download-header">
+              Doc Name
+              <!-- <p-columnFilter class="p-ml-auto show" type="text" matchMode="in" field="documentName"  display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-multiSelect appendTo="body" [(ngModel)]="docNameSelect" [options]="docNameFilteringList"  placeholder="Select" (onChange)="filter($event.value)">
+                  </p-multiSelect>
+                  </ng-template>
+                </p-columnFilter> -->
+              <!-- <p-columnFilter type="text" matchMode="in" field="documentName" ></p-columnFilter> -->
+            </th>
+            <th scope="col" role="columnheader" aria-label="=Document Type Header" aria-sort="ascending"
+              [pSortableColumn]="'doctypeLabel'" class="table-header-primary download-header">
+              Type
+              <!-- <p-columnFilter  class="p-ml-auto" type="text" field="doctypeLabel"  matchMode="in" display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showClearButton]="false" [showAddButton]="false">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-multiSelect  [(ngModel)]="doctypeLabel" [options]="doctypeLabelFilteringList" placeholder="Select" (onChange)="filter($event.value)">
+                  </p-multiSelect>
+                  </ng-template>
+              </p-columnFilter> -->
+            </th>
+            <th scope="col" role="columnheader" aria-label="=Document Sub Type Header" aria-sort="ascending"
+              [pSortableColumn]="'docSubTypeLabel'" class="table-header-primary download-header">
+              Sub-Type
+              <!-- <p-columnFilter class="p-ml-auto" type="text" matchMode="in" field="docSubTypeLabel"  display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-multiSelect [(ngModel)]="docSubTypeSelect" [options]="docSubTypeFilteringList"  placeholder="Select" (onChange)="filter($event.value)">
+                  </p-multiSelect>
+                  </ng-template>
+                </p-columnFilter> -->
+            </th>
+            <th scope="col" role="columnheader" aria-label="=Document Application ID Header" aria-sort="ascending"
+              [pSortableColumn]="'trackedApplicationId'" class="table-header-primary download-header">
+              App ID
+              <!-- <p-columnFilter class="p-ml-auto" type="text" field="trackedApplicationId" matchMode="in" display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-multiSelect  [(ngModel)]="docAppId" [options]="trackedApplcationIdFilteringList" placeholder="Select" (onChange)="filter($event.value)">
+                  </p-multiSelect>
+                  </ng-template>
+              </p-columnFilter> -->
+            </th>
+            <th scope="col" role="columnheader" aria-sort="ascending" [pSortableColumn]="'fileName'"
+              class="table-header-primary download-header">
+              File Name
+              <!-- <p-columnFilter class="p-ml-auto" type="text" field="fileName" matchMode="in" display="menu" [showClearButton]="false" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-multiSelect  [(ngModel)]="fileName" [options]="fileNameFilteringList" placeholder="Select" (onChange)="filter($event.value)">
+                  </p-multiSelect>
+                  </ng-template>
+              </p-columnFilter> -->
+            </th>
+            <th scope="col" role="columnheader" aria-label="=Document File Date Header" aria-sort="ascending"
+              [pSortableColumn]="'fileDate'" class="table-header-primary download-header">
+              File Date
+            </th>
+            <th scope="col" role="columnheader" aria-label="=Document Access Header" aria-sort="ascending"
+              [pSortableColumn]="'accessByDepOnly'" class="table-header-primary download-header">
+              Access
+            </th>
+            <th scope="col" role="columnheader" aria-label="Document DEP REL Det Header" aria-sort="ascending"
+              [pSortableColumn]="'documentReleasableCode'" class="table-header-primary download-header">
+              DEP Rel Det
+            </th>
+            <th scope="col" role="columnheader" aria-label="Document Name Header" aria-sort="none"
+              class="table-clear table-header-primary download-header"></th>
+          </tr>
+          <tr role="rowgroup2" class="table-header-secondary">
+            <th scope="col" role="columnheader" aria-label="Secondary Header 1" aria-sort="none"
+              class="table-check-box table-header-secondary"></th>
+            <th scope="col" role="columnheader" aria-label="Secondary Header 2" aria-sort="none"
+              class="table-header-secondary">
+              <input class="form-control reduced-height" size="10" type="text" [(ngModel)]="docName" (input)="
+                  downloadTable.filter(docName, 'documentName', 'contains')
+                " />
+            </th>
+            <th scope="col" role="columnheader" aria-label="Secondary Header 3" aria-sort="none"
+              class="table-header-secondary">
+              <select class="form-control reduced-height" [(ngModel)]="doctypeSelect" (change)="
+                  downloadTable.filter(doctypeSelect, 'doctypeLabel', 'equals')
+                ">
+                <option [value]=""></option>
+                <option *ngFor="let item of documentTypeOptionsSet" [value]="item">
+                  {{ item }}
+                </option>
+              </select>
+            </th>
+            <th scope="col" role="columnheader" aria-label="Document Sub Type cell" aria-sort="none"
+              class="table-header-secondary">
+              <select class="form-control reduced-height" [(ngModel)]="docSubTypeSelect" (change)="
+                  downloadTable.filter(
+                    docSubTypeSelect,
+                    'docSubTypeLabel',
+                    'equals'
+                  )
+                ">
+                <option [value]=""></option>
+                <option *ngFor="let item of documentSubTypesOptionsSet" [value]="item">
+                  {{ item }}
+                </option>
+              </select>
+            </th>
+            <th scope="col" role="columnheader" aria-label=" Track Application ID" aria-sort="none"
+              class="table-header-secondary">
+              <input class="form-control reduced-height" size="10" type="text" [(ngModel)]="trackedApplicationId"
+                (input)="
+                  downloadTable.filter(
+                    trackedApplicationId,
+                    'trackedApplicationId',
+                    'contains'
+                  )
+                " />
+            </th>
+            <th scope="col" role="columnheader" aria-label="Download File Name Details" aria-sort="none"
+              class="table-header-secondary">
+              <input class="form-control reduced-height" size="10" type="text" [(ngModel)]="fileName"
+                (input)="downloadTable.filter(fileName, 'fileName', 'contains')" />
+            </th>
+            <th scope="col" role="columnheader" aira-label="Selected File Date" aria-sort="none"
+              class="table-header-secondary">
+              <select class="form-control reduced-height" [(ngModel)]="fileDateSelect" type="date" (change)="
+                  downloadTable.filter(
+                    fileDateSelect,
+                    'fileDateString',
+                    'contains'
+                  )
+                ">
+                <option [value]=""></option>
+                <option *ngFor="let item of fileDateOptionsSet" [value]="item">
+                  {{ item }}
+                </option>
+              </select>
+            </th>
+            <th scope="col" role="columnheader" aria-label="Access Selected" aria-sort="none"
+              class="table-header-secondary">
+              <select class="form-control reduced-height" [(ngModel)]="accessSelect" (change)="
+                  downloadTable.filter(
+                    accessSelect,
+                    'accessByDepOnly',
+                    'equals'
+                  )
+                ">
+                <option [value]=""></option>
+                <option *ngFor="let item of accessOptionsSet" [value]="item">
+                  {{ item }}
+                </option>
+              </select>
+            </th>
+            <th scope="col" role="columnheader" aria-label="Releasable Code" aria-sort="none"
+              class="table-header-secondary">
+              <select class="form-control reduced-height" [(ngModel)]="ReleasableCode" (change)="
+                  downloadTable.filter(
+                    ReleasableCode,
+                    'documentReleasableDesc',
+                    'equals'
+                  )
+                ">
+                <option [value]=""></option>
+                <option *ngFor="let item of depReleaseOptionsSet" [value]="item">
+                  {{ item }}
+                </option>
+              </select>
+            </th>
+            <th scope="col" role="columnheader" aria-label="Filter Button" aria-sort="none"
+              class="table-clear table-header-secondary">
+              <button class="btn btn-sm btn-primari mb-2 mr-2 upload"
+                (click)="clearFilters(downloadTable); downloadTable.reset()">
+                Clear
+              </button>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td class="table-check-box table-body">
+              <p-tableCheckbox [value]="item"></p-tableCheckbox>
+            </td>
+            <td scope="col" role="cell" aria-sort="none" aria-label="Document Name Cell" class="table-body"
+              style="word-wrap: break-word">
+              {{ item.documentName }}
+            </td>
+            <td scope="col" aria-label="Document Type Label Cell" role="cell" aria-sort="none" class="table-body">
+              {{ item.doctypeLabel }}
+            </td>
+            <td scope="col" role="cell" aria-label="Document  sub Type Label Cell" aria-sort="none" class="table-body">
+              {{ item.docSubTypeLabel }}
+            </td>
+            <td scope="col" role="cell" aria-label="Document Tracked Application ID Cell" aria-sort="none"
+              class="table-body">
+              {{ item.trackedApplicationId }}
+            </td>
+            <td scope="col" role="cell" aria-sort="none" aria-label="File Name Call" class="table-body"
+              style="word-wrap: break-word">
+              {{ item.fileName }}
+            </td>
+            <td scope="col" role="cell" aria-label="File Date Call" aria-sort="none" class="table-body">
+              {{ item.fileDate | date: "MM/dd/yyyy" }}
+            </td>
+            <td scope="col" role="cell" aria-label="File Access Call" aria-sort="none" class="table-body">
+              {{ item.accessByDepOnly }}
+            </td>
+            <td scope="col" role="cell" aria-label="File Release Description Call" aria-sort="none" class="table-body">
+              {{ item.documentReleasableDesc }}
+            </td>
+            <td scope="col" role="cell" aria-sort="none" class="table-clear table-body"></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No Documents found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div class="modal-footer model-footer-reduced">
+      <button type="button" [disabled]="!selectedFiles?.length" class="btn btn-sm btn-primari mb-2 mr-2 upload"
+        (click)="downloadFilesFromSelected()">
+        Download
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-dark closebutton button-width mb-2 mr-2" (click)="
+          clearSelected(downloadTable);
+          modal.dismiss('Cross click');
+          downloadTable.reset()
+        ">
+        Close
+      </button>
+    </div>
+  </ng-template>
+</div>

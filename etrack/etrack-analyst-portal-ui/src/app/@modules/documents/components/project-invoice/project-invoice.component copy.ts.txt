@@ -1,0 +1,140 @@
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ProjectInvoiceService } from 'src/app/@shared/services/project-invoice.service';
+import { environment } from 'src/environments/environment';
+
+@Component({
+  selector: 'app-project-invoice',
+  templateUrl: './project-invoice.component.html',
+  styleUrls: ['./project-invoice.component.scss']
+})
+export class ProjectInvoiceComponent implements OnInit {
+  
+  
+  projectInvoiceList = [
+    {"projectTypeCode":1, "projectType":"Minor Projects", "projectTypeCd":"RM28" , "feeAmount":200},
+    {"projectTypeCode":2, "projectType":"Modifications to Permits", "projectTypeCd":"RM29", "feeAmount":200},
+    {"projectTypeCode":3, "projectType":"Other Projects","projectTypeCd":"RM30", "feeAmount":900}
+  ];
+
+  freshWaterprojectInvoiceList = [
+    {"projectTypeCode":1, "projectType":"Minor Projects","projectTypeCd":"R698", "feeAmount":50},
+    {"projectTypeCode":2, "projectType":"Modifications to Permits","projectTypeCd":"R699", "feeAmount":50},
+    {"projectTypeCode":2, "projectType":"Residential Projects defined as associated with one single family","projectTypeCd":"R700", "feeAmount":50},
+    {"projectTypeCode":2, "projectType":"Multiple family dwelling and customary appurtenances","projectTypeCd":"R701", "feeAmount":100},
+    {"projectTypeCode":3, "projectType":"Other Projects","projectTypeCd":"R702", "feeAmount":200}
+  ];
+
+  lngfprojectInvoiceList = [
+    {"projectTypeCode":1, "projectType":"Less than 1,100 gallons","projectTypeCd":"RG91", "feeAmount":100},
+    {"projectTypeCode":2, "projectType":"1,100 gallons to 10,000 gallons","projectTypeCd":"RG92" ,"feeAmount":500},
+    {"projectTypeCode":2, "projectType":"10,001 gallons to 70,000 gallons","projectTypeCd":"RG93", "feeAmount":1000}
+    
+  ];
+
+
+  @ViewChild('printContent') printContent!:ElementRef;
+  invoice : any;
+  isInvoiceCreated = false;
+  as1 :any;
+  as2 :any;
+  as3 :any;
+  isChecked: any;
+  paymentUrl: string='';
+  pageFrom:any = '';
+
+  constructor(
+    private router : Router, 
+    private route:ActivatedRoute,
+    private projectInvoiceService : ProjectInvoiceService
+  ) { 
+    this.pageFrom = this.route.snapshot.queryParamMap.get('page');
+
+  }
+
+  ngOnInit(): void {
+  }
+
+  onSubmit(){
+
+    var requestPayload = {
+      "types": [
+          {
+              type:this.as1.projectTypeCd,
+              fee: this.as1.feeAmount
+  
+          },
+          {  
+            type:this.as2.projectTypeCd,
+            fee: this.as2.feeAmount
+          },
+          {
+            type:this.as3.projectTypeCd,
+            fee: this.as3.feeAmount
+          }
+      ]
+  };
+  var response  = this.projectInvoiceService.submitProjectInfo(requestPayload).subscribe(
+    
+      (response) => {
+    this.isInvoiceCreated = true;
+        this.invoice = response;
+       console.log(response);
+      },
+      (err) => {
+        console.log(err);
+      }
+    
+  );
+
+  console.log(response)
+  }
+  selectRow1(isChecked: boolean, item: any) {
+    this.as1 = item;
+    console.log(item);
+    this.isInvoiceCreated = false
+  }
+
+  selectRow2(isChecked: boolean, item: any) {
+    this.as2=item;
+    this.isInvoiceCreated = false
+  }
+
+  selectRow3(isChecked: boolean, item: any) {
+    this.as3=item;
+    this.isInvoiceCreated = false
+  }
+
+  makePayment(){
+   
+    this.projectInvoiceService.getTransactionId(this.invoice.invoiceNum).subscribe(
+      (response) => {
+        window.open(`${environment.paymentUrl}`+response,'_blank');
+      },
+      (err) => {
+        console.log(err);
+      }
+    
+  );
+
+
+    
+ 
+  }
+
+  onCancelClicked(){
+    if(this.pageFrom == 'virtual-workspace'){
+      this.router.navigate(['/virtual-workspace'])
+    }
+  }
+
+  // onPrint()
+  // {
+  //   let myWindow:any =window.open('','', 'width=400px,height:400px');
+  //   myWindow.document.write(this.printContent.nativeElement.innerHTML);
+  //   myWindow.document.close(); //missing code
+  //   myWindow.focus();
+  //   myWindow.print(); 
+  // }
+
+}

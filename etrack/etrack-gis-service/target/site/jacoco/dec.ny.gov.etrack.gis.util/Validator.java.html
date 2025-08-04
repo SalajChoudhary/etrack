@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Validator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.util</a> &gt; <span class="el_source">Validator.java</span></div><h1>Validator.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.util;
+
+import static dec.ny.gov.etrack.gis.util.Messages.INVALID_REQ;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+import dec.ny.gov.etrack.gis.exception.BadRequestException;
+import dec.ny.gov.etrack.gis.model.FacilityAddress;
+import dec.ny.gov.etrack.gis.model.ProjectDetail;
+
+public class Validator {
+
+<span class="nc" id="L13">  private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class.getName());</span>
+  
+  private Validator() {
+    
+  }
+ 
+  /**
+   * Validate the Project details passed as an input.
+   * 
+   * @param userId - User who initiates this request.
+   * @param contextId - Unique UUID to track this request.
+   * @param project - Project facility details.
+   * 
+   * @return - Boolean indicator whether the project facility details are valid or not.
+   */
+  public static boolean isProjectValid(final String userId, final String contextId, ProjectDetail project) {
+<span class="nc" id="L29">    LOGGER.info(&quot;Entering into validate &quot;</span>
+        + &quot;the project input request User Id :{}, Context Id :{}&quot;, userId, contextId);
+    
+<span class="nc bnc" id="L32" title="All 2 branches missed.">    if (project.getMailInInd() == null) {</span>
+<span class="nc" id="L33">      throw new BadRequestException(INVALID_REQ, &quot;Mail Indicator is not passed&quot;, project);</span>
+    }
+<span class="nc bnc" id="L35" title="All 4 branches missed.">    if (project.getApplicantTypeCode() == null || project.getApplicantTypeCode() == 0) {</span>
+<span class="nc" id="L36">      throw new BadRequestException(INVALID_REQ, &quot;Applicant Type is not passed&quot;, project);</span>
+    }
+<span class="nc bnc" id="L38" title="All 2 branches missed.">    if (project.getFacility() == null)</span>
+<span class="nc" id="L39">      throw new BadRequestException(INVALID_REQ, &quot;Facility details are not passed&quot;, project);</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">    if (project.getFacility().getAddress() == null)</span>
+<span class="nc" id="L41">      throw new BadRequestException(INVALID_REQ, &quot;Facility Address details are not passed&quot;, project);</span>
+<span class="nc" id="L42">    FacilityAddress facilityAddress = project.getFacility().getAddress();</span>
+<span class="nc" id="L43">    isValidString(facilityAddress.getCity(), facilityAddress.getState(), project.getPolygonId());</span>
+<span class="nc" id="L44">    LOGGER.info(&quot;Exiting from validate &quot;</span>
+        + &quot;the project input request User Id :{}, Context Id :{}&quot;, userId, contextId);
+<span class="nc" id="L46">    return true;</span>
+  }
+
+  private static void isValidString(String... input) {
+<span class="nc bnc" id="L50" title="All 2 branches missed.">    if (StringUtils.isEmpty(input))</span>
+<span class="nc" id="L51">      throw new BadRequestException(INVALID_REQ, &quot;One of the field City, State or Polygon id is empty or blank&quot;, input);</span>
+<span class="nc" id="L52">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

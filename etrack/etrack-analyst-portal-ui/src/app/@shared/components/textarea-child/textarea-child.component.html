@@ -1,0 +1,16 @@
+<ng-container *ngIf="!showPlaceholder">
+<form [formGroup]="formGroup">
+    <textarea id="textarea-common" (input)="onChange($event)" [ngStyle]="{'width':fieldWidth}" [formControlName]="controlName" name="brief"
+[maxlength]="maxLength" class="description" [rows]="noOfRows"></textarea>
+<span class="counter-brief" [ngStyle]="{'width':counterWidth}">{{brief?.length}} / {{maxLength}}</span>
+</form>
+</ng-container>
+
+<ng-container *ngIf="showPlaceholder">
+    <form [formGroup]="formGroup">
+        <textarea id="textarea-common" (input)="onChange($event)" [ngStyle]="{'width':fieldWidth}" [placeholder]="placeholderVal" [formControlName]="controlName" name="brief"
+    [maxlength]="maxLength" class="description" [rows]="noOfRows"></textarea>
+    <span class="counter-brief" [ngStyle]="{'width':counterWidth}">{{brief?.length}} / {{maxLength}}</span>
+    </form>
+    </ng-container>
+

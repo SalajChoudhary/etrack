@@ -1,0 +1,390 @@
+<div class="heading-wrapper">
+  <div class="container align-items-center">
+    <h4 class="top-heading header-2b text-center mb-1">
+      Project ID {{ projectId }}
+    </h4>
+    <h4 class="top-heading header-2b text-center mb-1">DART Application Add</h4>
+    <div class="text-center">
+      Choose the tracked record(s) and update default app type(s) as appropriate
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="permits-wrapper mt-20 mb-2">
+    <label for="" class="mr-2">Received Date<sup>*</sup>:</label>
+    <input
+      type="date"
+      class="form-input datepicker"
+      [(ngModel)]="receivedDate"
+    />
+    <div *ngIf="!isReceivedDateValid" class="inv-error-msg">
+      {{
+        errorMsgObj?.DATE_RCVD_NOT_FUTURE ||
+          "Error: Date Received cannot be a future Date."
+      }}
+    </div>
+  </div>
+</div>
+<form (change)="uploadToDartFormIsDirty = true">
+  <ng-container *ngFor="let key of permitSelectionSummaryKeys; let k = index">
+    <div
+      class="container"
+      *ngIf="
+        permitSelectionSummaryResponse &&
+        permitSelectionSummaryResponse[key.ref]?.length
+      "
+      attr.role="{{ key?.containerRole }}"
+      attr.aria-label="{{ key?.containerAriaLabel }}"
+      attr.aria-describedby="{{ key?.containerAriaDescribedBy }}"
+    >
+      <div class="permits-wrapper mt-20 mb-2">
+        <table
+          class="table table-borderless mb-0"
+          attr.aria-label="{{ key?.tableAriaLabel }}"
+          attr.aria-describedby="{{ key?.tableAriaDescribedBy }}"
+        >
+          <tbody role="rowgroup">
+            <tr *ngIf="isValidate">
+              <!-- <td class="text-black"></td> -->
+              <td class="text-black">Tracked Record</td>
+              <td *ngIf="key.ref != 'etrack-permits'" class="text-black"></td>
+              <td *ngIf="key.ref == 'etrack-permits'" class="text-black">
+                Batch Group
+              </td>
+              <td class="text-black">App Type</td>
+              <td></td>
+              <td></td>
+              <!-- <td
+                class="permit-desc permit-td-color"
+                *ngIf="key.ref != 'etrack-permits'"
+              >
+                Expires On
+              </td> -->
+            </tr>
+            <ng-container
+              *ngFor="
+                let permitArr of permitSelectionSummaryResponse[key.ref];
+                let i = index;
+                let last = last
+              "
+            >
+              <ng-container *ngIf="key.ref == 'etrack-permits'">
+                <ng-container *ngFor="let permit of permitArr; let j = index">
+                  <tr scope="col" role="cell">
+                    <ng-container *ngIf="isValidate">
+                      <td style="width: 100px">
+                        <input
+                          type="checkbox"
+                          name="trackingInd{{ k }}{{ i }}{{ j }}"
+                          value="1"
+                          class="input-checkbox-transType"
+                          [(ngModel)]="permit.trackingInd"
+                        />
+                      </td>
+
+                      <td style="width: 40px">
+                        <select
+                          name="batchGroup{{ k }}{{ i }}{{ j }}"
+                          [(ngModel)]="permit.batchGroup"
+                          style="width: 68px"
+                        >
+                          <option
+                            [value]="option"
+                            *ngFor="let option of batchGroupOptions"
+                          >
+                            {{ option }}
+                          </option>
+                        </select>
+                      </td>
+                      <td style="width: 40px">
+                        <select [disabled]="true">
+                          <option>NEW</option>
+                        </select>
+                      </td>
+                    </ng-container>
+                    <td colspan="3" class="permit-desc permit-td-color">
+                      <span> {{ permit?.permitTypeDesc }}</span>
+                    </td>
+                    <td class="permit-desc permit-td-color">
+                      {{ permit?.programIdFormatted }}
+                    </td>
+
+                    <td class="permit-desc permit-td-color">
+                      <span>
+                        {{ permit?.effectiveEndDate }}
+                      </span>
+                    </td>
+                    <td scope="col" role="cell" class="permit-action">
+                      <div
+                        class="d-flex justify-content-end align-items-center"
+                        style="padding-right: 25px"
+                      >
+                        <button
+                          class="action action-delete"
+                          aria-label="A button to delete an existing permit"
+                          (click)="uploadConfirmDelete(permit)"
+                        >
+                          X
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+
+              <ng-container *ngIf="key.ref != 'etrack-permits'">
+                <ng-container
+                  *ngFor="
+                    let permit of permitArr;
+                    let j = index;
+                    let end = last
+                  "
+                >
+                  <tr>
+                    <ng-container *ngIf="isValidate">
+                      <td style="width: 100px">
+                        <input
+                          type="checkbox"
+                          name="trackingInd{{ k }}{{ i }}{{ j }}"
+                          value="1"
+                          class="input-checkbox-transType"
+                          [(ngModel)]="permit.trackingInd"
+                        />
+                      </td>
+                      <td style="width: 75px"></td>
+                      <td style="width: 50px">
+                        <ng-container *ngIf="transTypes?.length">
+                          <select
+                            name="transTypeCode{{ k }}{{ i }}{{ j }}"
+                            [(ngModel)]="permit.validatedSelTransType"
+                          >
+                            <option
+                              [value]="transType?.edbTransTypeCode"
+                              *ngFor="let transType of transTypes"
+                            >
+                              {{ transType?.transTypeCode }}
+                            </option>
+                          </select>
+                        </ng-container>
+                      </td>
+                    </ng-container>
+                    <td class="permit-desc permit-td-color">
+                      {{ permit?.permitTypeDesc }}
+                    </td>
+
+                    <td
+                      class="permit-desc permit-td-color"
+                      style="width: 150px"
+                    >
+                      {{ permit?.programIdFormatted }}
+                    </td>
+
+                    <td
+                      class="permit-desc permit-td-color"
+                      style="width: 100px"
+                    >
+                      <span>
+                        {{ permit?.effectiveEndDate }}
+                      </span>
+                    </td>
+                    <td scope="col" role="cell" class="permit-action">
+                      <div
+                        class="d-flex justify-content-center align-items-center"
+                      >
+                        <button
+                          class="action action-delete"
+                          (click)="uploadConfirmDelete(permit)"
+                          aria-label="A button to delete an existing permit"
+                        >
+                          X
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr *ngIf="end && !last">
+                    <td colspan="6">
+                      <div class="shadow-div"></div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+  <div
+    class="typo-2 mt-3 pl-3 error-msg"
+    *ngIf="nonEtrackPermitHasZeroTrackingInd"
+  >  
+    {{
+      errorMsgObj?.NO_TRACK_AVAIL_PER_BATCH ||  "Only one Tracked Record can be selected."
+    }}
+  </div>
+  <div
+    class="typo-2 mt-3 pl-3 error-msg"
+    *ngIf="nonEtrackPermitHasMoreThanOneTrackingInd"
+  > 
+    {{
+      errorMsgObj?.ONE_TRACK_REC_PER_BATCH ||  "Only one Tracked Record can be selected."
+    }}
+  </div>
+  
+  <div class="typo-2 mt-3 pl-3 error-msg" *ngIf="etrackPermitsHasZeroTrackingInd">
+    {{
+      errorMsgObj?.NO_TRACK_AVAIL_PER_BATCH || "No Tracked Record is selected per Batch."
+    }}
+  </div>
+  <div class="typo-2 mt-3 pl-3 error-msg" *ngIf="etrackPermitOneBatchOneTrackingInd">
+    {{
+      errorMsgObj?.ONE_TRACK_REC_PER_BATCH || "Only one Tracked Record can be selected."
+    }}
+  </div>
+  
+  <div class="typo-2 mt-3 pl-3 error-msg" *ngIf="etrackPermitGPOneBatchInd || etrackPermitGPWithinOneBatchSelectedInd">
+    {{
+      errorMsgObj?.GP_MUST_BE_INDV_BATCH || "Error: Each General Permit must be within their own Batch Group and marked as the Tracked Record."
+    }}
+  </div>
+  
+</form>
+
+<app-delete-confirm-popup
+  [openModal]="deleteIsClicked"
+  (result)="onUploadDeleteConfirmPopupClosed($event)"
+  [bodyText]="confirmDeleteBodyText"
+></app-delete-confirm-popup>
+
+<ng-template #uploadConfirmDeleteModal let-modal>
+  <div class="modal-body">
+    <div class="confirm-custom-header">
+      <h2 class="modal-title m-auto" id="modal-basic-title">Confirm</h2>
+    </div>
+    <p style="text-align: center; font-size: 15px" class="mb-0">
+      Are you sure you want to remove the following applications?
+    </p>
+    <div class="clearfix"></div>
+    <table
+      id="new_permit_table"
+      class="table table-borderless"
+      aria-label="A table that shows permits the user applied for"
+    >
+      <tbody role="rowgroup">
+        <tr role="row">
+          <td
+            scope="col"
+            text='"bold"'
+            role="cell"
+            class="permit-desc permit-td-color"
+          >
+            {{ permitSelectedToDelete?.permitTypeDesc }}
+          </td>
+          <td class="permit-desc permit-td-color">
+            {{ permitSelectedToDelete?.programIdFormatted }}
+          </td>
+          <td class="permit-desc permit-td-color">
+            <span>
+              {{ permitSelectedToDelete?.effectiveEndDate }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer model-footer-reduced">
+    <button
+      type="button"
+      class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="modal.close('deleted')"
+      id="deleteBtn"
+    >
+      Delete
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-dark closebutton mb-2"
+      (click)="modal.dismiss('Cross click')"
+      id="cancelBtn2"
+    >
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<div class="text-center">
+  <button
+    class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload text-center btn-597"
+    (click)="okIsClicked()"
+  >
+    Upload
+  </button>
+
+  <button
+    class="btn btn-sm btn-outline-dark closebutton mb-2 text-center"
+    (click)="closeIsClicked()"
+  >
+    Cancel
+  </button>
+</div>
+
+<div class="float-right mr-2" *ngIf="showServerError">
+  <app-server-error-message
+    [serverErrorMessage]="serverErrorMessage"
+  ></app-server-error-message>
+</div>
+
+<ng-template #trackedRecordDeleteWarningModal let-modal>
+  <div class="modal-body pb-0">
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="mr-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="25"
+          height="25"
+          fill="red"
+          class="bi bi-exclamation-triangle float-left"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+          />
+          <path
+            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
+          />
+        </svg>
+      </div>
+      <div class="d-flex justify-content-center align-items-center flex-column">
+        <p class="instruction-font text-center">
+          You must change the tracked record to delete.
+        </p>
+      </div>
+      <div>
+        <!-- Intentionally left blank -->
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer model-footer-reduced align-center border-0 pt-0">
+    <button
+      type="button"
+      class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="modal.close(true)"
+      id="trackedOkBtn"
+    >
+      OK
+    </button>
+  </div>
+</ng-template>
+
+<app-pending-changes-popup
+  #pendingPopup
+  (onOkClick)="onCloseConfirmation()"
+></app-pending-changes-popup>
+
+<app-success-popup
+  #successPopup
+  [successMsg]="successMsg"
+  (onOkClick)="onSuccesPopupOkClicked()"
+></app-success-popup>

@@ -1,0 +1,5 @@
+package dec.ny.gov.etrack.dms.util;
+
+public enum ClientId {
+  DEC_APPLICATION_P8, DEC_PERMIT_P8, DEC_CORRESPONDENCE_P8, DEC_REPORTS_P8, DEC_NOTICES_P8, DEC_SUPPORTINGDOCUMENTS_P8;
+}

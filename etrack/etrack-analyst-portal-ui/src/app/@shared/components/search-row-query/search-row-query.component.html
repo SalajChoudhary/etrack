@@ -1,0 +1,352 @@
+<div class="fluid-container" *ngIf="currentFieldVal">
+  <form [formGroup]="searchForm">
+    <div class="row mb-2">
+      <div
+        class="col-1 text-center ml-3"
+        *ngIf="rowIndex == 0"
+        type=""
+        name="andOr"
+        value="and"
+      >
+        <!--|| (rowIndex > 0 && mainRowIndex != 0)"-->
+        <label class="typo-2 form-check-label mr-4" *ngIf="mainRowIndex != 0">
+        </label>
+      </div>
+      <div class="col-1 text-center ml-3" *ngIf="rowIndex != 0">
+        <!--&& mainRowIndex==0-->
+        <input
+          class="form-check-input"
+          type="radio"
+          name="andOr"
+          value="and"
+          formControlName="andOr"
+        />
+        <label class="typo-2 form-check-label mr-4">AND</label>
+        <input
+          class="form-check-input"
+          type="radio"
+          name="andOr"
+          formControlName="andOr"
+          value="or"
+        />
+        <label class="typo-2 form-check-label">OR</label>
+      </div>
+
+      <div class="col-2">
+        <select
+          class="form-control"
+          name=""
+          id=""
+          (change)="onFieldChanged($event)"
+          formControlName="field"
+        >
+          <option value="null" disabled>--Select--</option>
+          <option *ngFor="let field of sectionFieldlist" [value]="field.field">
+            {{ field.field }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-2 pl-0">
+        <ng-container *ngIf="sectionOperators.length > 0">
+          <select
+            class="form-control w-64"
+            style="width: 75%;"
+            name=""
+            id=""
+            (change)="onOperatorChanged($event)"
+            formControlName="operator"
+            *ngIf="currentFieldVal.isCheckbox == 'N'"
+            
+          >
+            <option value="null" disabled>--Select--</option>
+            <option
+              *ngFor="let operator of sectionOperators"
+              [value]="operator"
+            >
+              {{ operator }}
+            </option>
+          </select>
+        </ng-container>
+      </div>
+
+      <div class="col-3" *ngIf="!currentFieldVal.checkboxesValue.length">
+        <div class="row" *ngIf="isBetween && currentFieldVal.isCheckbox == 'N'">
+          <div class="col-5 mr-1">
+            <input
+              type="date"
+              *ngIf="currentFieldVal.isDate"
+              class="form-input datepicker w-100"
+              [max]="todaysDate"
+              formControlName="betweenInput1"
+            />
+            <input
+              class="w-100 input1"
+              *ngIf="!currentFieldVal.isDate"
+              [type]="'text'"
+              formControlName="inputField"
+              maxlength="200"
+            />
+          </div>
+          <div class="col-5">
+            <input
+              type="date"
+              *ngIf="currentFieldVal.isDate"
+              class="form-input datepicker w-100"
+              [max]="todaysDate"
+              formControlName="betweenInput2"
+            />
+            <input
+              class="w-100 input"
+              *ngIf="!currentFieldVal.isDate"
+              [type]="'text'"
+              formControlName="inputField"
+              maxlength="200"
+            />
+          </div>
+        </div>
+        <div *ngIf="!isBetween && currentFieldVal.isCheckbox == 'N'">
+          <input
+            type="date"
+            *ngIf="currentFieldVal.isDate"
+            class="form-input datepicker w-50"
+            [max]="todaysDate"
+            formControlName="inputField"
+          />
+          <input
+            class="w-100 input2"
+            *ngIf="
+              !currentFieldVal.isDate &&
+              !currentFieldVal.isSelect &&
+              !currentFieldVal.isMasked
+            "
+            [type]="'text'"
+            formControlName="inputField"
+            maxlength="200"
+          />
+          <input
+            class="w-100 input2"
+            *ngIf="!currentFieldVal.isDate && currentFieldVal.isMasked"
+            [type]="'text'"
+            formControlName="maskedInput"
+            (input)="checkTypeAndFormat($event)"
+            maxlength="200"
+          />
+          <select
+            class="form-control w-60"
+            *ngIf="currentFieldVal.isSelect"
+            formControlName="inputField"
+          >
+            <option>--Select--</option>
+            <option
+              *ngFor="let op of currentFieldVal.attributes"
+              [value]="op.cd"
+            >
+              {{ op.cdDesc? op.cdDesc: op.cd }}
+            </option>
+          </select>
+        </div>
+        <div
+          class="form-check form-check-inline"
+          *ngIf="
+            currentFieldVal.isCheckbox == 'Y' &&
+            currentFieldVal.checkboxesValue.length < 1
+          "
+        >
+          <input
+            class="form-check-input"
+            id="yes"
+            type="radio"
+            name="checkbox"
+            value="1"
+            formControlName="checkbox"
+            maxlength="200"
+          />
+          <label for="yes" class="typo-2 form-check-label mr-2">Yes</label>
+          <input
+            class="form-check-input"
+            id="no"
+            type="radio"
+            name="checkbox"
+            value="0"
+            formControlName="checkbox"
+          />
+          <label for="no" class="typo-2 form-check-label mr-2">No</label>
+        </div>
+      </div>
+
+      <div class="col-5"  *ngIf="currentFieldVal.checkboxesValue.length > 0">
+        <p-multiSelect
+          [options]="getFilterList(currentFieldVal.checkboxesValue)"
+          [styleClass]="currentFieldVal.searchAttributeName == 'SHPA Review' ? 'ejSHAPdropDown' : ''"
+          formControlName="multipleCheckboxes"
+          class="custom-ms"
+          placeholder="Select"
+          maxlength="200"
+        ></p-multiSelect>
+      </div>
+      <!-- <div class="form-check form-check-inline"  *ngFor="let name of currentFieldVal.checkboxesValue" >
+        <input type="checkbox"  class="form-check-input" formControlName="multipleCheckboxes" id="name">
+        <label class="mb-0 mr-2"for="name">{{name}}</label>
+    </div> -->
+
+      <div
+        class="col-1 text-right"
+        *ngIf="currentFieldVal.checkboxesValue.length > 0"
+      >
+        <span
+          style="cursor: pointer; margin-left: -2px"
+          (click)="createRow()"
+          class="mr-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            x="0px"
+            y="0px"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z"
+            ></path>
+          </svg>
+        </span>
+        <span
+          style="cursor: pointer; margin-left: -2px"
+          (click)="deleteRow()"
+          class="mr-2"
+        >
+          <svg
+            fill="#000000"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20px"
+            height="20px"
+            viewBox="0 0 83 83"
+          >
+            <path
+              d="M81,36.166H2c-1.104,0-2,0.896-2,2v6.668c0,1.104,0.896,2,2,2h79c1.104,0,2-0.896,2-2v-6.668
+            C83,37.062,82.104,36.166,81,36.166z"
+            ></path>
+          </svg>
+        </span>
+      </div>
+
+      <div
+        class="col-3 text-right"
+        *ngIf="!currentFieldVal.checkboxesValue.length"
+      >
+        <span
+          style="cursor: pointer; margin-left: -2px"
+          (click)="createRow()"
+          class="mr-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            x="0px"
+            y="0px"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z"
+            ></path>
+          </svg>
+        </span>
+        <span
+          style="cursor: pointer; margin-left: -2px"
+          (click)="deleteRow()"
+          class="mr-2"
+        >
+          <svg
+            fill="#000000"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20px"
+            height="20px"
+            viewBox="0 0 83 83"
+          >
+            <path
+              d="M81,36.166H2c-1.104,0-2,0.896-2,2v6.668c0,1.104,0.896,2,2,2h79c1.104,0,2-0.896,2-2v-6.668
+            C83,37.062,82.104,36.166,81,36.166z"
+            ></path>
+          </svg>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3 text-center">
+        <span
+          class="addr-error-msg typo-2 ml-4r"
+          *ngIf="isSubmitted && formControls?.field?.errors?.required"
+          >Error: Field is required.</span
+        >
+      </div>
+      <div class="col-2">
+        <span
+          class="addr-error-msg typo-2"
+          *ngIf="
+            isSubmitted &&
+            formControls?.operator?.errors?.required &&
+            currentFieldVal.isCheckbox == 'N' &&
+            !formControls?.field?.errors?.required
+          "
+          >Error: Operator is required.</span
+        >
+      </div>
+      <div class="col-5">
+        <span
+          class="addr-error-msg typo-2 ml-1r"
+          *ngIf="
+            isSubmitted &&
+            this.currentFieldVal.isCheckbox == 'N' &&
+              !isBetween &&
+              formControls?.inputField?.value == '' &&
+              !formControls?.field?.errors?.required &&
+              (!formControls?.multipleCheckboxes.errors?.required && this.currentFieldVal.isMultiSelect=='N')
+          "
+          >Error: Input is required.</span
+        >
+        <span
+          class="addr-error-msg typo-2 ml-1r"
+          *ngIf="
+            isSubmitted &&
+            this.currentFieldVal.checkboxesValue.length > 0 &&
+              formControls?.multipleCheckboxes.errors?.required &&
+              !formControls?.field?.errors?.required
+          "
+          >Error: At least one selection criteria is Required.</span
+        >
+
+        <div class="col-5">
+          <span
+            class="addr-error-msg typo-2"
+            *ngIf="
+              isSubmitted && isBetween && 
+              (formControls?.betweenInput1?.errors?.required ||
+                formControls?.betweenInput2?.errors?.required)
+            "
+            >Error: This field is required.</span
+          >
+          <span
+            class="addr-error-msg typo-2"
+            *ngIf="
+              isSubmitted
+              && !isBetween
+              && formControls?.inputField?.value !== '' 
+              && (formControls?.inputField?.errors?.required ||
+                formControls?.checkbox?.errors?.required)
+            "
+          > <!-- ||
+            formControls?.multipleCheckboxes?.errors?.required-->
+            Error: This field is required.</span
+          >
+
+          <!-- <span class="addr-error-msg typo-2" *ngIf="isSubmitted && (this.currentFieldVal.isCheckbox =='N' && isBetween && formControls?.betweenInput2?.value == '')">Error: Between Input  is required.</span> -->
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

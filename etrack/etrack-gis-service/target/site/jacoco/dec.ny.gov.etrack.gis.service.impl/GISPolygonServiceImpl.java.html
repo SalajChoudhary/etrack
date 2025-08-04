@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GISPolygonServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.service.impl</a> &gt; <span class="el_source">GISPolygonServiceImpl.java</span></div><h1>GISPolygonServiceImpl.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.service.impl;
+
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dec.ny.gov.etrack.gis.exception.BadRequestException;
+import dec.ny.gov.etrack.gis.exception.GISException;
+import dec.ny.gov.etrack.gis.exception.URLInvalidException;
+import dec.ny.gov.etrack.gis.model.GISResponse;
+import dec.ny.gov.etrack.gis.model.GISServiceResponse;
+import dec.ny.gov.etrack.gis.model.PolygonFeature;
+import dec.ny.gov.etrack.gis.model.PolygonObject;
+import dec.ny.gov.etrack.gis.model.ProjectPolygon;
+import dec.ny.gov.etrack.gis.service.GISPolygonService;
+
+/**
+ * This class to interact with GIS internal, External and Other eTrack servers to support Facility
+ * Step 1.
+ * 
+ * @author mxmahali
+ */
+@Service
+<span class="nc" id="L50">public class GISPolygonServiceImpl implements GISPolygonService {</span>
+
+  private static final String POLYGON_URL_TEMPLATE = &quot;/%1$s/FeatureServer/0/%2$s&quot;;
+  private static final String DEC_POLYGON =
+      &quot;/%1$s/FeatureServer/0/%2$s?outFields=*&amp;returnGeometry=true&amp;returnDistinctValues=true&amp;f=pjson&amp;outSR=4326&amp;returnCentroid=true&amp;&quot;;
+
+
+  @Autowired
+  @Qualifier(&quot;gisInternalServiceRestTemplate&quot;)
+  private RestTemplate gisInternalServiceRestTemplate;
+
+  @Autowired
+  @Qualifier(&quot;gisExternalServiceRestTemplate&quot;)
+  private RestTemplate gisExternalServiceRestTemplate;
+
+  @Autowired
+  @Qualifier(&quot;eTrackOtherServiceRestTemplate&quot;)
+  private RestTemplate eTrackOtherServiceRestTemplate;
+
+  @Autowired
+  @Qualifier(&quot;eTrackGISServiceRestTemplate&quot;)
+  private RestTemplate eTrackGISServiceRestTemplate;
+
+  @Autowired
+  @Qualifier(&quot;gisEFindPolygonReadRestTemplate&quot;)
+  private RestTemplate gisEFindPolygonReadRestTemplate;
+
+  @Autowired
+  @Qualifier(&quot;giseFindPolygonUploadServiceRestTemplate&quot;)
+  private RestTemplate giseFindPolygonUploadServiceRestTemplate;
+
+  private static final String SAVE_ACTION = &quot;S&quot;;
+  private static final String UPDATE_ACTION = &quot;U&quot;;
+  private static final String INVALID_URL_LOG_INFO =
+      &quot;URL {} contains invalid encoded value. Error Message {}&quot;;
+  private static final String PJSON_FIELD = &quot;pjson&quot;;
+  private static final String OUTFIELDS_TEXT = &quot;outFields&quot;;
+<span class="nc" id="L87">  private static Logger LOGGER = LoggerFactory.getLogger(GISPolygonService.class.getName());</span>
+
+  public String getDECPolygonByTaxId(final String taxParcelID, final String countyName,
+      final String municipalName, final String contextId) {
+
+<span class="nc" id="L92">    String query = &quot;COUNTIES='&quot; + countyName + &quot;' and MUNICIPALITIES='&quot; + municipalName</span>
+        + &quot;' and PRIMARY_ID like '&quot; + taxParcelID + &quot;%'&quot;;
+<span class="nc" id="L94">    String url = String.format(DEC_POLYGON, &quot;eTrack_facility_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L95">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query).toUriString();</span>
+
+    try {
+<span class="nc" id="L98">      LOGGER.info(&quot;getDECPolygonByTaxId URL {}&quot;,</span>
+<span class="nc" id="L99">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L100">      return gisInternalServiceRestTemplate</span>
+<span class="nc" id="L101">          .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L102">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L103">      LOGGER.error(INVALID_URL_LOG_INFO, uri, e);</span>
+<span class="nc" id="L104">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L105">    }  catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L106">      throw new GISException(&quot;GIS_POLYGON_BY_TAXID_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  /**
+   * 
+   */
+  public String getDECPolygonByAddress(final String street, final String city,
+      final String contextId) {
+<span class="nc" id="L115">    String query = &quot;UPPER(LOCATION_DIRECTIONS_1) like '%&quot; + street.toUpperCase()</span>
+<span class="nc" id="L116">        + &quot;%' and UPPER(CITY)='&quot; + city.toUpperCase() + &quot;'&quot;;</span>
+<span class="nc" id="L117">    String url = String.format(DEC_POLYGON, &quot;eTrack_facility_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L118">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query).toUriString();</span>
+
+    try {
+<span class="nc" id="L121">      LOGGER.info(&quot;getDECPolygonByAddress URL {}&quot;,</span>
+<span class="nc" id="L122">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L123">      return gisInternalServiceRestTemplate</span>
+<span class="nc" id="L124">          .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L125">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L126">      LOGGER.error(INVALID_URL_LOG_INFO, uri, e);</span>
+<span class="nc" id="L127">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L128">    }  catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L129">      throw new GISException(&quot;GIS_POLYGON_BY_ADR_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  /**
+  * 
+  */
+  public String getDECPolygonByDecId(final String decId, final String contextId,
+      final String jwtToken) {
+
+<span class="nc" id="L139">    Map&lt;String, Object&gt; facilityDetails =</span>
+<span class="nc" id="L140">        getDECIdByProgramType(&quot;system&quot;, contextId, jwtToken, decId, &quot;DEC&quot;);</span>
+<span class="nc" id="L141">    LOGGER.info(&quot;DEC ID Program Type {}&quot;, facilityDetails);</span>
+<span class="nc" id="L142">    String edbDistrictId = (String) facilityDetails.get(&quot;districtId&quot;);</span>
+
+    // String query = &quot;PRIMARY_ID Like '&quot; + decId + &quot;%'&quot;;
+<span class="nc" id="L145">    String url = String.format(DEC_POLYGON, &quot;eTrack_facility_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L146">    String query = &quot;SITE_ID='&quot; + edbDistrictId + &quot;'&quot;;</span>
+    // String url = String.format(DEC_POLYGON, &quot;eFind_facility_poly&quot;, &quot;query&quot;);
+<span class="nc" id="L148">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query).toUriString();</span>
+    try {
+<span class="nc" id="L150">      LOGGER.info(&quot;getDECPolygonByDecId URL {}&quot;,</span>
+<span class="nc" id="L151">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L152">      return gisInternalServiceRestTemplate</span>
+<span class="nc" id="L153">          .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L154">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L155">      LOGGER.error(INVALID_URL_LOG_INFO, uri, e);</span>
+<span class="nc" id="L156">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L157">    }  catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L158">      throw new GISException(&quot;GIS_POLYGON_BY_DECID_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  /**
+   * This method is used to perform Save, update and Delete Applicant polygon based on the action
+   * indicator
+   */
+  public Object applicantPolygon(final List&lt;Object&gt; featureMap, final String value,
+      final String actionInd, final String contextId) {
+<span class="nc" id="L168">    String url = null;</span>
+<span class="nc bnc" id="L169" title="All 3 branches missed.">    switch (actionInd) {</span>
+      case SAVE_ACTION:
+<span class="nc" id="L171">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_scratch_poly&quot;, &quot;addFeatures&quot;);</span>
+<span class="nc" id="L172">        break;</span>
+      case UPDATE_ACTION:
+<span class="nc" id="L174">        url =</span>
+<span class="nc" id="L175">            String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_scratch_poly&quot;, &quot;updateFeatures&quot;);</span>
+<span class="nc" id="L176">        break;</span>
+      default:
+<span class="nc" id="L178">        throw new BadRequestException(&quot;NOT_VALID_ACTION&quot;,</span>
+            &quot;Not a valid an action indicator passed to the Applicant Polygon &quot;, actionInd);
+    }
+<span class="nc" id="L181">    return submitPolygonRequest(url, featureMap, value, &quot;INTERNAL&quot;, contextId);</span>
+  }
+
+  /**
+   * This method is used to perform Save, update and Delete Analyst polygon based on the action
+   * indicator
+   */
+  public Object analystPolygon(List&lt;Object&gt; featureMap, String value, final String actionInd,
+      final String contextId) {
+<span class="nc" id="L190">    String url = null;</span>
+<span class="nc bnc" id="L191" title="All 3 branches missed.">    switch (actionInd) {</span>
+      case SAVE_ACTION:
+<span class="nc" id="L193">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_analyst_poly&quot;, &quot;addFeatures&quot;);</span>
+<span class="nc" id="L194">        break;</span>
+      case UPDATE_ACTION:
+<span class="nc" id="L196">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_analyst_poly&quot;, &quot;updateFeatures&quot;);</span>
+<span class="nc" id="L197">        break;</span>
+      default:
+<span class="nc" id="L199">        throw new BadRequestException(&quot;NOT_VALID_ACTION&quot;,</span>
+            &quot;Not a valid an action indicator passed to the Analyst Polygon&quot;, actionInd);
+
+    }
+<span class="nc" id="L203">    return submitPolygonRequest(url, featureMap, value, &quot;INTERNAL&quot;, contextId);</span>
+  }
+
+  /**
+   * This method is used to perform Save and Delete Analyst polygon based on the action indicator
+   */
+  public Object submittedPolygon(List&lt;Object&gt; featureMap, String value, final String actionInd,
+      final String contextId) {
+<span class="nc" id="L211">    String url = null;</span>
+<span class="nc bnc" id="L212" title="All 3 branches missed.">    switch (actionInd) {</span>
+      case SAVE_ACTION:
+<span class="nc" id="L214">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_submittal_poly&quot;, &quot;addFeatures&quot;);</span>
+<span class="nc" id="L215">        break;</span>
+      case UPDATE_ACTION:
+<span class="nc" id="L217">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_submittal_poly&quot;,</span>
+            &quot;updateFeatures&quot;);
+<span class="nc" id="L219">        break;</span>
+      default:
+<span class="nc" id="L221">        throw new BadRequestException(&quot;NOT_VALID_ACTION&quot;,</span>
+            &quot;Not a valid an action indicator passed to the Submitted Polygon&quot;, actionInd);
+    }
+<span class="nc" id="L224">    return submitPolygonRequest(url, featureMap, value, &quot;INTERNAL&quot;, contextId);</span>
+  }
+
+  /**
+   * 
+   * @param url
+   * @param featureMap
+   * @param value
+   * @return
+   */
+  private Object submitPolygonRequest(String url, List&lt;Object&gt; featureMap, String value,
+      final String gisEnvInd, final String contextId) {
+
+<span class="nc" id="L237">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L238">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L239">    formheaders.setContentType(MediaType.APPLICATION_JSON);</span>
+<span class="nc" id="L240">    HttpEntity&lt;List&lt;Object&gt;&gt; formJson = new HttpEntity&lt;&gt;(featureMap, formheaders);</span>
+<span class="nc" id="L241">    featureMapDetails.add(&quot;features&quot;, formJson);</span>
+
+<span class="nc" id="L243">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L244">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L245">    featureMapDetails.set(&quot;f&quot;, form);</span>
+<span class="nc" id="L246">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L247">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L248">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+<span class="nc" id="L250">    GISServiceResponse response = null;</span>
+    try {
+<span class="nc" id="L252">      LOGGER.info(&quot;URL for save Polygon {}&quot;, URLDecoder.decode(url, StandardCharsets.UTF_8.name()));</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">      if (&quot;EXTERNAL&quot;.equals(gisEnvInd)) {</span>
+<span class="nc" id="L254">        LOGGER.info(&quot;GIS External service is getting executed&quot;);</span>
+<span class="nc" id="L255">        response = gisExternalServiceRestTemplate.postForObject(</span>
+<span class="nc" id="L256">            URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity,</span>
+            GISServiceResponse.class);
+      } else {
+<span class="nc" id="L259">        LOGGER.info(&quot;GIS Internal service is getting executed&quot;);</span>
+<span class="nc" id="L260">        response = gisInternalServiceRestTemplate.postForObject(</span>
+<span class="nc" id="L261">            URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity,</span>
+            GISServiceResponse.class);
+      }
+<span class="nc" id="L264">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L265">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L266">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L267">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L268">      throw new GISException(&quot;GIS_SUBMIT_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+<span class="nc" id="L269">    }</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">    if (response != null) {</span>
+<span class="nc" id="L271">      List&lt;GISResponse&gt; gisResponse =</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">          !CollectionUtils.isEmpty(response.getAddResults()) ? response.getAddResults()</span>
+<span class="nc" id="L273">              : response.getUpdateResults();</span>
+<span class="nc bnc" id="L274" title="All 2 branches missed.">      if (!CollectionUtils.isEmpty(gisResponse)) {</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">        if (!gisResponse.get(0).isSuccess()) {</span>
+<span class="nc" id="L276">          throw new BadRequestException(&quot;GIS Error Code &quot; + gisResponse.get(0).getError().getCode(),</span>
+<span class="nc" id="L277">              gisResponse.get(0).getError().getDescription(), featureMap);</span>
+        }
+      }
+<span class="nc" id="L280">      return response;</span>
+    } else {
+<span class="nc" id="L282">      throw new GISException(&quot;GIS_SERVICE_ERROR&quot;, &quot;Error while interacting with GIS Service&quot;);</span>
+    }
+  }
+
+  /**
+   * 
+   */
+  public String getApplicantPolygon(final String applicationId, final String contextId) {
+
+<span class="nc" id="L291">    String query = &quot;OBJECTID=&quot; + applicationId;</span>
+<span class="nc" id="L292">    String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_scratch_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L293">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query)</span>
+<span class="nc" id="L294">        .queryParam(&quot;f&quot;, PJSON_FIELD).queryParam(OUTFIELDS_TEXT, &quot;*&quot;).queryParam(&quot;outSR&quot;, &quot;3857&quot;)</span>
+<span class="nc" id="L295">        .queryParam(&quot;returnCentroid&quot;, true).toUriString();</span>
+
+    try {
+<span class="nc" id="L298">      LOGGER.info(&quot;getApplicantPolygon URL {}&quot;,</span>
+<span class="nc" id="L299">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L300">      return gisInternalServiceRestTemplate</span>
+<span class="nc" id="L301">          .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L302">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L303">      LOGGER.error(INVALID_URL_LOG_INFO, uri, e);</span>
+<span class="nc" id="L304">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L305">    }  catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L306">      throw new GISException(&quot;GIS_APLCT_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  /**
+   * 
+   */
+  public Object deletePolygonByObjId(String objectIdInput, final String contextId) {
+<span class="nc" id="L314">    LOGGER.info(&quot;Entering into Delete polygon by Id {}&quot;, objectIdInput);</span>
+<span class="nc" id="L315">    String url =</span>
+<span class="nc" id="L316">        String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_scratch_poly&quot;, &quot;deleteFeatures&quot;);</span>
+
+<span class="nc" id="L318">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L319">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L320">    formheaders.setContentType(MediaType.TEXT_PLAIN);</span>
+<span class="nc" id="L321">    HttpEntity&lt;String&gt; formJson = new HttpEntity&lt;&gt;(&quot;objectId=&quot; + objectIdInput, formheaders);</span>
+<span class="nc" id="L322">    featureMapDetails.add(&quot;where&quot;, formJson);</span>
+
+<span class="nc" id="L324">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L325">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L326">    featureMapDetails.set(&quot;f&quot;, form);</span>
+
+<span class="nc" id="L328">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L329">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L330">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+    try {
+<span class="nc" id="L333">      LOGGER.info(&quot;URL for delete the Polygon ById {}&quot;,</span>
+<span class="nc" id="L334">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L335">      return gisInternalServiceRestTemplate.postForEntity(</span>
+<span class="nc" id="L336">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity, Object.class).getBody();</span>
+<span class="nc" id="L337">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L338">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L339">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L340">    }  catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L341">      throw new GISException(&quot;GIS_DEL_APLCT_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  
+  public Object deleteSpatialInquiryPolygonByObjId(String spatialInquiryObjectIdInput,
+      final String contextId) {
+<span class="nc" id="L348">    LOGGER.info(&quot;Entering into Delete polygon by Id {}&quot;, spatialInquiryObjectIdInput);</span>
+<span class="nc" id="L349">    String url =</span>
+<span class="nc" id="L350">        String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_scratch_poly&quot;, &quot;deleteFeatures&quot;);</span>
+
+<span class="nc" id="L352">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L353">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L354">    formheaders.setContentType(MediaType.TEXT_PLAIN);</span>
+<span class="nc" id="L355">    HttpEntity&lt;String&gt; formJson =</span>
+        new HttpEntity&lt;&gt;(&quot;objectId=&quot; + spatialInquiryObjectIdInput, formheaders);
+<span class="nc" id="L357">    featureMapDetails.add(&quot;where&quot;, formJson);</span>
+
+<span class="nc" id="L359">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L360">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L361">    featureMapDetails.set(&quot;f&quot;, form);</span>
+
+<span class="nc" id="L363">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L364">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L365">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+    try {
+<span class="nc" id="L368">      LOGGER.info(&quot;URL for delete the Polygon ById {}&quot;,</span>
+<span class="nc" id="L369">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L370">      return gisInternalServiceRestTemplate.postForEntity(</span>
+<span class="nc" id="L371">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity, Object.class).getBody();</span>
+<span class="nc" id="L372">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L373">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L374">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L375">    }  catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L376">      throw new GISException(&quot;GIS_SPATIAL_INQ_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  /**
+   * 
+   */
+  public Object deleteAnalystPolygonByObjId(final String userId, final String contextId,
+      final String objectIdInput) {
+<span class="nc" id="L385">    LOGGER.info(&quot;Entering into Delete Analyst polygon by Id {}&quot;, objectIdInput);</span>
+<span class="nc" id="L386">    String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_analyst_poly&quot;, &quot;deleteFeatures&quot;);</span>
+<span class="nc" id="L387">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L388">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L389">    formheaders.setContentType(MediaType.TEXT_PLAIN);</span>
+<span class="nc" id="L390">    HttpEntity&lt;String&gt; formJson = new HttpEntity&lt;&gt;(&quot;objectId=&quot; + objectIdInput, formheaders);</span>
+<span class="nc" id="L391">    featureMapDetails.add(&quot;where&quot;, formJson);</span>
+
+<span class="nc" id="L393">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L394">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L395">    featureMapDetails.set(&quot;f&quot;, form);</span>
+
+<span class="nc" id="L397">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L398">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L399">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+    try {
+<span class="nc" id="L402">      LOGGER.info(&quot;URL for delete the Analyst Polygon ById {}&quot;,</span>
+<span class="nc" id="L403">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L404">      return gisInternalServiceRestTemplate.postForEntity(</span>
+<span class="nc" id="L405">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity, Object.class).getBody();</span>
+<span class="nc" id="L406">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L407">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L408">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L409">    }  catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L410">      throw new GISException(&quot;GIS_DEL_ANALYST_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  /**
+   * 
+   */
+  public Object deleteApplicantSubmittalPolygonByObjId(final String userId, final String contextId,
+      final String objectIdInput) {
+<span class="nc" id="L419">    LOGGER.info(&quot;Entering into Delete Submittal polygon by Id {}&quot;, objectIdInput);</span>
+<span class="nc" id="L420">    String url =</span>
+<span class="nc" id="L421">        String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_submittal_poly&quot;, &quot;deleteFeatures&quot;);</span>
+<span class="nc" id="L422">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L423">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L424">    formheaders.setContentType(MediaType.TEXT_PLAIN);</span>
+<span class="nc" id="L425">    HttpEntity&lt;String&gt; formJson = new HttpEntity&lt;&gt;(&quot;objectId=&quot; + objectIdInput, formheaders);</span>
+<span class="nc" id="L426">    featureMapDetails.add(&quot;where&quot;, formJson);</span>
+
+<span class="nc" id="L428">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L429">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L430">    featureMapDetails.set(&quot;f&quot;, form);</span>
+
+<span class="nc" id="L432">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L433">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L434">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+    try {
+<span class="nc" id="L437">      LOGGER.info(&quot;URL for delete the submit Polygon ById {}&quot;,</span>
+<span class="nc" id="L438">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L439">      return gisInternalServiceRestTemplate.postForEntity(</span>
+<span class="nc" id="L440">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity, Object.class).getBody();</span>
+<span class="nc" id="L441">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L442">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L443">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L444">    }  catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L445">      throw new GISException(&quot;GIS_DEL_APLCT_SUBMITTED_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+
+  public String getAnalystPolygon(final String polygonId, final String contextId) {
+
+<span class="nc" id="L452">    String query = &quot;OBJECTID=&quot; + polygonId;</span>
+<span class="nc" id="L453">    String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_analyst_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L454">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query)</span>
+<span class="nc" id="L455">        .queryParam(&quot;f&quot;, PJSON_FIELD).queryParam(OUTFIELDS_TEXT, &quot;*&quot;).queryParam(&quot;outSR&quot;, &quot;3857&quot;)</span>
+<span class="nc" id="L456">        .queryParam(&quot;returnCentroid&quot;, true).toUriString();</span>
+
+    try {
+<span class="nc" id="L459">      LOGGER.info(&quot;getAnalystPolygon URL {}&quot;,</span>
+<span class="nc" id="L460">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L461">      return gisInternalServiceRestTemplate</span>
+<span class="nc" id="L462">          .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L463">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L464">      LOGGER.error(INVALID_URL_LOG_INFO, uri, e);</span>
+<span class="nc" id="L465">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L466">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L467">      throw new GISException(&quot;GIS_ANALYST_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  /**
+   * 
+   */
+  public String getsubmitedPolygon(final String applSubId, final String contextId) {
+
+<span class="nc" id="L476">    String query = &quot;OBJECTID=&quot; + applSubId;</span>
+<span class="nc" id="L477">    String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_applicant_submittal_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L478">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query)</span>
+<span class="nc" id="L479">        .queryParam(&quot;f&quot;, PJSON_FIELD).queryParam(OUTFIELDS_TEXT, &quot;*&quot;).queryParam(&quot;outSR&quot;, &quot;3857&quot;)</span>
+<span class="nc" id="L480">        .queryParam(&quot;returnCentroid&quot;, true).toUriString();</span>
+
+    try {
+<span class="nc" id="L483">      LOGGER.info(&quot;getsubmitedPolygon URL {}&quot;,</span>
+<span class="nc" id="L484">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L485">      return gisInternalServiceRestTemplate</span>
+<span class="nc" id="L486">          .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L487">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L488">      LOGGER.error(INVALID_URL_LOG_INFO, uri, e);</span>
+<span class="nc" id="L489">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L490">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L491">      throw new GISException(&quot;GIS_SUBMITTED_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+
+  /**
+   * 
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  @Override
+  public Map&lt;String, Object&gt; getDECIdByProgramType(final String userId, final String contextId,
+      final String jwtToken, final String programId, final String programType) {
+<span class="nc" id="L503">    LOGGER.info(&quot;Entering into getDECIDDetail. User Id {} Context Id{}&quot;, userId, contextId);</span>
+<span class="nc" id="L504">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L505">    httpHeaders.add(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L506">    httpHeaders.add(&quot;contextId&quot;, contextId);</span>
+<span class="nc" id="L507">    httpHeaders.add(&quot;programId&quot;, programId);</span>
+<span class="nc" id="L508">    httpHeaders.add(HttpHeaders.AUTHORIZATION, jwtToken);</span>
+<span class="nc" id="L509">    String url = UriComponentsBuilder.fromUriString(&quot;/etrack-dart-db/decid/programType/&quot;)</span>
+<span class="nc" id="L510">        .path(programType).toUriString();</span>
+<span class="nc" id="L511">    HttpEntity&lt;?&gt; entity = new HttpEntity&lt;&gt;(httpHeaders);</span>
+    try {
+<span class="nc" id="L513">      return eTrackOtherServiceRestTemplate.exchange(url, HttpMethod.GET, entity, Map.class)</span>
+<span class="nc" id="L514">          .getBody();</span>
+<span class="nc" id="L515">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L516">      throw new GISException(&quot;ETRACK_DECID_BY_PROG_TYPE_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  /**
+   * 
+   */
+  @Override
+  public ResponseEntity&lt;String&gt; getDECIdByTxmap(final String userId, final String contextId,
+      final String jwtToken, final String txmap, final String county, final String municipality) {
+<span class="nc" id="L526">    LOGGER.info(&quot;Entering into getDECIDDetail. User Id {} Context Id{}&quot;, userId, contextId);</span>
+<span class="nc" id="L527">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L528">    httpHeaders.add(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L529">    httpHeaders.add(&quot;contextId&quot;, contextId);</span>
+<span class="nc" id="L530">    httpHeaders.add(HttpHeaders.AUTHORIZATION, jwtToken);</span>
+<span class="nc" id="L531">    String url = UriComponentsBuilder.fromUriString(&quot;/etrack-dart-db/decid/txmap/&quot;)</span>
+<span class="nc" id="L532">        .queryParam(&quot;txmap&quot;, txmap).queryParam(&quot;county&quot;, county)</span>
+<span class="nc" id="L533">        .queryParam(&quot;municipality&quot;, municipality).toUriString();</span>
+<span class="nc" id="L534">    HttpEntity&lt;?&gt; entity = new HttpEntity&lt;&gt;(httpHeaders);</span>
+    
+    try {
+<span class="nc" id="L537">      ResponseEntity&lt;String&gt; responseEntity =</span>
+<span class="nc" id="L538">          eTrackOtherServiceRestTemplate.exchange(url, HttpMethod.GET, entity, String.class);</span>
+<span class="nc bnc" id="L539" title="All 2 branches missed.">      if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {</span>
+<span class="nc" id="L540">        return responseEntity;</span>
+      } else {
+<span class="nc" id="L542">        return new ResponseEntity&lt;String&gt;(responseEntity.getStatusCode());</span>
+      }
+<span class="nc" id="L544">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L545">      throw new GISException(&quot;ETRACK_DECID_BY_TAXMAP_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+
+  @Override
+  public Object uploadShapefile(String userId, String contextId, String filetype,
+      String publishParameters, String value, MultipartFile file) {
+
+<span class="nc" id="L554">    LOGGER.info(&quot;Entering into upload the shape file. User Id {}, Context Id {}&quot;, userId,</span>
+        contextId);
+<span class="nc" id="L556">    MultiValueMap&lt;String, Object&gt; requestBody = new LinkedMultiValueMap&lt;String, Object&gt;();</span>
+<span class="nc" id="L557">    HttpHeaders multiPartHeaders = new HttpHeaders();</span>
+<span class="nc" id="L558">    multiPartHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L559">    requestBody.add(&quot;filetype&quot;, filetype);</span>
+<span class="nc" id="L560">    requestBody.add(&quot;publishParameters&quot;, publishParameters);</span>
+<span class="nc" id="L561">    requestBody.add(&quot;f&quot;, value);</span>
+    try {
+<span class="nc" id="L563">      ByteArrayResource resource = new ByteArrayResource(file.getBytes()) {</span>
+        @Override
+        public String getFilename() {
+<span class="nc" id="L566">          return file.getOriginalFilename();</span>
+        }
+      };
+<span class="nc" id="L569">      requestBody.add(&quot;file&quot;, resource);</span>
+<span class="nc" id="L570">    } catch (Exception e) {</span>
+<span class="nc" id="L571">      LOGGER.error(&quot;File is not available or corrupted . User Id {}, Context Id {} &quot;, userId,</span>
+          contextId);
+<span class="nc" id="L573">      throw new GISException(&quot;FILE_NOT_FOUND&quot;, &quot;File is not available or corrupted&quot;, e);</span>
+<span class="nc" id="L574">    }</span>
+    try {
+<span class="nc" id="L576">      HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; requestEntity =</span>
+          new HttpEntity&lt;&gt;(requestBody, multiPartHeaders);
+<span class="nc" id="L578">      return eTrackGISServiceRestTemplate.postForEntity(&quot;/&quot;, requestEntity, String.class);</span>
+<span class="nc" id="L579">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L580">      throw new GISException(&quot;GIS_RET_ADR_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    } 
+  }
+
+
+  @Override
+  public Object saveOrUpdateWorkAreaPolygon(List&lt;Object&gt; featureMap, String value, String action,
+      String contextId) {
+
+<span class="nc" id="L589">    String url = null;</span>
+<span class="nc bnc" id="L590" title="All 3 branches missed.">    switch (action) {</span>
+      case SAVE_ACTION:
+<span class="nc" id="L592">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_work_area_poly&quot;, &quot;addFeatures&quot;);</span>
+<span class="nc" id="L593">        break;</span>
+      case UPDATE_ACTION:
+<span class="nc" id="L595">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_work_area_poly&quot;, &quot;updateFeatures&quot;);</span>
+<span class="nc" id="L596">        break;</span>
+      default:
+<span class="nc" id="L598">        throw new BadRequestException(&quot;NOT_VALID_ACTION&quot;,</span>
+            &quot;Not a valid an action indicator passed for the Work Area Polygon &quot;, action);
+
+    }
+<span class="nc" id="L602">    return submitPolygonRequest(url, featureMap, value, &quot;INTERNAL&quot;, contextId);</span>
+  }
+
+  @Override
+  public Object deleteWorkAreaPolygonByObjId(String userId, String contextId, String objectId) {
+<span class="nc" id="L607">    LOGGER.info(&quot;Entering into WorkArea Polygon by Id {}&quot;, objectId);</span>
+<span class="nc" id="L608">    String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_work_area_poly&quot;, &quot;deleteFeatures&quot;);</span>
+<span class="nc" id="L609">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L610">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L611">    formheaders.setContentType(MediaType.TEXT_PLAIN);</span>
+<span class="nc" id="L612">    HttpEntity&lt;String&gt; formJson = new HttpEntity&lt;&gt;(&quot;objectId=&quot; + objectId, formheaders);</span>
+<span class="nc" id="L613">    featureMapDetails.add(&quot;where&quot;, formJson);</span>
+
+<span class="nc" id="L615">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L616">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L617">    featureMapDetails.set(&quot;f&quot;, form);</span>
+
+<span class="nc" id="L619">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L620">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L621">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+    try {
+<span class="nc" id="L624">      LOGGER.info(&quot;URL for delete the submit Polygon ById {}&quot;,</span>
+<span class="nc" id="L625">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L626">      return gisInternalServiceRestTemplate.postForEntity(</span>
+<span class="nc" id="L627">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity, Object.class).getBody();</span>
+<span class="nc" id="L628">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L629">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L630">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L631">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L632">      throw new GISException(&quot;GIS_DEL_WA_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  @Override
+  public String getWorkAreaPolygon(String workareaId, String contextId) {
+<span class="nc" id="L638">    LOGGER.info(&quot;Entering into getWorkAreaPolygon. Context Id {}&quot;, contextId);</span>
+<span class="nc" id="L639">    String query = &quot;OBJECTID=&quot; + workareaId;</span>
+    // String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_appl_scratch&quot;, &quot;query&quot;);
+<span class="nc" id="L641">    String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_work_area_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L642">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query)</span>
+<span class="nc" id="L643">        .queryParam(&quot;f&quot;, PJSON_FIELD).queryParam(OUTFIELDS_TEXT, &quot;*&quot;).queryParam(&quot;outSR&quot;, &quot;3857&quot;)</span>
+<span class="nc" id="L644">        .queryParam(&quot;returnCentroid&quot;, true).toUriString();</span>
+    try {
+<span class="nc" id="L646">      LOGGER.info(&quot;getWorkAreaPolygon URL {}&quot;,</span>
+<span class="nc" id="L647">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L648">      return gisInternalServiceRestTemplate</span>
+<span class="nc" id="L649">          .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L650">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L651">      LOGGER.error(INVALID_URL_LOG_INFO, uri, e);</span>
+<span class="nc" id="L652">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L653">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L654">      throw new GISException(&quot;GIS_GET_WA_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+
+  /**
+   * 
+   */
+  private ResponseEntity&lt;PolygonObject&gt; getDECPolygonByDistrictId(final Long edbDistrictId,
+      final String contextId) {
+<span class="nc" id="L664">    String query = &quot;SITE_ID ='&quot; + edbDistrictId + &quot;'&quot;;</span>
+<span class="nc" id="L665">    String url = String.format(DEC_POLYGON, &quot;eFind_facility_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L666">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query).toUriString();</span>
+    try {
+<span class="nc" id="L668">      HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L669">      httpHeaders.add(HttpHeaders.ACCEPT_LANGUAGE, &quot;text/plain&quot;);</span>
+<span class="nc" id="L670">      HttpEntity&lt;?&gt; requestEntity = new HttpEntity&lt;&gt;(httpHeaders);</span>
+<span class="nc" id="L671">      LOGGER.info(&quot;getDECPolygonByDistrictId URL {}&quot;,</span>
+<span class="nc" id="L672">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L673">      return gisEFindPolygonReadRestTemplate.exchange(</span>
+<span class="nc" id="L674">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), HttpMethod.GET, requestEntity,</span>
+          PolygonObject.class);
+<span class="nc" id="L676">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L677">      LOGGER.error(&quot;URL {} contains invalid encoded value. Error Message &quot;, uri, e);</span>
+<span class="nc" id="L678">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L679">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L680">      throw new GISException(&quot;GIS_DEC_POLYGON_DIST_ERROR&quot;, ex.getResponseBodyAsString(), ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  @Override
+  public Map&lt;Long, String&gt; uploadApprovedPolygonToEFind(final String contextId,
+      final List&lt;ProjectPolygon&gt; uploadPolygonProjects) {
+
+<span class="nc" id="L688">    Map&lt;Long, String&gt; projectIdsWithUploadedStatus = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L689">    uploadPolygonProjects.forEach(uploadPolygonProject -&gt; {</span>
+<span class="nc" id="L690">      List&lt;Object&gt; uploadApprovedPolygon = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L691">      PolygonFeature polygonFeature = new PolygonFeature();</span>
+
+      try {
+<span class="nc" id="L694">        String query = &quot;OBJECTID=&quot; + uploadPolygonProject.getPolygonGisId();</span>
+<span class="nc" id="L695">        String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_analyst_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L696">        String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query)</span>
+<span class="nc" id="L697">            .queryParam(&quot;f&quot;, PJSON_FIELD).queryParam(OUTFIELDS_TEXT, &quot;*&quot;)</span>
+<span class="nc" id="L698">            .queryParam(&quot;outSR&quot;, &quot;26918&quot;)</span>
+            // .queryParam(&quot;returnCentroid&quot;, true)
+<span class="nc" id="L700">            .toUriString();</span>
+<span class="nc" id="L701">        LOGGER.info(&quot;Query Parameter for this Geometry call {}&quot;,</span>
+<span class="nc" id="L702">            URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L703">        String geoMetricDetails = gisInternalServiceRestTemplate</span>
+<span class="nc" id="L704">            .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L705">        LOGGER.debug(&quot;Geo Metric details . Context Id {}. Geo metry details {} &quot;, contextId,</span>
+            geoMetricDetails);
+<span class="nc" id="L707">        PolygonObject polygongeoMetryObject =</span>
+<span class="nc" id="L708">            new ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)</span>
+<span class="nc" id="L709">                .readValue(geoMetricDetails, PolygonObject.class);</span>
+<span class="nc" id="L710">        polygonFeature.setGeometry(polygongeoMetryObject.getFeatures().get(0).getGeometry());</span>
+<span class="nc" id="L711">        LOGGER.debug(&quot;Geo Polygon Metric details . Context Id {}. Geo metry details {} &quot;, contextId,</span>
+<span class="nc" id="L712">            new ObjectMapper().writeValueAsString(polygongeoMetryObject));</span>
+
+<span class="nc" id="L714">        PolygonObject polygonObject =</span>
+<span class="nc" id="L715">            getDECPolygonByDistrictId(uploadPolygonProject.getEdbDistrictId(), contextId).getBody();</span>
+<span class="nc" id="L716">        LOGGER.debug(&quot;Geo Polygon Object details . Context Id {}. Geo metry details {} &quot;, contextId,</span>
+<span class="nc" id="L717">            new ObjectMapper().writeValueAsString(polygonObject));</span>
+
+<span class="nc bnc" id="L719" title="All 2 branches missed.">        if (polygonObject.getError() != null) {</span>
+<span class="nc" id="L720">          throw new GISException(&quot;EFIND_POLYGON_RETRIEVAL_ERR&quot;,</span>
+<span class="nc" id="L721">              &quot;Unable to retrieve the Polygon &quot; + polygonObject.getError());</span>
+        }
+<span class="nc" id="L723">        polygonFeature.setAttributes(polygonObject.getFeatures().get(0).getAttributes());</span>
+<span class="nc" id="L724">        polygonFeature.getAttributes()</span>
+<span class="nc" id="L725">            .setValidatedLocation(uploadPolygonProject.getApprovedPolygonChangeInd());</span>
+<span class="nc" id="L726">        LOGGER.debug(&quot;Polygon Object details &quot;,</span>
+<span class="nc" id="L727">            new ObjectMapper().writeValueAsString(polygonObject));</span>
+<span class="nc" id="L728">        uploadApprovedPolygon.add(polygonFeature);</span>
+<span class="nc" id="L729">        LOGGER.debug(&quot;Ready to upload polygon Object details {}&quot;,</span>
+<span class="nc" id="L730">            new ObjectMapper().writeValueAsString(uploadApprovedPolygon));</span>
+<span class="nc" id="L731">        uploadPolygonToEFind(uploadApprovedPolygon, PJSON_FIELD, contextId);</span>
+<span class="nc" id="L732">        LOGGER.debug(&quot;Ready to upload polygon Object details {}&quot;,</span>
+<span class="nc" id="L733">            new ObjectMapper().writeValueAsString(uploadApprovedPolygon));</span>
+<span class="nc" id="L734">        projectIdsWithUploadedStatus.put(uploadPolygonProject.getProjectId(), &quot;S&quot;);</span>
+<span class="nc" id="L735">      } catch (Exception e) {</span>
+<span class="nc" id="L736">        LOGGER.error(&quot;Error while uploading the polygon into eFind. Context Id {}&quot;, contextId, e);</span>
+<span class="nc" id="L737">        projectIdsWithUploadedStatus.put(uploadPolygonProject.getProjectId(), &quot;E&quot;);</span>
+<span class="nc" id="L738">      }</span>
+<span class="nc" id="L739">    });</span>
+<span class="nc" id="L740">    return projectIdsWithUploadedStatus;</span>
+  }
+
+  /**
+   * This method is used to perform Update Approved Polygon details into eFind.
+   * 
+   */
+  private Object uploadPolygonToEFind(List&lt;Object&gt; featureMap, String value,
+      final String contextId) throws UnsupportedEncodingException {
+
+<span class="nc" id="L750">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L751">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L752">    formheaders.setContentType(MediaType.APPLICATION_JSON);</span>
+<span class="nc" id="L753">    HttpEntity&lt;List&lt;Object&gt;&gt; formJson = new HttpEntity&lt;&gt;(featureMap, formheaders);</span>
+<span class="nc" id="L754">    featureMapDetails.add(&quot;features&quot;, formJson);</span>
+
+<span class="nc" id="L756">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L757">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L758">    featureMapDetails.set(&quot;f&quot;, form);</span>
+<span class="nc" id="L759">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L760">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L761">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+<span class="nc" id="L763">    String url = &quot;/eFind_facility_poly/FeatureServer/0/updateFeatures&quot;;</span>
+    
+<span class="nc" id="L765">    GISServiceResponse response = giseFindPolygonUploadServiceRestTemplate.postForObject(</span>
+<span class="nc" id="L766">        URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity, GISServiceResponse.class);</span>
+<span class="nc bnc" id="L767" title="All 2 branches missed.">    if (response != null) {</span>
+<span class="nc" id="L768">      List&lt;GISResponse&gt; gisResponse =</span>
+<span class="nc bnc" id="L769" title="All 2 branches missed.">          !CollectionUtils.isEmpty(response.getAddResults()) ? response.getAddResults()</span>
+<span class="nc" id="L770">              : response.getUpdateResults();</span>
+<span class="nc bnc" id="L771" title="All 4 branches missed.">      if (!CollectionUtils.isEmpty(gisResponse) &amp;&amp; !gisResponse.get(0).isSuccess()) {</span>
+<span class="nc" id="L772">        throw new BadRequestException(&quot; GIS Error Code &quot; + gisResponse.get(0).getError().getCode(),</span>
+<span class="nc" id="L773">            gisResponse.get(0).getError().getDescription(), featureMap);</span>
+      }
+<span class="nc" id="L775">      return response;</span>
+    } else {
+<span class="nc" id="L777">      throw new GISException(&quot;GIS_EFIND_SERVICE_ERROR&quot;,</span>
+          &quot;Error while interacting with GIS eFind Service&quot;);
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

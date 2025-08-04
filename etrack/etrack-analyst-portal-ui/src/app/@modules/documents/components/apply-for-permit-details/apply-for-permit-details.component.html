@@ -1,0 +1,375 @@
+<app-analyst-sub-header
+  [showAddress]="true"
+  [showButton]="true"
+  (openWarningModalEmitter)="open()"
+  [isValidateMode]="isValidateMode"
+></app-analyst-sub-header>
+<app-validate-banner
+  *ngIf="this.isValidateMode"
+  [validated]="isValidatedMode"
+></app-validate-banner>
+
+<div class="shadow mb-5 light-green rounded">
+  <div class="accord-container">
+    <a
+      class="d-flex accord active"
+      [class.disabledaccord]="isStepDisabled('SEL_PROJ_LOC', '')"
+      id="stepOne"
+      routerLink="/project-location"
+      [ngClass]="{ 'pointer-events-none': isStepDisabled('SEL_PROJ_LOC', '') }"
+    >
+      <div class="step header-1n">Step 1</div>
+      <div class="text-cont">
+        <p class="text-decoration-none text-black header-1b">
+          Project Location
+        </p>
+        <span class="text-decoration-none text-black header-1n"
+          >Identify project location on a map</span
+        >
+      </div>
+      <div
+        class="icon-holder ml-auto mr-4"
+        tabindex="-1"
+        [hidden]="!getStatusOfStep('SEL_PROJ_LOC')"
+        [routerLink]="
+          !getStatusOfStep('SEL_PROJ_LOC') ? [] : ['/associated-applicants']
+        "
+        [queryParams]="navigateQueryParams"
+      >
+        <img
+          class="mt-50"
+          src="assets/icons/check2-square.svg"
+          alt="check2-square"
+        />
+      </div>
+    </a>
+
+    <a
+      class="d-flex accord active"
+      [class.disabledaccord]="isStepDisabled('APPLICANT_INFO', 'SEL_PROJ_LOC')"
+      id="stepTwo"
+      [routerLink]="
+        !getStatusOfStep('SEL_PROJ_LOC') ? [] : ['/associated-applicants']
+      "
+      [ngClass]="{
+        'pointer-events-none': isStepDisabled('APPLICANT_INFO', 'SEL_PROJ_LOC')
+      }"
+    >
+      <div class="step header-1n">Step 2</div>
+      <div class="text-cont">
+        <p class="text-decoration-none text-black header-1b">
+          Applicant Information
+        </p>
+        <span class="text-decoration-none text-black header-1n"
+          >Identify the applicants, property owners, and contacts
+        </span>
+      </div>
+      <div
+        class="icon-holder ml-auto mr-4"
+        [hidden]="!getStatusOfStep('APPLICANT_INFO')"
+      >
+        <img
+          class="mt-50"
+          src="assets/icons/check2-square.svg"
+          alt="check2-square"
+        />
+        <!-- <img class="mt-50" *ngIf="isValidatedMode" src="assets/icons/check2-square-yellow.svg"  alt="" /> -->
+      </div>
+    </a>
+    <!-- [routerLink]="!getStatusOfStep('APPLICANT_INFO')? './':'/applicant-informations'" -->
+    <a
+      class="d-flex accord"
+      [class.disabledaccord]="isStepDisabled('PROJECT_INFO', 'APPLICANT_INFO')"
+      id="stepThree"
+      [routerLink]="
+        !getStatusOfStep('APPLICANT_INFO') ? [] : ['/project-informations']
+      "
+      [ngClass]="{
+        'pointer-events-none': isStepDisabled('PROJECT_INFO', 'APPLICANT_INFO')
+      }"
+    >
+      <div class="step header-1n">Step 3</div>
+      <div class="text-cont">
+        <p class="text-decoration-none text-black header-1b">
+          Project Information
+        </p>
+        <span class="text-decoration-none text-black header-1n"
+          >Select the permit types and enter project details on the application
+          forms
+        </span>
+      </div>
+      <div
+        class="icon-holder ml-auto mr-4"
+        [hidden]="!getStatusOfStep('PROJECT_INFO')"
+      >
+        <img
+          class="mt-50"
+          src="assets/icons/check2-square.svg"
+          alt="check2-square"
+        />
+        <!-- <img class="mt-50" *ngIf="isValidatedMode" src="assets/icons/check2-square-yellow.svg"  alt="" /> -->
+      </div>
+    </a>
+    <a
+      class="d-flex accord"
+      [class.disabledaccord]="isStepDisabled('UPLOAD_DOC', 'PROJECT_INFO')"
+      id="stepFour"
+      [routerLink]="
+        !getStatusOfStep('PROJECT_INFO') ? [] : ['/supporting-documentation']
+      "
+      [ngClass]="{
+        'pointer-events-none': isStepDisabled('UPLOAD_DOC', 'PROJECT_INFO')
+      }"
+    >
+      <div class="step header-1n">Step 4</div>
+      <div class="text-cont">
+        <p class="text-decoration-none text-black header-1b">
+          Supporting Documents
+        </p>
+        <span class="text-decoration-none text-black header-1n"
+          >Upload additional project materials
+        </span>
+      </div>
+      <div
+        class="icon-holder ml-auto mr-4"
+        [hidden]="!getStatusOfStep('UPLOAD_DOC')"
+      >
+        <img
+          class="mt-50"
+          src="assets/icons/check2-square.svg"
+          alt="check2-square"
+        />
+        <!-- <img class="mt-50" *ngIf="isValidatedMode" src="assets/icons/check2-square-yellow.svg"  alt="" /> -->
+      </div>
+    </a>
+    <a
+      class="d-flex accord"
+      [class.disabledaccord]="isStepDisabled('SIGNATURE', 'UPLOAD_DOC')"
+      id="stepFive"
+      [routerLink]="!getStatusOfStep('UPLOAD_DOC') ? [] : ['/sign-submit']"
+      [ngClass]="{
+        'pointer-events-none': isStepDisabled('SIGNATURE', 'UPLOAD_DOC')
+      }"
+    >
+      <div class="step header-1n">Step 5</div>
+      <div class="text-cont">
+        <p class="text-decoration-none text-black header-1b">Sign and Submit</p>
+        <span class="text-decoration-none text-black header-1n"
+          >Collect signatures, review and print application, and submit</span
+        >
+      </div>
+      <div
+        class="icon-holder ml-auto mr-4"
+        [hidden]="!getStatusOfStep('SIGNATURE')"
+      >
+        <img
+          class="mt-50"
+          src="assets/icons/check2-square.svg"
+          alt="check2-square"
+        />
+        <!-- <img class="mt-50" *ngIf="isValidatedMode" src="assets/icons/check2-square-yellow.svg"  alt="" /> -->
+      </div>
+    </a>
+
+    <div class="text-right">
+      <button
+        class="btn btn-sm btn-primari nextbutton mr-2 upload"
+        (click)="onUploadToDartClicked()"
+        id="uploadToDartBtn"
+        aria-label="A button to upload documents to DART"
+        *ngIf="showUploadToDartButton"
+      >
+        UPLOAD TO DART 
+      </button>
+
+      <button
+        *ngIf="showSubmitButton && isAllStepsCompleted"
+        (click)="onSubmitClicked()"
+        class="btn btn-sm btn-primari nextbutton mr-2 upload"
+        type="button"
+        id="submitBtn"
+       
+      >
+        SUBMIT PROJECT
+      </button>
+
+      <button
+        class="btn btn-sm btn-primari nextbutton mr-2 upload"
+        id="viewDocumentsBtn"
+        aria-label="A button to view documents uploaded for the project"
+       *ngIf="isValidateMode"
+        (click)="onViewDocmentsClicked()"
+      >
+        View Documents
+      </button>
+      <button
+      class="btn btn-sm btn-outline-dark closebutton mr-93"
+      aria-label="A close button in Main Navigation."
+      (click)="returnToDash()"
+    >
+      Close
+    </button>
+    </div>
+    <div class="clearfix">
+      <div class="margin-left-56" *ngIf="showServerError">
+        <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+      </div>
+    </div>
+    
+  </div>
+  
+  <app-custom-modal-popup #warningModal [modalConfig]="warningConfig">
+    <ng-container>
+      <!-- *ngIf="isOpenConfirmPopUp | async" -->
+      <div class="modal-body center-align">
+        <div class="text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="25"
+            height="25"
+            fill="red"
+            class="bi bi-exclamation-triangle float-left"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+            />
+            <path
+              d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
+            />
+          </svg>
+          <span class="text-left mt-2 typo-2"
+            >You are about to leave the application entry process for this
+            project</span
+          >
+          <br />
+          <span class="typo-2">and start a new one.</span>
+        </div>
+      </div>
+      <div class="text-center ml-23 typo-2">
+        <span class=""
+          >Click <strong>OK</strong> to continue and begin application entry for
+          another project.</span
+        >
+        <br />
+        <span class="mb-5 typo-2"
+          >Click <strong>Cancel</strong> to return to current screen.</span
+        >
+      </div>
+      <div class="modal-footer-confirmation model-footer-reduced">
+        <div class="text-center mt-4">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark btn-primari mb-2 mr-2 okButton"
+            (click)="openApplyForPermitModal()"
+          >
+            OK
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark closebutton mb-2"
+            (click)="this.closeModal($event)"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </app-custom-modal-popup>
+
+  <ng-template #applyForPermit let-modal>
+    <div class="modal-body">
+      <app-apply-for-permit
+        [userRoles]="userRoles"
+        [restartStepper]="restartStepper"
+        (closeBtnClicked)="closeModal($event)"
+      ></app-apply-for-permit>
+    </div>
+  </ng-template>
+  <app-success-popup
+    #successPopup
+    (onOkClick)="onSuccesPopupOkClicked()"
+  ></app-success-popup>
+  <app-custom-modal-popup #confirmModal [modalConfig]="warningConfig">
+    <ng-container>
+      <div class="modal-body center-align">
+        <div class="text-center">
+          <span *ngIf="isUploadToDart" class="text-left mt-2 typo-2"
+            >Are you sure you are ready to upload your project to DART?</span
+          >
+          <span *ngIf="!isUploadToDart" class="text-left mt-2 typo-2"
+            >Are you sure you are ready to submit your project?</span
+          >
+        </div>
+      </div>
+      <div class="text-center ml-23 typo-2">
+        <span *ngIf="isUploadToDart" class=""
+          >Click <strong>OK</strong> to continue upload to <strong>DART</strong>.</span
+        >
+        <span *ngIf="!isUploadToDart" class=""
+          >Click <strong>OK</strong> to continue to submit your project.</span
+        >
+        <br />
+        <span class="mb-5 typo-2"
+          >Click <strong>Cancel</strong> to return to current screen.</span
+        >
+      </div>
+      <div class="modal-footer-confirmation model-footer-reduced">
+        <div class="text-center mt-4">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark btn-primari mb-2 mr-2 okButton"
+            (click)="okClicked()"
+          >
+            OK
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark closebutton mb-2"
+            (click)="this.closeModal($event)"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </app-custom-modal-popup>
+
+  <app-custom-modal-popup #rejectProjectModal [modalConfig]="rejectProject">
+    <ng-container>
+      <div class="modal-body center-align">
+        <div class="text-center">
+          <span class="text-left mt-2 "
+            ><strong>Rejected Project ID {{rejectProjectDetails?.projectId}} {{rejectProjectDetails?.facilityName}} </strong></span>
+         
+        </div>
+      </div>
+      <div class="text-center ml-23 mb-2 ">
+        <span  class=""
+          ><strong>Reason:</strong> {{rejectProjectDetails?.rejectReason}}</span
+        >
+      </div>
+        <div class="text-center ml-23 ">
+          <span  class=""
+            >This rejected project cannot be resubmitted. </span
+          >
+          <br>
+          <span  class=""
+            >Please delete  this project and create a new one. </span
+          >
+      </div>
+      <div class="modal-footer-confirmation model-footer-reduced">
+        <div class="text-center mt-4">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark closebutton mb-2"
+            (click)="this.closeModal($event)"
+          >
+            OK
+          </button>
+          
+        </div>
+      </div>
+    </ng-container>
+  </app-custom-modal-popup>
+</div>

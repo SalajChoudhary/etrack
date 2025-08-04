@@ -1,0 +1,495 @@
+<app-analyst-sub-header [showAddress]="false"></app-analyst-sub-header>
+<app-stepper-buttons [selectedIndex]="selectedIndex" [lastIndex]="projectDetailsForm.valid ? 0:1"
+  [startNumber]="1" [endNumber]="2" [startName]="'Location'" [endName]="'Applicant Information'"
+  mainNavigation="/apply-for-permit-details" [backwardName]="'Project Location'" [forwardName]="'Applicant Information'"
+  [showBackArrow]="false" [forward]="'/associated-applicants'"></app-stepper-buttons>
+<mat-horizontal-stepper class="child-stepper customStepper has-step-icon-bg--white custom-step-height" #stepper [linear]="true"
+  [selectedIndex]="selectedIndex" (selectionChange)="selectionChange($event)">
+  <ng-template matStepperIcon="done">
+    <img src="assets/icons/check2-square.svg" alt="">
+  </ng-template>
+  <ng-template matStepperIcon="edit">
+    <img src="assets/icons/edit_square-white.svg" alt="Edit Square Icon">
+  </ng-template>
+  <mat-step [stepControl]="projectDetailsForm" [state]="selectedIndex === 0 ? 'edit' : ''">
+    <ng-template matStepLabel><span class="child-label">Facility Details</span></ng-template>
+    <br>
+   <div *ngIf="isValidate" class="row" style="background-color:#CAD1CC; text-align:center;border-bottom: 1px solid black;">
+      <p  style="padding-top: 1rem; color: #233E2A;" class="col-12 header-1b">Review and validate the facility details and draft polygon.</p>
+      <p style="color: #233E2A;" class="col-12 header-1b">If changes are made to the facility boundary, please be sure the address is also corrected in the facility details.</p>
+    </div>
+    <div *ngIf="!isValidate" class="row" style="background-color:#CAD1CC; text-align:center;border-bottom: 1px solid black;">
+      <p  style="padding-top: 1rem; color: #233E2A;" class="col-12 header-1b">Please review and update the details for the selected facility below.</p>
+      <p *ngIf="projectLocation?.polygonStatus === 'APPLICANT_SCRATCH'" style="color: #233E2A;" class="col-12 header-1b">If helpful, you may outline the specific work area(s)<svg style="margin-top: -0.5rem; padding-right: 5px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+        <title>Area of disturbance and/or proposed activity</title></svg> needed for this project using the map tools.</p>
+        <!--<p style="color: #233E2A;" class="col-12 header-1b">To make corrections to the property boundary, please return to the Project Location screen.</p>-->
+    </div>
+    <div class="row">
+      <div class="top-border" *ngIf="!isValidate"></div>
+    </div>
+    <div class="float-right mr-2" *ngIf="serviceError">
+        <app-server-error-message [serverErrorMessage]="serviceErrorMessage"></app-server-error-message>
+    </div>
+    <form [formGroup]="projectDetailsForm" (ngSubmit)="submitConform()">
+        <div class="col-12 pl-0 pr-0 d-flex body-content">
+        <div class="container-fluid" style="padding-right: 0px !important; padding-left: 0px !important;">
+          <br>
+          <fieldset [disabled]="isReadonly" style=" padding-right: 15px !important; padding-left: 15px !important;">
+          <div class="row">
+            <div class="col-lg-6 col-md-12">
+              <div class="row form-inline">
+                <div *ngIf="isValidate" style="padding-left: 1rem;padding-bottom: 1rem;">
+                  Accept applicant details, click <img src="../../../../../assets/icons/yieldsign.svg" alt="Yield Icon"> to restore the eFind data, undo <img src="../../../../../assets/icons/revert_symbol.svg" alt="Revert Icon">, or make corrections.<br/><br/>
+                  Search eFind facility records to look for an existing match for this location.  If a match is found, please transfer these facility details to the correct DEC ID.<br/>
+                </div>
+                <div class="form-group">
+                  <label for="projectName" class="font-label-bold" style="margin-left: 6.5rem">DEC ID:</label>
+                  <div *ngIf="!isValidate" style="margin-left: 0.3rem;" title={{getEfindDECID}}> {{ getEfindDECID }}</div>
+                  <div *ngIf="isValidate && !isEFindDECIDEmpty" style="margin-left: 0.3rem;" title={{getEfindDECID}}>
+                    <a href="{{getEfindUrl}}" target="_blank" rel="noopener noreferrer">{{ getEfindDECID }}</a>
+                  </div>
+                </div>
+                <div class="form-group" *ngIf="isValidate && isEFindDECIDEmpty" style="margin-left: 3px !important;margin-right: -10px !important;" (click)="decIdChange($event)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#233E2A" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                  </svg>
+                </div>
+                <div class="form-group">
+                <div *ngIf="isValidate" style="margin-left: 4rem;" title='Find Sites'>
+                  <a href="{{getEfindUrl}}" target="_blank" rel="noopener noreferrer">Search eFind facility records</a>
+                </div>
+                </div>
+              </div>
+              <div class="row form-inline">
+                <div class="form-group">
+                  <label for="projectName" class="font-label-bold">Project/Facility Name*:</label>
+                  <div class="input-box-wrap">
+                    <input type="text" class="form-control" id="projectName" style="margin-left: 0.2rem" size="40"
+                    maxlength="100" aria-describedby="Project Name" formControlName="projectName" />
+                      <div class="icon-holder" *ngIf="isFacilityNameChanged && !isFacilityNameToggle">
+                          <img [src]="yieldSignPath" alt="A yellow yield sign for project name"
+                          (click)="toggleValue('projectName', projectLocationHistory?.hfacilityName,projectLocation?.facility?.facilityName);"
+                          ngbTooltip="{{projectLocationHistory?.hfacilityName}}" />
+                      </div>
+                      <div class="icon-holder" [hidden] ="!isFacilityNameToggle">
+                        <img [src]="editSignPath" alt="A revert sign for project name"
+                        (click)="revertValue('projectName');"
+                        ngbTooltip="{{projectLocation?.facility?.facilityName}}" />
+                      </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="
+              isSavedSubmitted &&
+              projectDetailsForm.controls.projectName.errors
+            " class="errors">
+                <div *ngIf="
+                projectDetailsForm.controls.projectName.errors!.required
+              " class="errors">
+                  {{errorMsgObj?.PRJ_LOC_NAME_REQD}}
+                </div>
+                <div *ngIf="
+                projectDetailsForm.controls.projectName.errors!
+                  .minlength
+              " class="errors">
+                  {{errorMsgObj?.PRJ_LOC_NAME_MIN_LENG}}
+                </div>
+                <div *ngIf="
+                projectDetailsForm.controls.projectName.errors!
+                  .facilityNameInvalid
+              " class="errors">
+                  {{errorMsgObj?.FAC_CONTAN_INVALID_CHAR}}
+                </div>
+              </div>
+              <div class="row form-inline">
+                <div class="form-group">
+                  <label for="address1" class="font-label-bold" style="margin-left: 5.3rem">Address *:</label>
+                  <div class="input-box-wrap">
+                    <input type="text" class="form-control" id="address1" style="margin-left: 0.2rem" size="40"
+                     maxlength=200 aria-describedby="address1" formControlName="address1" />
+                     <div class="icon-holder" *ngIf="isFacilityStreet1Changed && !isFacilityStreet1Toggle">
+                      <img [src]="yieldSignPath" alt="A yellow yield sign for address"
+                      (click)="toggleValue('address1', projectLocationHistory?.hstreet1,projectLocation?.facility?.address?.street1);"
+                      ngbTooltip="{{projectLocationHistory?.hstreet1}}" />
+                    </div>
+                    <div class="icon-holder" [hidden] ="!isFacilityStreet1Toggle">
+                      <img [src]="editSignPath" alt="A revert sign for address"
+                      (click)="revertValue('address1');"
+                      ngbTooltip="{{projectLocation?.facility?.address?.street1}}" />
+                    </div>
+                </div>
+                </div>
+              </div>
+              <div *ngIf="
+              isSavedSubmitted &&
+              projectDetailsForm.controls.address1.errors
+            " class="errors">
+                <div *ngIf="
+                projectDetailsForm.controls.address1.errors!.required
+              " class="errors">
+                  {{errorMsgObj?.PRJ_LOC_ADR1_REQD}}
+                </div>
+                <div *ngIf="
+                projectDetailsForm.controls.address1.errors!.minlength
+              " class="errors">
+                  {{errorMsgObj?.PRJ_LOC_ADR1_MIN_LENG}}
+                </div>
+              </div>
+              <div class="row form-inline">
+                <div class="form-group">
+                  <label for="city" class="font-label-bold" style="margin-left: 5.1rem">Town/City*:</label>
+                  <div class="input-box-wrap">
+                    <input type="text" class="form-control" style="margin-left: 0.2rem" id="city" size="15"
+                     formControlName="city" maxlength="65" />
+                     <div class="icon-holder" *ngIf="isFacilityCityChanged && !isFacilityCityToggle">
+                      <img [src]="yieldSignPath" alt="A yellow yield sign for city"
+                      (click)="toggleValue('city', projectLocationHistory?.hcity,projectLocation?.facility?.address?.city);"
+                      ngbTooltip="{{projectLocationHistory?.hcity}}" />
+                    </div>
+                    <div class="icon-holder" [hidden] ="!isFacilityCityToggle">
+                      <img [src]="editSignPath" alt="A revert sign for city"
+                      (click)="revertValue('city');"
+                      ngbTooltip="{{projectLocation?.facility?.address?.city}}" />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="zip" class="font-label-bold" style="margin-left: 0.2rem">Zip:</label>
+                  <div class="form-inline">
+                    <div class="input-box-wrap">
+                      <input type="text" class="form-control" id="zip" style="margin-left: 0.2rem" maxlength="5" size="3"
+                        formControlName="zip" mask="00000" />
+                        <div class="icon-holder" *ngIf="isFacilityZipChanged && !isFacilityZipToggle">
+                          <img [src]="yieldSignPath" alt="A yellow yield sign for zip"
+                          (click)="toggleValue('zip', projectLocationHistory?.hzip,projectLocation?.facility?.address?.zip);"
+                          ngbTooltip="{{projectLocationHistory?.hzip}}" />
+                        </div>
+                        <div class="icon-holder" [hidden] ="!isFacilityZipToggle">
+                          <img [src]="editSignPath" alt="A revert sign for zip"
+                          (click)="revertValue('zip');"
+                          ngbTooltip="{{projectLocation?.facility?.address?.zip}}" />
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <span id="state" class="font-label-bold" style="margin-left: 0.2rem">State:</span>
+                  <output style="margin-left: 0.2rem" aria-labelledby="state">NY</output>
+                </div>
+              </div>
+              <div *ngIf="
+              isSavedSubmitted && projectDetailsForm.controls.city.errors
+            " class="errors">
+                <div *ngIf="projectDetailsForm.controls.city.errors!.required" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_DETAIL_TOWN_REQD}}
+                </div>
+                <div *ngIf="projectDetailsForm.controls.city.errors!.minlength" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_TOWN_MIN_LENG}}
+                </div>
+                <div *ngIf="projectDetailsForm.controls.city.errors!.maxlength" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_TOWN_MAX_LENG}}
+                </div>
+              </div>
+              <div *ngIf="
+              isSavedSubmitted && projectDetailsForm.controls.zip.errors
+            " class="errors">
+                <div *ngIf="projectDetailsForm.controls.zip.errors!.minlength" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_ZIP_MIN_LENG}}
+                </div>
+              </div>
+
+              <div class="row">
+                <label for="direction" class="font-label-bold" style="margin-left: 1rem">Directions and Distance
+                  to roads, intersections, bridges and waterbodies:
+                </label>
+              </div>
+              <div class="row">
+                <div class="form-group" style="display: block !important;padding-left: 1rem !important;">
+                  <div class="input-box-wrap">
+                    <textarea id="direction" aria-describedby="direction" formControlName="address2" cols="75"
+                      maxlength="300" class="form-control description" rows="4"></textarea>
+                      <span class="counter-brief" [hidden]="isFacilityStreet2Changed">{{projectDetailsForm.controls.address2.value?.length}} /
+                        300</span>
+                        <div class="icon-holder" *ngIf="isFacilityStreet2Changed && !isFacilityStreet2Toggle">
+                          <img [src]="yieldSignPath" alt="A yellow yield sign for address2"
+                          (click)="toggleValue('address2', projectLocationHistory?.hstreet2,projectLocation?.facility?.address?.street2);"
+                          ngbTooltip="{{projectLocationHistory?.hstreet2}}" />
+                          <span class="counter-brief-1">{{projectDetailsForm.controls.address2.value?.length}} /
+                            300</span>
+                        </div>
+                        <div class="icon-holder" [hidden] ="!isFacilityStreet2Toggle">
+                          <img [src]="editSignPath" alt="A revert sign for address2"
+                          (click)="revertValue('address2');"
+                          ngbTooltip="{{projectLocation?.facility?.address?.street2}}" />
+                          <span class="counter-brief-1">{{projectDetailsForm.controls.address2.value?.length}} /
+                            300</span>
+                        </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+              *ngIf="projectDetailsForm.controls.boundaryChangeReason.value !== undefined && projectDetailsForm.controls.boundaryChangeReason.value !== null  &&  projectDetailsForm.controls.boundaryChangeReason.value !==''">
+              <div class="row">
+                <label for="boundaryChangeReason" class="font-label-bold" style="margin-left: 1rem">Please provide an explanation for changing the property boundary:</label>
+              </div>
+              <div class="row">
+                <div class="form-group" style="display: block !important;padding-left: 1rem !important;">
+                  <div class="input-box-wrap">
+                  <textarea id="boundaryChangeReason" aria-describedby="boundary change reason" formControlName="boundaryChangeReason" cols="75" maxlength="300"
+                    class="form-control description" rows="4"></textarea>
+                  <span class="counter-brief" [hidden] = "isFacilityboundaryChangeReasonChanged">{{projectDetailsForm.controls.boundaryChangeReason.value?.length}} /
+                      300</span>
+                      <div class="icon-holder" *ngIf="isFacilityboundaryChangeReasonChanged && !isFacilityboundaryChangeReasonToggle">
+                        <img [src]="yieldSignPath" alt="A yellow yield sign for boundary change reason"
+                        (click)="toggleValue('boundaryChangeReason', projectLocationHistory?.hboundaryChangeReason,projectLocation?.boundaryChangeReason);"
+                        ngbTooltip="{{projectLocationHistory?.hboundaryChangeReason}}" />
+                        <span class="counter-brief-1">{{projectDetailsForm.controls.boundaryChangeReason.value?.length}} /
+                          300</span>
+                      </div>
+                      <div class="icon-holder" [hidden] ="!isFacilityboundaryChangeReasonToggle">
+                        <img [src]="editSignPath" alt="A revert sign for boundary change reason"
+                        (click)="revertValue('boundaryChangeReason');"
+                        ngbTooltip="{{projectLocation?.boundaryChangeReason}}" />
+                        <span class="counter-brief-1">{{projectDetailsForm.controls.boundaryChangeReason.value?.length}} /
+                          300</span>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+              <div
+                *ngIf="projectDetailsForm.controls.reason.value !== undefined && projectDetailsForm.controls.reason.value !== null && projectDetailsForm.controls.reason.value !==''">
+                <div class="row">
+                  <label for="reason" class="font-label-bold" style="margin-left: 1rem">Please provide an explanation for creating a new facility at the same location as an existing record:</label>
+                </div>
+                <div class="row">
+                  <div class="form-group" style="display: block !important;padding-left: 1rem !important;">
+                    <div class="input-box-wrap">
+                    <textarea id="reason" aria-describedby="reason" formControlName="reason" cols="75" maxlength="300"
+                    class="form-control description" rows="4"></textarea>
+                    <span class="counter-brief" [hidden] ="isFacilityReasonChanged">{{projectDetailsForm.controls.reason.value?.length}} /
+                        300</span>
+                        <div class="icon-holder" *ngIf="isFacilityReasonChanged && !isFacilityReasonToggle">
+                          <img [src]="yieldSignPath" alt="A yellow yield sign for reason"
+                          (click)="toggleValue('reason',projectLocationHistory?.hreason,projectLocation?.reason);"
+                          ngbTooltip="{{projectLocationHistory?.hreason}}" />
+                          <span class="counter-brief-1">{{projectDetailsForm.controls.reason.value?.length}} /
+                            300</span>
+                        </div>
+                        <div class="icon-holder" [hidden] ="!isFacilityReasonToggle">
+                          <img [src]="editSignPath" alt="A revert sign for reason"
+                          (click)="revertValue('reason');"
+                          ngbTooltip="{{projectLocation?.reason}}" />
+                          <span class="counter-brief-1">{{projectDetailsForm.controls.reason.value?.length}} /
+                            300</span>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="projectDetailsForm.controls.reason.value !== undefined && projectDetailsForm.controls.reason.value !== null  &&  projectDetailsForm.controls.reason.value !=='' &&
+              isSavedSubmitted && projectDetailsForm.controls.reason.errors
+            " class="errors">
+                <div *ngIf="projectDetailsForm.controls.reason.errors!.required" class="errors">
+                  {{errorMsgObj?.PRJ_LOC_REASON_REQD}}
+                </div>
+              </div>
+              <br />
+              <mat-divider style="border-top-color: rgba(0, 0, 0, 0.5)"></mat-divider>
+              <br />
+              <div class="row">
+                <div class="form-group">
+                  <label class="font-label-bold" style="margin-left: 1rem;">County:
+                  </label>
+                  <div style="margin-left: 0.3rem;" title={{projectDetailsForm.controls.countyName.value}}> {{
+                    projectDetailsForm.controls.countyName.value}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <label class="font-label-bold" style="margin-left: 1rem;">Municipality:
+                  </label>
+                  <div style="margin-left: 0.3rem;" title={{projectDetailsForm.controls.municipalityName.value}}> {{
+                    projectDetailsForm.controls.municipalityName.value}}</div>
+                </div>
+                <div class="form-group" *ngIf="primaryMunicipalities?.size > 1 && isValidate">
+                  <span id="primaryMunicipality" class="font-label-bold" style="margin-left: 1rem;">Primary Municipality:
+                  </span>
+                  <select class="form-control dec-select" style="margin-left: 0.3rem;width: 12rem;" id="primaryMunicipalitySelect"
+                  formControlName="primaryMunicipality"  aria-describedby="primaryMunicipality">
+                  <option *ngFor="let primaryMunicipality of primaryMunicipalities" [value]="primaryMunicipality.fullMunicipalityDetails">
+                    {{ primaryMunicipality.fullDescription}}
+                  </option>
+                </select>
+                </div>
+                <div class="form-group" *ngIf="primaryMunicipalities?.size==1 && isValidate">
+                  <span id="primaryMunicipality" class="font-label-bold" style="margin-left: 1rem;">Primary Municipality:
+                  </span>
+                  <div style="margin-left: 0.3rem;" title={{projectDetailsForm.controls.primaryMunicipalityView.value}} aria-describedby="primaryMunicipality">{{projectDetailsForm.controls.primaryMunicipalityView.value}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <label class="font-label-bold" style="margin-left: 1rem;">Tax Map Number:</label>
+                  <div style="margin-left: 0.3rem;" title={{projectDetailsForm.controls.taxMap.value}}>{{taxParcelValue}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <label class="font-label-bold" style="margin-left: 1rem;">Regions:</label>
+                  <div style="margin-left: 0.3rem;">{{ projectDetailsForm.controls.region.value }}</div>
+                </div>
+              </div>
+              <mat-divider style="border-top-color: rgba(0, 0, 0, 0.5)"></mat-divider>
+              <div class="row form-inline" *ngIf="isValidate" style="margin-top: 1rem;">
+                  <div class="form-group">
+                    <label class="font-label-bold">Related Geographical Inquiries:</label>
+                    <input type="text" class="form-control" id="projectName1" style="margin-left: 0.2rem" size="11" maxlength="11" aria-describedby="inquiryId 1" [placeholder]="'GID-0000000'" formControlName="inquiryId1" [prefix] = "'GID-'" [mask] = "'00000000000'"/>
+                    <input type="text" class="form-control" id="projectName2" style="margin-left: 0.2rem" size="11" maxlength="11" aria-describedby="inquiryId 2"  [placeholder]="'GID-0000000'" formControlName="inquiryId2" [prefix] = "'GID-'" [mask] = "'00000000000'"/>
+                    <input type="text" class="form-control" id="projectName3" style="margin-left: 0.2rem" size="11" maxlength="11" aria-describedby="inquiryId 3"  [placeholder]="'GID-0000000'" formControlName="inquiryId3" [prefix] = "'GID-'" [mask] = "'00000000000'"/>
+                    <input type="text" class="form-control" id="projectName4" style="margin-left: 0.2rem" size="11" maxlength="11" aria-describedby="inquiryId 4"  [placeholder]="'GID-0000000'" formControlName="inquiryId4" [prefix] = "'GID-'" [mask] = "'00000000000'"/>
+                    <input type="text" class="form-control" id="projectName5" style="margin-left: 0.2rem" size="11" maxlength="11" aria-describedby="inquiryId 5"  [placeholder]="'GID-0000000'" formControlName="inquiryId5" [prefix] = "'GID-'" [mask] = "'00000000000'"/>
+                  </div>
+             </div>
+            </div>
+             <div class="col-lg-6 col-md-12">
+                <div *ngIf="isValidate" style="padding-bottom: 5px;"><strong>Draft Polygon</strong> <svg style="margin-top: -0.5rem; padding-right: 5px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                  <title>The draft polygon will become the final eFind polygon. Initially, the draft polygon defaults to the applicant submitted location, and the analyst can do the following:&#013;
+                    &nbsp;1. Accept the applicant submitted location.&#013;
+                    &nbsp;2. Update the applicant submitted location.&#013;
+                    &nbsp;3. Delete the applicant submitted location and either:&#013;
+                    &nbsp;&nbsp;&nbsp;&nbsp;a.) Draw/ select a new facility boundary.&#013;
+                    &nbsp;&nbsp;&nbsp;&nbsp;b.) Select the existing eFind polygon, if applicable.&#013;
+                    &nbsp;4. Restore the applicant submitted location.</title>
+                </svg> <img width="25" height="12" src="../../../../../assets/icons/draft-poly.png" alt="Analyst scratch polygon">:Either click Next to accept the applicant submitted location, choose to restore the existing eFind polygon <em>if applicable</em>, or make corrections to the facility boundary and/or project work area.</div>
+                <em style="font-size: 0.8rem !important;color:#007bff;" [hidden]="isReadonly || isSubmittalPoly">Click to draw <svg style="margin-top: -0.5rem;"  xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="svg-icon"><path d="M15 1L6.833 7 1 4v11h14zm-1 13H2V5.639l4.927 2.534L14 2.976z"/></svg> or select/ unselect <svg style="margin-top: -0.5rem;"  xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="svg-icon"><path d="M13.174 8.976L5 3.012V13.1l2.116-2.902L9 13.928l2.555-1.285-1.838-3.667zm-2.961 3.222l-.77.388L7.27 8.288 6 10.032V4.979l4.106 2.997h-2.01z"/></svg> parcels</em>
+                <div [hidden]="isReadonly || isSubmittalPoly" style="padding-bottom: 5px;"><em style="font-size: 0.8rem !important;color:#007bff;">Then, if necessary, click <svg style="margin-top: -0.5rem;" xmlns="http://www.w3.org/2000/svg" height="16" width="16"><path d="M10 4.069V9h-.9V3.927C9.1 2.509 8.057 1.79 6 1.79s-3.1.719-3.1 2.137v7.259L6 14.294l1.282-1.286a2.007 2.007 0 0 0 .576.63L6 15.5l-4-4.01V4.066C2 1.852 3.791 1 6 1s4 .852 4 3.067zM6 8a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm1-2a1 1 0 1 0-1 1 1 1 0 0 0 1-1zm2 5v1h3v3h1v-3h3v-1h-3V8h-1v3z"></path></svg> to add, update, or remove the project work area.</em><img style="margin-top: -0.5rem;" width="25" height="12" src="../../../../../assets/icons/workarea-poly.png" alt="work area polygon"></div>
+                <app-gis-map-editor [mapProperties]="mapProperties" [polygonType]="polygonType" [decId]="eFindDECID"
+                  [showFacility]="facilityPolygonExist" [projectGraphic]="projectGraphic" [workAreaGraphic]="workAreaGraphic"
+                  (taxParcelNumbers)="onTaxMapUpdated($event)" (regions)="onRegionsUpdated($event)"
+                  (primaryRegion)="onPrimaryRegionUpdated($event)" (counties)="onCountyUpdated($event)"
+                  (municipalities)="onMunicipalityUpdated($event)" (gisLocation)="onGisLocationUpdate($event)"
+                  (workAreaPolygonModified)="onWorkAreaPolygonModified($event)" [isValidated]="isReadonly"
+                  [isSubmitted]="isSubmittalPoly" [customTextElements]="customTextElements" (mapInit)="onMapInitialized()"
+                  (primaryMunicipality)="onPrimaryMunicipalityUpdate($event)"></app-gis-map-editor>
+            </div>
+          </div>
+        </fieldset>
+        <div class="footer-row">
+          <div class="col-md-12 bottom-button-container">
+            <app-validate-checkbox *ngIf="mode == 'validate'" category="proj" activityId="6" [(validatedModel)]="projectLocationValidated" (validatedModelChange)="onValidateChange($event)"></app-validate-checkbox>
+            <!-- TODO: Disabled removed
+            Needs to be discussed [disabled]="!projectDetailsForm.valid" -->
+            <button type="submit" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" [hidden]="mode == 'validate'"
+             >
+              Next
+            </button>
+            <button type="submit" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" *ngIf="mode == 'validate'"
+              [disabled]="!gisMapEdit.isPolygonExist">
+              Next
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="cancel()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </form>
+  </mat-step>
+</mat-horizontal-stepper>
+<app-pending-changes-popup #pendingPopup (onOkClick)="commonService.navigateToMainPage();"></app-pending-changes-popup>
+
+<ng-template #submitConfirmModal let-modal>
+  <div class="modal-body center-align">
+    <div class="text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="green" class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+       <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+       <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+     </svg>
+     <span class="text-left mt-2">Are you ready to save this location for <strong>{{projectDetailsForm.controls.projectName.value}}</strong>? <br/>If you still want to make changes to the Property Location, click <strong><em>Cancel</em></strong>. Click <strong><em>Save for Later</em></strong> to come back later and change the Work Area or Facility Details.</span>
+   </div>
+  </div>
+  <div class="modal-footer model-footer-reduced" style="justify-content: center;">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="modal.dismiss('Cross click');saveAndSubmit()">
+      Yes
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click');saveOnly();">
+      Save For Later
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click');">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #decIdChangeConfirmModal let-modal>
+  <div class="modal-body center-align">
+    <div class="text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="orange" class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+       <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+       <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+     </svg>
+     <span class="text-left mt-2">Because of the change in the list of municipalities for this facility, the DEC ID for this facility will change and impact the Application IDs at this facility. <div *ngIf="decIdChangeConfirmMessages.length > 0"> This facility has the following active authorizations: <strong>{{decIdChangeConfirmMessages}}</strong>.</div> Do you still wish to proceed?</span>
+   </div>
+  </div>
+  <div class="modal-footer model-footer-reduced" style="justify-content: center;">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="modal.dismiss('Cross click');saveAnalystProjectOnDECIdConflict(projectLocationValidated);">
+      Yes
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="modal.dismiss('Cross click');">
+      No
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #decIdConfirmModal let-modal>
+  <ng-container>
+    <div class="modal-body center-align">
+      <div class="text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="green" class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+         <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+         <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+       </svg>
+       <span class="text-left mt-2">Transfer details to existing DEC ID*.</span>
+     </div>
+    </div>
+    <div class="text-center ml-23">
+        <form [formGroup]="decIdSearchForm" style="padding-left: 3rem;padding-right: 3rem;">
+          <div class="form-group form-inline" style="justify-content: center !important">
+            <label class="font-weight" for="searchBy">DEC ID*:</label>
+          <input type="text" class="form-control" id="dec_id" aria-describedby="id"
+          style="margin-left: 1rem; margin-right: 1rem;" formControlName="decId" placeholder="9-9999-99999" mask="0-0000-00000"
+          [dropSpecialCharacters]="false" size="12"/>
+          <button class="btn btn-sm btn-primari nextbutton mr-2 upload" (click)="ondecIdSearchSubmit()" type="button"
+            [disabled]="decIdSearchForm.value.decId?.trim() === '' || decIdSearchForm.value.decId?.length <12">Search</button>
+          </div>
+          <div *ngIf="selectedFacility?.PRIMARY_ID !==undefined && selectedFacility?.PRIMARY_ID !==null && selectedFacility?.PRIMARY_ID !==''">
+            <p class="instruction-font">We found an approved facility {{selectedFacility?.SITE_NAME}} <br/>DEC ID : {{selectedFacility?.PRIMARY_ID}} <br/>Address: {{selectedFacility?.address}}</p>
+            <p class="instruction-font">If you wish to replace current permit information with this approved facility, please click <em><strong>Yes</strong></em></p>
+          </div>
+          <div *ngIf="(selectedFacility ===undefined || selectedFacility?.PRIMARY_ID ===undefined) && decIdSearched">
+            <p class="instruction-font text-center">We did not find an approved facility for this DEC ID</p>
+          </div>
+        </form>
+    </div>
+    <div class="modal-footer model-footer-reduced" style="justify-content: center;">
+        <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="modal.dismiss('Cross click');copyFacility()" [disabled]="selectedFacility ===undefined || selectedFacility?.PRIMARY_ID ===undefined">
+          Yes
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2"
+          (click)="modal.dismiss('Cross click');resetFlags()">
+          No
+        </button>
+    </div>
+  </ng-container>
+</ng-template>

@@ -1,0 +1,54 @@
+<div class="parent">
+<div #mapViewDisplay></div>
+<div id="textTool" #textTool class="esri-component esri-widget">
+  <div
+    class="esri-widget--button esri-interactive esri-icon-comment" style="border-bottom:solid 1px rgba(110,110,110,.3);"
+    id="textButton" #textButton
+    type="button"
+    title="Add text"
+  ></div>
+  <div
+    class="esri-widget--button esri-interactive esri-icon-trash"
+    id="resetButton" #resetButton
+    type="button"
+    title="Delete text"
+  ></div>
+</div>
+<div id="textInputDiv" #textInputDiv class="esri-widget">
+  <label class="esri-feature-form__label">
+    <input
+      type="text"
+      class="esri-input"
+      id="textInput" #textInput
+      value="new text alert"
+    />
+  </label>
+</div>
+<div id="submitLayerDiv" #submitLayerDiv class="esri-widget esri-interactive" [hidden]="hideToggleLayer">
+  <div class="custom-control custom-switch" [hidden]="!showFacility">
+    <input type="checkbox" class="custom-control-input" id="facilityInput" #facilityInput >
+    <label class="custom-control-label" for="facilityInput">eFind Polygon <svg style="margin-top: -0.5rem; padding-right: 5px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+      <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+      <title>Select to view eFind Polygon and Click to restore</title>
+    </svg> <img width="25" height="12" src="../../../../../assets/icons/efind-poly.png" alt="Select to view eFind Polygon and Click to restore"> </label>
+  </div>
+  <div class="custom-control custom-switch">
+    <input type="checkbox" class="custom-control-input" #applicantInput id="applicantInput">
+    <label class="custom-control-label" for="applicantInput">Applicant Submitted <svg style="margin-top: -0.5rem; padding-right: 5px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+      <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+      <title>Select to view Applicant Submitted and Click to restore</title>
+    </svg> <img width="25" height="12" src="../../../../../assets/icons/submittal-poly.png" alt="Select to view Applicant Submitted and Click to restore"></label>
+  </div>
+</div>
+<div id="workAreaDiv" class="esri-component esri-widget" #workAreaDiv aria-label="toolbar to create work area" [hidden]="isValidated || isSubmitted">
+  <div id="workArea" #workArea class="esri-widget--button esri-interactive" title="Add work area(s)" (click)="toggleWorkAreaSketch()" style="border-right: none;
+  border-bottom: 1px solid rgba(110,110,110,.3);" role="button" alt="Add work area(s)" aria-label="Add work area(s)" aria-pressed="false">
+  <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16"><path d="M10 4.069V9h-.9V3.927C9.1 2.509 8.057 1.79 6 1.79s-3.1.719-3.1 2.137v7.259L6 14.294l1.282-1.286a2.007 2.007 0 0 0 .576.63L6 15.5l-4-4.01V4.066C2 1.852 3.791 1 6 1s4 .852 4 3.067zM6 8a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm1-2a1 1 0 1 0-1 1 1 1 0 0 0 1-1zm2 5v1h3v3h1v-3h3v-1h-3V8h-1v3z"></path></svg>
+</div>
+<div id="printButton" class="esri-component esri-widget" #printButton>
+  <div id="printItemInfo" #printItem class="esri-widget--button esri-icon-question" title="Please zoom out to see print option" style="border-right: none;border-bottom: 1px solid rgba(110,110,110,.3);" [hidden]="!printHide"></div>
+  <div id="printItem" #printItem class="esri-widget--button esri-icon-printer" title="Print" (click)="printMap()" style="border-right: none;border-bottom: 1px solid rgba(110,110,110,.3);" [hidden]="printHide"></div>
+</div>
+</div>

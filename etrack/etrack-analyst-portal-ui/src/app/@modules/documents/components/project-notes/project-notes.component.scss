@@ -1,0 +1,104 @@
+::ng-deep{
+    // .p-datatable .p-datatable-tbody > tr > td {
+    //     border-right: solid black 2px;
+    //   }
+    
+    //   .p-datatable table {
+    //     border: solid black 2px;
+    //   }
+      .p-multiselect .p-multiselect-panel{
+          max-width: 250px!important;
+      }
+      .p-column-filter-overlay-menu{
+          max-width: 250px!important;
+      }
+      .p-datatable .p-datatable-tbody > tr:nth-child(odd) {
+        background-color: rgba(0, 0, 0, 0.05) !important;
+      }
+} 
+
+.actions-btn-cont button{
+    background-color: #fff;border: none;
+}
+.actions-btn-cont{
+    display: flex;
+}
+.clearbutton{
+    background-color: #233E2A !important;
+}
+
+:host ::ng-deep .multiselect .k-searchbar {
+  display: none;
+}
+
+@media (min-width:1025px){
+    .table-body .action-edit{
+         margin-right: 10px;
+         cursor: pointer;
+     }
+     .dlt-icon{
+        cursor: pointer; 
+        margin-left: -2px;
+     }
+     .col-date{
+         width: 16%;
+         word-wrap:break-word;
+     }
+     .col-type{
+        width:22%;
+        word-wrap:break-word;
+    }
+    
+    .col-notes{
+        width: 26%;
+        word-wrap:break-word;
+    }
+ 
+    .col-comments{
+        width: 26%;
+        word-wrap:break-word;
+    }
+    .col-haction{
+        width: 13%;
+        word-wrap:break-word;
+    }
+    .col-action{
+        width: 10%;
+        word-wrap:break-word;
+    }
+}
+@media (max-width:1024px){
+    .table-body .action-edit{
+         cursor: pointer;
+     }
+     .dlt-icon{
+        cursor: pointer; 
+     }
+     .col-date{
+        width: 18%;
+        word-wrap:break-word;
+    }
+    .col-type{
+       width:25%;
+       word-wrap:break-word;
+   }
+   .col-notes{
+       width: 23%;
+       word-wrap:break-word;
+   }
+   .col-comments{
+       width: 22%;
+       word-wrap:break-word;
+   }
+   .col-action{
+       width: 12%;
+       word-wrap:break-word;
+   }
+}
+
+::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  height: 35px !important;
+}
+.black{
+    color: black;
+}

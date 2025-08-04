@@ -1,0 +1,489 @@
+<div *ngIf="!isNoContent" class="container-fluid">
+  <div class="row">
+    <div *ngIf = "!isGi" class="col-12 px-0 mt-4">
+      <div class="">
+      <span class="ml-1r mt-3 header-1b">{{ facilityName }} Project {{ projectId }}</span>  
+        <mat-accordion class="mat-expansion--has-toggle-icon-left px-3">
+          <mat-expansion-panel
+            class="has-no-shadow vd-mat-padding-left"
+            [expanded]="false"
+          >
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <div class="title header-1b">
+                Project Description
+                </div>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="description header-1n">
+              {{ virtualDesktopData?.description }}
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+    <div *ngIf="isGi" class="px-0 mt-4 mb-2">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-8" style="padding-right: 5px !important">
+            <div class="row">
+              <div class="col-4 px-0 w-45 ml-3">
+
+                <div class="header-1b mr-0">
+                  GI ID:
+                </div>
+              </div>
+              <div class="col-8 m-0 pl-0 w-120">
+                  {{formatInquiryId(virtualDesktopData?.inquiryId ? virtualDesktopData.inquiryId : '')}}
+              </div>
+            </div>
+
+          </div>
+          <div class="col-4">
+            <div class="row w-300">
+              <div class="col-4 px-0 header-1b w-110">
+                  Received Date:
+              </div>
+              <div class="col-4 px-0">
+                <div class="pl-0">
+                  {{virtualDesktopData?.receivedDate}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="isGi">
+    <div class="col-12 px-0 mt-4">
+      <div class="row">
+            <div class="col-2 header-1b w-147 pr-0 ml-3">
+              Request Identifier:
+            </div>
+            <div class="col-3 w-150 pl-0" style="overflow-wrap:break-word">
+              {{virtualDesktopData?.requestIdentifier}}
+            </div>
+            <div class="col-1 header-1b mr-0 ml-0 px-0 w-60">
+              Region:
+            </div>
+            <div class="col-1 pl-0 w-42">
+              {{virtualDesktopData?.region}}
+            </div>
+            <div class="col-2 header-1b w-108 pr-0">
+              Municipality:
+            </div>
+            <div class="col-3 pl-0 w-150" style="overflow-wrap: break-word">
+              {{virtualDesktopData?.municipality}}
+            </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-virtual-desktop-litigation-hold-banner 
+*ngIf="canShowLitigationBanner"
+[projectId]="projectId"
+></app-virtual-desktop-litigation-hold-banner>
+<div *ngIf="!isNoContent" class="container-fluid">
+  <div class="row">
+    <div class="col-8">
+      <div *ngIf="isGi ">
+        <hr class="mt-1">
+      </div>
+      <div *ngIf="!isFromDisposed">
+      <div
+        class="col-12 mt-1 mb-5"
+        *ngIf="!userRoles?.includes(UserRole.DEC_Program_Staff)"
+      >
+        <div class="d-flex justify-content-between align-items-start">
+          <h3 class="header-1b m-0">{{isGi ? 'Notes' : 'Project Notes'}}</h3>
+          <button
+            class="btn btn-sm btn-outline-dark nextbutton mb-2 upload"
+            [disabled]="isReadOnly"
+            *ngIf="!userRoles?.includes('Online Submitter')"
+            (click)="openAddNotePop()"
+          >
+            Add New
+          </button>
+        </div>
+        <hr class="mt-1">
+          <app-project-notes 
+          *ngIf="projectNotes"
+          [projectId]="projectId"
+          [projectNotes]="projectNotes"
+          [inquiryId]="inquiryId"
+          [isGi]="isGi"
+          [userRoles]="userRoles"
+          (onEdit)="onEditClicked($event)"
+          [configObject]="configObject"
+          [isReadOnly]="isReadOnly"
+        ></app-project-notes>
+      </div>
+    </div>
+      <div class="col-12">
+        <app-virtual-desktop-table-documents
+          *ngIf="
+        (userRoles?.includes(UserRole.DEC_Program_Staff) ||
+            (userRoles?.includes(UserRole.Analyst) ||
+            (userRoles?.includes(UserRole.System_Admin)) || 
+            (userRoles?.includes(UserRole.Override_Admin)) &&
+              virtualDesktopData?.documents?.documents?.length)) || (dimsr)
+          "
+          [documents]="virtualDesktopData?.documents"
+          [isReadOnly]="isDocumentReadOnly"          
+          [projectId]="projectId"
+          [isFromDisposed]="isFromDisposed"
+          [isGi]="isGi"
+          [inquiryId]="inquiryId"
+        [virtualDesktopData]="virtualDesktopData"
+        >
+        </app-virtual-desktop-table-documents>
+        <app-virtual-desktop-table-applicant-communications
+         *ngIf="virtualDesktopData?.onlineApplnInd === 'Y'"
+         (reloadData)="reloadData($event)"
+         [isReadOnly]="isReadOnly"
+         [communicationsHistory]="virtualDesktopData?.aplctCorrespondences"
+         [existingRequestedDocs]="virtualDesktopData?.additionalInfoReqstd"
+         [projectId]="projectId"
+         [documents]="virtualDesktopData?.documents"
+         [onlineSubmitter]="virtualDesktopData?.onlineUserDetail">
+
+        </app-virtual-desktop-table-applicant-communications>
+        <app-virtual-desktop-table-program-review
+          [isReadOnly]="isReadOnly"
+          *ngIf="!userRoles?.includes(UserRole.DEC_Program_Staff)"
+          (reloadData)="reloadData($event)"
+          [programReviewers]="virtualDesktopData?.reviewDocuments"
+          [isGi]="isGi"
+          [projectId]="projectId"
+          [inquiryId]="inquiryId"
+          [inquiryCompletedInd]="virtualDesktopData?.geographicalInquiryResponse?.inquiryCompletedInd"
+        >
+        </app-virtual-desktop-table-program-review>
+        <br>
+        <br>
+        <div *ngIf="!isGi">
+        <app-virtual-desktop-table-fees-n-invoice
+          *ngIf="
+            !userRoles?.includes(UserRole.DEC_Program_Staff) &&
+            virtualDesktopData?.invoiceReq !='N' && 
+            virtualDesktopData?.emergencyInd != 1 && 
+            (userRoles?.includes(UserRole.Analyst) || userRoles?.includes(UserRole.System_Admin) || userRoles?.includes(UserRole.Override_Admin)) &&
+             canShowAddNewButton
+          "
+          [virtualDesktopData]="virtualDesktopData"
+          [isFromDisposed]="isFromDisposed"
+          [errorMsgObj]="errorMsgObj"
+          [isReadOnly]="isReadOnly"
+          (reloadData)="reloadData($event)"
+          (onFeesAndInvoiceLoad)="onFeesAndInvoiceLoad($event)"
+        >
+        </app-virtual-desktop-table-fees-n-invoice>
+      
+      </div>
+      <div *ngIf="!isGi">
+        <app-keywords-text-grid [categoryList]="categoryList" [otherKeywordItems]="otherKeywordList"
+         (categoryListUpdated)="updatedCategoryList($event)" (otherKeywordsUpdated)="updatedOtherKeywordList($event)"></app-keywords-text-grid>
+     </div>
+     <div *ngIf="isGi && !userRoles?.includes(UserRole.DEC_Program_Staff) && virtualDesktopData?.inquiryId">
+      <app-gi-response
+      [errorMsgObj]="errorMsgObj"
+      [inquiryId]="inquiryId"
+      [inquiryType]="virtualDesktopData?.inquiryTypeCategory"
+      [virtualDesktopData]="virtualDesktopData"
+      [disableSubmit]="'Y' === virtualDesktopData?.geographicalInquiryResponse?.inquiryCompletedInd"
+      (reloadData)="reloadData($event)"
+      [maxNote]="maxNote"
+      [reviewsAreComplete]="reviewsAreComplete">
+       
+      </app-gi-response>
+     </div>
+      <div *ngIf="!isFromDisposed && !isGi">
+      <div class="col-12 max-width pl-0">
+        <app-virtual-desktop-grid *ngIf="virtualDesktopData?.pendingApplications?.length"
+          [data]="virtualDesktopData?.pendingApplications"
+          title="Pending Applications"
+        >
+        </app-virtual-desktop-grid>
+      </div>
+        <div class="col-12 max-width pl-0">
+        <app-virtual-desktop-grid *ngIf="virtualDesktopData?.activeAuthorizations?.length"
+          [data]="virtualDesktopData?.activeAuthorizations"
+          title="Active Authorizations"
+        ></app-virtual-desktop-grid>
+      </div>
+    </div>
+    </div>
+    </div>
+    <div class="col-4 vertical-line px-0">
+      <app-sideblock
+      (onFoilChange)="onFoilChange($event)"
+      (onLitigationChange)="onLitigationChange($event)"
+      *ngIf="virtualDesktopData?.dataFetchedFromBackend"
+      [errorMsgObj]="errorMsgObj"
+        [virtualDesktopData]="virtualDesktopData"
+        [projectId]="projectId"
+        [foilRequestForm]="foilRequestForm"
+        [foilRequestRowsUntouched]="foilRequestRowsUntouched"
+        [litigationForm] = "litigationForm"
+        (foilRequestRowsModified)="onFoilRequestModified($event)"
+        [saveClicked]="saveClicked"
+        [isFromDisposed]="isFromDisposed"
+        [isGi]="isGi"
+      ></app-sideblock>
+    </div>
+    <div class="col-12 right">
+        <app-server-error-message [serverErrorMessage]="serverErrorMessage" *ngIf="showServerError"></app-server-error-message>
+     </div>
+           
+            <!-- <div class="col-12 header-1n right alert-primary">
+              <span class="mr-22 typo-2" *ngIf="showSaveWasSuccessful">Save was successful</span>
+
+            </div> -->
+            
+    <div class="col-12">
+        <div class="d-flex justify-content-end align-items-center py-2">
+          <button class="btn btn-sm btn-outline-dark nextbutton mb-2 mr-2 upload" 
+          
+          *ngIf="!userIsProgramReviewer  && virtualDesktopData?.dataFetchedFromBackend &&  isLitigationChecked && !isGi" (click)="saveLitigation()">Save</button>
+
+<a  (click)="onCloseClicked()"  class="btn btn-sm btn-outline-dark nextbutton mb-2 font-12 upload">Close</a>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<app-custom-modal-popup #notesModal [modalConfig]="notesConfig">
+  <!-- <app-analyst-sub-header [showAddress]="true" [isPopUp]="true"></app-analyst-sub-header> -->
+  <ng-container *ngIf="isOpenNotePopUp | async">
+    <form
+      [formGroup]="notesFormGroup"
+      (ngSubmit)="onFormSubmit()"
+      *ngIf="isOpenNotePopUp | async"
+    >
+      <div style="min-height: 40px" class="top-header header-align">
+        {{ isGi ? giNoteTypes[0].actionTypeDesc 
+            : getDisplayType(notesFormGroup?.get("actionType")?.value) }}
+      </div>
+      <div class="modal-body-confirmation">
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <h3 class="w-100 p-0 m-0 font-weight r-align">Date*:</h3>
+              <div class="form-check">
+                <input
+                  type="date"
+                  formControlName="actionDate"
+                  class="form-input"
+                  id="inlineCheckbox3"
+                />
+                <div class="d-block">
+                  <span
+                    class="addr-error-msg"
+                    *ngIf="
+                      notesFormGroup?.controls?.actionDate?.errors?.required &&
+                      submitted
+                    "
+                    >{{ errorMsgObj?.NOTE_ACTION_DATE_REQD }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <h3 class="w-100 p-0 m-0 font-weight r-align" *ngIf="!isGi">Type*:</h3>
+              <h3 class="w-100 p-0 m-0 font-weight r-align" *ngIf="isGi">Type:</h3>
+              <div class="form-check" *ngIf="!isGi">
+                <select
+                  class="form-input form-control w-260"
+                  formControlName="actionType"
+                  value=""
+                >
+                  <option value="">--SELECT--</option>
+                  <option
+                    *ngFor="let action of configObject?.actionTypes"
+                    [value]="action?.actionTypeCode"
+                  >
+                    {{ action?.actionTypeDesc }}
+                  </option>
+                </select>
+                <div class="d-block">
+                  <span
+                    class="addr-error-msg"
+                    *ngIf="
+                      notesFormGroup?.controls?.actionType?.errors?.required &&
+                      submitted
+                    "
+                    >{{ errorMsgObj?.NOTE_ACTION_TYPE_REQD }}</span
+                  >
+                </div>
+              </div>
+              <div *ngIf="isGi">
+                <div class="typo-2 form-check mt-1" *ngFor="let action of giNoteTypes">
+                  {{action?.actionTypeDesc}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <h3 class="w-100 p-0 m-0 font-weight r-align">Note*:</h3>
+              <div class="form-check full-width">
+                <app-textarea-child
+                  [formGroup]="notesFormGroup"
+                  fieldWidth="98%"
+                  (onInputChange)="onInputChange($event)"
+                  controlName="actionNote"
+                  [maxLength]="maxNote"
+                  noOfRows="6"
+                ></app-textarea-child>
+                <!-- <textarea formControlName="actionNote" [(ngModel)]="note" name="note" maxlength="500"
+                            class="t-width" rows="6"></textarea>
+                        <span class="counter-brief">{{note?.length}} / 500</span> -->
+                <div class="d-block mtop-5">
+                  <span
+                    class="addr-error-msg"
+                    *ngIf="
+                      (notesFormGroup?.controls?.actionNote?.errors?.required ||
+                        notesFormGroup?.controls?.actionNote?.errors
+                          ?.isAllSpaces) &&
+                      submitted
+                    "
+                    >{{ errorMsgObj?.NOTE_TEXT_REQD }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <h3 class="w-100 p-0 m-0 font-weight r-align">Comments:</h3>
+              <div class="form-check full-width">
+                <app-textarea-child
+                  [formGroup]="notesFormGroup"
+                  fieldWidth="98%"
+                  (onInputChange)="onCommentInputChange($event)"
+                  controlName="comments"
+                  [maxLength]="maxComment"
+                  noOfRows="4"
+                ></app-textarea-child>
+                <!-- <textarea formControlName="comments" [(ngModel)]="comments" name="comment"
+                            maxlength="300" class="t-width" rows="4"></textarea>
+                        <span class="counter-brief">{{comments?.length}} / 300</span> -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="isEdit">
+          <div class="col-12">
+            <div class="form-group">
+              <h3
+                *ngIf="noteDetails?.updatedDate && noteDetails?.createDate"
+                class="w-100 p-0 m-0 font-weight r-align"
+              >
+                Updated Date:
+              </h3>
+              <h3
+                *ngIf="!noteDetails?.updatedDate && noteDetails?.createDate"
+                class="w-100 p-0 m-0 font-weight r-align"
+              >
+                Created Date:
+              </h3>
+              <div class="form-check">
+                <p
+                  *ngIf="noteDetails?.updatedDate && noteDetails?.createDate"
+                  class="mtop-3"
+                >
+                  {{
+                    noteDetails?.updatedDate
+                      ? (noteDetails?.updatedDate | date : "MM/dd/yyyy")
+                      : ""
+                  }}
+                </p>
+                <p
+                  *ngIf="!noteDetails?.updatedDate && noteDetails?.createDate"
+                  class="mtop-3"
+                >
+                  {{
+                    noteDetails?.createDate
+                      ? (noteDetails?.createDate | date : "MM/dd/yyyy")
+                      : ""
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button 
+          type="submit"
+          [disabled]="isReadOnly"
+          style="width: 60px"
+          class="btn btn-sm btn-outline-dark nextbutton mb-2 mr-2 upload"
+        >
+          Save
+        </button>
+
+        <button
+          type="button"
+          style="width: 60px"
+          class="btn btn-sm btn-outline-dark nextbutton mb-2 upload"
+          (click)="closeModal('manual')"
+        >Cancel
+        </button>
+      </div>
+    </form>
+  </ng-container>
+</app-custom-modal-popup>
+<app-custom-modal-popup #systemGenNotesModal [modalConfig]="notesConfig">
+  <app-edit-system-gen-notes
+    *ngIf="isOpenSystemGenNotePopUp | async"
+    [noteId]="currentNoteId"
+    [isReadOnly]="isReadOnly"
+    (onClose)="onClose($event)"
+  >
+  </app-edit-system-gen-notes>
+</app-custom-modal-popup>
+
+<app-pending-changes-popup
+  #pendingPopup
+  (onOkClick)="closeModal('program')"
+></app-pending-changes-popup>
+
+<app-pending-changes-popup
+  #litPendingPopup
+  (onOkClick)="goToDash()"
+></app-pending-changes-popup>
+<app-custom-modal-popup #confirmationPopup >
+  <ng-container>
+    <div>
+    <p class="text-center mt-2">Save was successful</p>
+    <div class="text-center mb-2">
+      <button
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+        (click)="confirmOkClicked()"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+  </ng-container>
+</app-custom-modal-popup>
+
+<div *ngIf="isNoContent" class="form-container container-fluid"> 
+  <div class="header-1n mt-4">
+    This project is no longer available.
+  </div>
+  <button type="button" (click) = "onCloseEmptyProject()"
+   class="btn btn-sm closebutton btn-outline-dark upload mt-2">Close</button>
+</div>

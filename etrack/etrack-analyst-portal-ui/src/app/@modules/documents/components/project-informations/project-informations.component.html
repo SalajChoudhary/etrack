@@ -1,0 +1,954 @@
+<app-analyst-sub-header [showAddress]="false"></app-analyst-sub-header>
+<app-stepper-buttons [selectedIndex]="selectedIndex" [lastIndex]="2" [startNumber]="3" [endNumber]="4"
+  [startName]="'Project Information'" [endName]="'Supporting Documents'" mainNavigation="/apply-for-permit-details"
+  [backwardName]="'Applicant Information'" [forwardName]="'Supporting Documents'" [backward]="'/associated-applicants'"
+  (forwardClicked)="forwardClick()" [forward]="'/supporting-documentation'">
+</app-stepper-buttons>
+<!-- <div class="spacer"></div> -->
+<mat-horizontal-stepper [linear]="true" role="tablist"
+  class="child-stepper customStepper custom-step-height has-step-icon-bg--white" #stepper
+  (selectionChange)="onStepperChange($event)">
+  <ng-template matStepperIcon="done">
+    <img src="assets/icons/check2-square.svg" alt="check2-square" />
+  </ng-template>
+  <ng-template matStepperIcon="edit">
+    <img src="assets/icons/edit_square-white.svg" alt="edit_square" />
+  </ng-template>
+
+  <mat-step role="tab" [editable]="true" [state]="selectedIndex === 0 ? 'edit' : ''" [completed]="stepOneCompleted">
+    <br />
+    <ng-template (click)="onPermitClick()" matStepLabel><span class="child-label">Permit Selection</span>
+    </ng-template>
+    <div class="content-wrapper">
+      <app-permit-selection-summary (onNextClick)="onStepOneComplete($event)"
+        (hasModifyPermits)="onHasModifyPermits($event)" (emitHasPermits)="onHasPermits($event)"></app-permit-selection-summary>
+    </div>
+  </mat-step>
+  <mat-step role="tab" [editable]="true" [state]="selectedIndex === 1 ? 'edit' : ''">
+    <br />
+    <ng-template matStepLabel><span class="child-label">Project Description</span></ng-template>
+    <div class="content-wrapper">
+      <form [formGroup]="projectDescForm" novalidate autocomplete="off" (ngSubmit)="onFormSubmit(stepper)"
+        #ngForm="ngForm">
+        <fieldset class="mt-3" [disabled]="projectDescriptionValidated || isReadonly">
+          <!-- <app-validate-banner *ngIf="isValidate" [validated]="projectDescriptionValidated"
+                        [showBottomBorder]="false"></app-validate-banner> -->
+          <div class="row">
+            <!-- <div class="top-header">
+                        PROJECT DESCRIPTION
+                    </div> -->
+            <div class="note-text header-1n"></div>
+          </div>
+          <div class="form-container">
+            <div class="row shadow-div">
+              <div class="col-12 t-center">
+                <div class="form-group" style="display: block !important">
+                  <h3 class="w-200 p-0 m-0 summary-align typo-1">
+                    Project Summary*:
+                  </h3>
+                  <div class="form-check">
+                    <!-- <textarea [(ngModel)]="brief" formControlName="briefDesc" name="brief"
+                                        maxlength="300" class="description" rows="4"></textarea>
+                                    <span class="counter-brief">{{brief?.length}} / 300</span> -->
+                    <app-textarea-child [formGroup]="projectDescForm" fieldWidth="90%"
+                      (onInputChange)="onInputChange($event)" controlName="briefDesc" [maxLength]="maxLength"
+                      noOfRows="4"></app-textarea-child>
+                  </div>
+                  <div class="d-block brief-err">
+                    <span class="addr-error-msg ml-80 typo-2" *ngIf="
+                        (projectDescForm?.controls?.briefDesc?.errors
+                          ?.required ||
+                          projectDescForm?.controls?.briefDesc?.errors
+                            ?.isAllSpaces) &&
+                        submitted
+                      ">{{ errorMsgObj?.PROJ_SUMMARY_REQD }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-check-expand" *ngIf="isValidate">
+                <div class="d-flex justify-content-center align-items-center flex-column mb-2">
+                  <div class="typo-2">
+                    <span class="ml_15">
+                      Is this project classified under SEQR as Type II?
+                    </span>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center flex-row mb-2 ml_1">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" (change)="onclassifiedUnderSeqrChange($event)"
+                      formControlName="classifiedUnderSeqr" type="radio" id="classifiedUnderRadio1" value="1" />
+                    <label class="form-check-label typo-2" for="classifiedUnderRadio1">Yes</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" (change)="onclassifiedUnderSeqrChange($event)"
+                      formControlName="classifiedUnderSeqr" type="radio" id="classifiedUnderRadio2" value="2" />
+                    <label class="form-check-label typo-2" for="classifiedUnderRadio2">No</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" (change)="onclassifiedUnderSeqrChange($event)"
+                      formControlName="classifiedUnderSeqr" type="radio" id="classifiedUnderRadio3" value="3" />
+                    <label class="form-check-label typo-2" for="classifiedUnderRadio3">Not Sure</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="hr hr-1">
+                    &nbsp;
+                </div> -->
+            <!-- At least one checkbox must be chosen to indicate the relationship to this property. -->
+            <div class="shadow-div">
+              <div class="container-f">
+                <div class="col-4 container-f dev-align">
+                  <h3 class="p-0 m-0 ml-15 typo-1">Proposed Use*:</h3>
+                  <div class="p-top block-align">
+                    <div class="form-check form-check-inline ml-13 mb-15"
+                      *ngFor="let code of proposedUseCodes; let i = index">
+                      <input formControlName="proposedUse" name="proposedUse" class="form-check-input" type="radio"
+                        id="inlineradio{{ i }}" value="{{ code?.proposedUseCode }}" />
+                      <label class="form-check-label typo-2" for="inlineradio{{ i }}">{{ code?.proposedUseDesc
+                        }}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-8">
+                  <div class="form-check form-check-inline m-auto" *ngIf="isBinShow">
+                    <label class="form-check-label label-width typo-1" for="inlineCheckbox3">Bridge ID Number
+                      (BIN):</label>
+                    <input class="form-input w-250" maxlength="11" id="binNumbers" prefix="BIN " mask="0000000"
+                      (keyup)="binKeyup($event)" />
+                    <button type="button" class="btn btn-sm btn-primari ml-2" (click)="onAddBridgeId()">
+                      Add
+                    </button>
+                    <img [src]="yieldSignPath" alt="A yellow yield sign" placement="right"
+                      [ngbPopover]="binNumbersContent" [popoverTitle]="'BIN Numbers'"
+                      *ngIf="binHistories?.length && mode == 'validate'" />
+                  </div>
+                  <div class="mb-2 mt-2 ptable-padding w-250" *ngIf="isBinShow" role="Bridge ID Table"
+                    aria-label="Project Informations Bridge ID table" aria-describedby="bridge_id-table">
+                    <p-table *ngIf="bridgeIds.length > 0" [value]="bridgeIds" scrollHeight="165px"
+                      [totalRecords]="bridgeIds.length" [scrollable]="bridgeIds.length > 3 ? true : false"
+                      aria-describedby="A table showing bridge ID's">
+                      <!-- <ng-template pTemplate="header">
+                                            <tr>
+                                                <th class="table-header-primary" [ngStyle]="{'width':'75%'}">BIN</th>
+                                                <th class="table-header-primary" [ngStyle]="{'width':'25%'}"></th>
+                                            </tr>
+                                        </ng-template> -->
+                      <caption class="typo-1">
+                        Project Informations Bridge ID table
+                      </caption>
+                      <ng-template pTemplate="body" let-bridgeId let-i="rowIndex">
+                        <tr row="rowgroup" aria-label="Bridge ID Table Header group">
+                          <td scope="col" aria-label="Bridge ID Cell" role="cell" class="table-body typo-2">
+                            {{ bridgeId }}
+                          </td>
+                          <td scope="col" role="cell" aria-label="Bridge ID  Delete Cell" class="table-body" [ngStyle]="{
+                              'text-align': 'center',
+                              'word-wrap': 'break-word',
+                              width: '25%'
+                            }">
+                            <span style="cursor: pointer; margin-left: -2px" (click)="deleteBinRow(i)">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-trash" viewBox="0 0 16 16">
+                                <path
+                                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                <path fill-rule="evenodd"
+                                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                              </svg>
+                            </span>
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                  <div class="mb-2 mt-2 ptable-padding" *ngIf="isBinShow">
+                    <span class="addr-error-msg typo-2" *ngIf="this.showDuplicateBridgeIdError">{{
+                      errorMsgObj?.BRIDGE_ID_EXIST }}</span>
+                    <span class="addr-error-msg typo-2" *ngIf="this.showBridgeIdRequiredError">{{
+                      errorMsgObj?.BRIDGE_ID_REQD }}</span>
+                    <span class="addr-error-msg typo-2" *ngIf="this.showBridgeIdMinLengthError">{{
+                      errorMsgObj?.BRIDGE_ID_INVALID }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="hr hr-2">
+                    &nbsp;
+                </div>  -->
+            <div class="row shadow-div" *ngIf="isConstructionDisplay || isStreamDisplayed">
+              <div class="col-12">
+                <div class="form-group d-flex ml-30" *ngIf="isConstructionDisplay">
+                  <h3 class="w-185 p-0 m-0 mt-12 const-align typo-1">
+                    Construction Type*:
+                  </h3>
+                  <div class="d-block construction-mw">
+                    <div class="form-check ml-13 mt-15">
+                      <input (change)="onContructionChange($event)" name="constrnType" formControlName="constrnType"
+                        class="form-check-input" type="radio" id="inlineCheck1" value="1" />
+                      <label class="form-check-label typo-2" for="inlineCheck1">New Construction (Installation)</label>
+                    </div>
+                    <div class="form-check ml-13 mt-15">
+                      <input (change)="onOtherChange($event)" name="constrnType" formControlName="constrnType"
+                        class="form-check-input" type="radio" id="inlineCheck2" value="2" />
+                      <label class="form-check-label typo-2" for="inlineCheck2">Reconstruction
+                        (Replacement/Repair)</label>
+                    </div>
+                    <div class="form-check ml-13 mt-15">
+                      <input (change)="onOtherChange($event)" name="constrnType" formControlName="constrnType"
+                        class="form-check-input" type="radio" id="inlineCheck3" value="3" />
+                      <label class="form-check-label typo-2" for="inlineCheck3">Other</label>
+                    </div>
+                    <span class="addr-error-msg typo-2" *ngIf="
+                        projectDescForm?.controls?.constrnType?.errors
+                          ?.isRequired && submitted
+                      ">{{ errorMsgObj?.CONSTRN_TYPE_REQD }}</span>
+                  </div>
+                  <div class="d-block align-date">
+                    <div class="form-check m-auto">
+                      <label class="form-check-label typo-1" for="proposedStartDate">Proposed Start Date:</label>
+                      <input type="date" formControlName="proposedStartDate" class="form-input"
+                        id="proposedStartDate" />
+                    </div>
+                    <span class="addr-error-msg ml-80 typo-2" *ngIf="
+                        projectDescForm?.controls?.proposedStartDate?.errors
+                          ?.isPastDate && submitted
+                      ">{{ errorMsgObj?.PROPOSED_DATE_INVALID }}</span>
+                    <br /><br />
+                    <div class="form-check m-auto">
+                      <label class="form-check-label typo-1" for="estmtdCompletionDate">Estimated Completion
+                        Date:</label>
+                      <input type="date" formControlName="estmtdCompletionDate" class="form-input"
+                        id="estmtdCompletionDate" />
+                    </div>
+                    <span class="addr-error-msg ml-80 typo-2" *ngIf="
+                        projectDescForm?.controls?.estmtdCompletionDate?.errors
+                          ?.isGreaterThanStart && submitted
+                      ">{{ errorMsgObj?.ESTIMATED_DATE_INVALID }}</span>
+                  </div>
+                </div>
+                <div class="form-group d-block ml-10" *ngIf="isStreamDisplayed">
+                  <div class="form-check p-align m-auto">
+                    <label class="form-check-label align-wetland-lbl typo-1" for="strWaterbodyName">Stream/Waterbody
+                      Name:</label>
+                    <input maxlength="125" [ngbTooltip]="infoMsg" formControlName="strWaterbodyName"
+                      class="form-input w-400" id="strWaterbodyName" />
+                  </div>
+                  <span class="addr-error-msg ml-80 typo-2" *ngIf="
+                      projectDescForm?.controls?.strWaterbodyName?.errors
+                        ?.required && submitted
+                    ">{{ errorMsgObj?.STRM_WATERBODY_REQD }}</span>
+                </div>
+                <div class="form-group d-block ml-10" *ngIf="isStreamDisplayed">
+                  <div class="form-check p-align m-auto">
+                    <label class="form-check-label align-wetland-lbl typo-1" for="wetlandIds">Wetland ID
+                      Number(s):</label>
+                    <input [ngbTooltip]="wetlandInfoMsg" maxlength="125" formControlName="wetlandIds"
+                      class="form-input w-400" id="wetlandIds" />
+                  </div>
+                  <span class="addr-error-msg ml-80 typo-2" *ngIf="
+                      projectDescForm?.controls?.wetlandIds?.errors?.required &&
+                      submitted
+                    ">{{ errorMsgObj?.WETLAND_NUMBERS_REQD }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row shadow-div" *ngIf="isDamTypeTobeDisplayed">
+              <div class="col-12 d-flex">
+                <div class="pr-align mtop-10">
+                  <!-- <h3 class="w-200 p-0 m-0">Proposed Use*:</h3> -->
+                  <h3 class="p-0 m-0 typo-1">
+                    Designer's Estimate of Class Hazard*:
+                  </h3>
+                  <a class="ml-5"
+                  href={{systemParameters?.NYCPR_PART_673}} 
+                    target="_blank">(as described in 6NYCRR Part 673)</a>
+                </div>
+              </div>
+              <div class="col-6 offset-2">
+                <div class="row mtop-10">
+                  <div *ngFor="let dType of damTypeRadios; let i = index"
+                    class="form-check form-check-expand coll-20 col-sm-4 m-bottom">
+                    <input #damTypeRadios [checked]="dType.isChecked" class="form-check-input" type="radio"
+                      id="damTypeRadio{{ i }}" value="{{ dType?.value }}" formControlName="damType" />
+                    <label class="form-check-label margint-5 typo-2" for="damTypeRadio{{ i }}">{{ dType?.label
+                      }}</label>
+                  </div>
+                </div>
+                <div class="d-block">
+                  <span class="addr-error-msg typo-2" *ngIf="
+                      projectDescForm?.controls?.damType?.errors?.required &&
+                      submitted
+                    ">{{ errorMsgObj?.CLASS_HAZARD_REQD }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row shadow-div" *ngIf="isSolidWasteFieldsDisplay">
+              <div class="col-12 row">
+                <div class="col-lg-2 col-md-3 pr-align mtop-10">
+                  <!-- <h3 class="w-200 p-0 m-0">Proposed Use*:</h3> -->
+                  <h3 class="p-0 m-0 w-210 typo-1">
+                    Solid Waste Facility Type*:
+                  </h3>
+                </div>
+              </div>
+              <div class="col-12 row">
+                <div class="col-lg-10 offset-lg-1 typo-2 mt-3 pl-0">
+                  <span style="font-style: italic" class="typo-2">
+                    When applying for a new
+                    <a href={{systemParameters?.SW_PERMIT_REG_URL}} target="_blank">Solid Waste Permit</a>
+                    or a modification not specifically designated as minor some
+                    additional information is needed regarding the type of
+                    Facility for this project.</span>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="col-lg-10 col-md-10 offset-1">
+                  <div class="row mtop-10">
+                    <div *ngFor="let sw of solidWasteChecboxTypes; let i = index" [ngClass]="
+                        sw?.facilitySubTypes
+                          ? 'form-check form-check-block  col-sm-6 m-bottom'
+                          : 'form-check form-check-expand  col-sm-6 m-bottom'
+                      ">
+                      <input *ngIf="!sw.facilitySubTypes" (change)="facilityTypeChange($event, sw)" #swCheckboxes
+                        class="form-check-input" type="checkbox" id="swCheckbox{{ i }}"
+                        value="{{ sw?.swFacilityTypeId }}" />
+                      <label class="form-check-label margint-5 typo-2" for="swCheckbox{{ i }}">{{ sw?.facilityType
+                        }}</label>
+                      <div class="ml-5">
+                        <div class="d-block" *ngFor="
+                            let subCheckboc of sw.facilitySubTypes;
+                            let j = index
+                          ">
+                          <input #swSubCheckboxes class="form-check-input" type="checkbox"
+                            (change)="subTypeChange($event, sw, subCheckboc)" id="swSubCheckbox{{ i }}{{ j }}"
+                            value="{{ subCheckboc?.swFacilitySubTypeId }}" />
+                          <label class="form-check-label margint-5 typo-2" for="swSubCheckbox{{ i }}{{ j }}">{{
+                            subCheckboc?.facilitySubType }}</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-block">
+                    <span class="addr-error-msg typo-2" *ngIf="swSelectedState?.length === 0 && submitted">{{
+                      errorMsgObj?.ATLEAST_ONE_SEL_REQD }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row shadow-div">
+              <div class="col-12 d-flex">
+                <div class="col-lg-2 col-md-3 pr-align mtop-10">
+                  <!-- <h3 class="w-200 p-0 m-0">Proposed Use*:</h3> -->
+                  <h3 class="p-0 m-0 w-210 typo-1">
+                    Project/Development Type*:
+                  </h3>
+                </div>
+                <div class="col-lg-8 col-md-8 marginl">
+                  <div class="row mtop-10">
+                    <div *ngFor="let dev of devTypes; let i = index"
+                      class="form-check form-check-expand coll-20 col-sm-4 m-bottom">
+                      <input #developmentCheckBoxes class="form-check-input" type="checkbox"
+                        (change)="onDevTypeCheckboxChange($event)" id="inlineCheckBox{{ i }}"
+                        value="{{ dev?.developmentTypeCode }}" />
+                      <label class="form-check-label margint-5 typo-2" for="inlineCheckBox{{ i }}">{{
+                        dev?.developmentTypeDesc }}</label>
+                    </div>
+                  </div>
+                  <div class="d-block">
+                    <span class="addr-error-msg typo-2" *ngIf="
+                        projectDescForm?.controls?.developmentType?.errors
+                          ?.required && submitted
+                      ">{{ errorMsgObj?.PROJ_DEV_TYPE_REQD_MSG }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div [ngClass]="
+                projectDescForm?.controls?.developmentType?.value?.includes(
+                  '1'
+                ) ||
+                projectDescForm?.controls?.developmentType?.value?.includes('5')
+                  ? 'row shadow-div'
+                  : 'row shadow-div mb-5'
+              ">
+              <div class="col-12 d-flex">
+                <div class="col-lg-2 col-md-3 struc-align mtop-10">
+                  <h3 class="p-0 m-0 w-203 typo-1">Project Structure Type*:</h3>
+                </div>
+                <div class="col-lg-8 col-md-8 marginl">
+                  <div class="row mtop-10">
+                    <div *ngFor="let structure of structureTypes; let i = index"
+                      class="form-check form-check-expand coll-20 col-sm-4 m-bottom">
+                      <input type="checkbox" #structureCheckboxes (change)="onStructureTypeCheckboxChange($event)"
+                        class="form-check-input" id="strucCheck{{ i }}" value="{{ structure?.resDevTypeCode }}" />
+                      <label class="form-check-label margint-5 typo-2" for="strucCheck{{ i }}">{{
+                        structure?.resDevTypeDesc }}</label>
+                    </div>
+                  </div>
+                  <div class="d-block">
+                    <span class="addr-error-msg typo-2" *ngIf="
+                        projectDescForm?.controls?.structureType?.errors
+                          ?.required && submitted
+                      ">{{ errorMsgObj?.PROJ_STRUCT_TYPE_REQD_MSG }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row shadow-div" *ngIf="
+                projectDescForm?.controls?.developmentType?.value?.includes(
+                  '1'
+                ) ||
+                projectDescForm?.controls?.developmentType?.value?.includes('5')
+              ">
+              <div class="col-12 pl-35 mt-3">
+                <div class="form-group">
+                  <div class="form-check form-check-inline sic-m col-4">
+                    <label class="t-align-right sic-align form-check-label typo-1" for="inlineCheckbox1">SIC
+                      Codes:</label>
+                    <app-searchable-dropdown style="font-size: 12px" width="20rem"
+                      (optionSelected)="onSicChange($event)" formControlName="sicCode" [listItems]="sicArray"
+                      labelKey="sicDesc" valueKey="sicCode"></app-searchable-dropdown>
+                  </div>
+                  <div class="form-check form-check-inline col-4">
+                    <label class="form-check-label t-align-right typo-1" for="inlineCheckbox1">NAICS Codes:</label>
+                    <app-searchable-dropdown [disabled]="
+                        projectDescForm?.controls?.sicCode?.value &&
+                        naicsArray?.length > 0
+                          ? false
+                          : true
+                      " style="font-size: 12px" width="20rem" formControlName="naicsCode" [listItems]="naicsArray"
+                      labelKey="naicsDesc" valueKey="naicsCode"></app-searchable-dropdown>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <button type="button" (click)="addToGrid()"
+                      class="btn btn-sm btn-primari nextbutton mr-2 upload ml-20" id="addBtn">
+                      Add
+                    </button>
+                  </div>
+                </div>
+                <div class="d-block">
+                  <span class="addr-error-msg typo-2" *ngIf="addClicked && isError">{{
+                    errorMsgObj?.SIC_NAICS_CODE_EXIST_MSG }}</span>
+                </div>
+              </div>
+              <div class="grid-margin" role="Projects Table" aria-label="Agricultural or Industrial Projects table"
+                aria-describedby="project_table">
+                <p-table styleClass="p-datatable-lg" [value]="items" class="w"
+                  [scrollable]="items?.length > 5 ? true : false" scrollHeight="175px" [totalRecords]="items.length"
+                  aria-describedby="An agricultural or industrial projects table">
+                  <caption class="typo-1">
+                    For Agricultural or Industrial Projects table
+                  </caption>
+                  <ng-template pTemplate="header">
+                    <tr role="rowgroup" class="no-filter">
+                      <th scope="col" aria-label="SIC Codes Header" role="columnheader" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'sicCode'"
+                        [ngStyle]="{ width: '52%', color: '#65666B' }">
+                        SIC Codes
+                      </th>
+                      <th scope="col" role="columnheader" aria-label="SIC Codes Header" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'naicsCode'" [ngStyle]="{ width: '40%' }">
+                        NAICS Codes
+                      </th>
+                      <th scope="col" role="columnheader" aria-label="Bridge Cell Header" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{ width: '8%' }">
+                      </th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-item let-i="rowIndex">
+                    <tr role="rowgroup">
+                      <td scope="col" role="cell" aria-label="SIC Codes Cell" aria-sort="none" class="table-body"
+                        [ngStyle]="{
+                          'text-align': 'left',
+                          'word-wrap': 'break-word',
+                          width: '52%'
+                        }">
+                        {{ item?.sicDesc }}
+                      </td>
+                      <td scope="col" role="columnheader" aria-label="NAICS Codes Cell" aria-sort="ascending"
+                        class="table-body" [ngStyle]="{
+                          'text-align': 'left',
+                          'word-wrap': 'break-word',
+                          width: '40%'
+                        }">
+                        {{ item?.naicsCode ? item?.naicsCode : "" }}
+                      </td>
+
+                      <td scope="col" role="columnheader" aria-label="Bridge Cell Cell" aria-sort="ascending"
+                        class="table-body" [ngStyle]="{
+                          'text-align': 'center',
+                          'word-wrap': 'break-word',
+                          width: '8%'
+                        }">
+                        <span style="cursor: pointer; margin-left: -2px" (click)="deleteRow(i)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-trash" viewBox="0 0 16 16">
+                            <path
+                              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fill-rule="evenodd"
+                              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                          </svg>
+                        </span>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 d-flex mt-3 mb-2">
+                <div class="col-lg-2 col-md-3 struc-align mtop-10">
+                  <h3 class="p-0 m-0 typo-1">
+                    Project Attributes:
+                  </h3>
+                </div>
+                
+              </div>
+
+              <div class="grid-margin" role="Project's XTRA ID Table" aria-label="XTRA ID table"
+                aria-describedby="project_xtraId_table">
+                <p-table styleClass="p-datatable-lg" [value]="xtraIdItems" class="w"
+                  [scrollable]="xtraIdItems?.length > 5 ? true : false" scrollHeight="175px"
+                  [totalRecords]="xtraIdItems.length" aria-describedby="XTRA ID table">
+                  <caption class="typo-1">
+                    XTRA ID table
+                  </caption>
+                  <ng-template pTemplate="header">
+                    <tr role="rowgroup" class="no-filter">
+                      <th scope="col" aria-label="XTRA ID table Header" role="columnheader" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'xtraId'"
+                        [ngStyle]="{ width: '52%', color: '#65666B' }">
+                        XTRA ID
+                      </th>
+                      <th scope="col" aria-label="XTRA ID table Header" role="columnheader" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'xtraId'"
+                        [ngStyle]="{ width: '52%', color: '#65666B' }">
+                        Type
+                      </th>
+
+                      <th scope="col" role="columnheader" aria-label="Bridge Cell Header" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{ width: '8%' }">
+                      </th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-xtraIdItem let-i="rowIndex">
+                    <tr role="rowgroup">
+                      <td scope="col" role="cell" aria-label="XTRA ID type Cell" aria-sort="none" class="table-body"
+                        [ngStyle]="{
+                          'text-align': 'left',
+                          'word-wrap': 'break-word',
+                          width: '52%'
+                        }">
+                        {{ xtraIdItem?.xtraId }}
+                      </td>
+                      <td scope="col" role="cell" aria-label="XTRA ID type Cell" aria-sort="none" class="table-body"
+                        [ngStyle]="{
+                          'text-align': 'left',
+                          'word-wrap': 'break-word',
+                          width: '52%'
+                        }">
+                        {{ xtraIdItem?.xtraIdValue }}
+                      </td>
+
+                      <td scope="col" role="columnheader" aria-label="Bridge Cell Cell" aria-sort="ascending"
+                        class="table-body" [ngStyle]="{
+                          'text-align': 'center',
+                          'word-wrap': 'break-word',
+                          width: '8%'
+                        }">
+
+                        <span style="cursor: pointer; margin-left: -2px" (click)="deletextraIdRow(i)"
+                          [hidden]="xtraIdItem.edbProgramApplicationIdentifier == 'null'">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-trash" viewBox="0 0 16 16">
+                            <path
+                              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fill-rule="evenodd"
+                              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                          </svg>
+                        </span>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+              <div class="col-12 pl-135">
+                <div class="form-group">
+                  <div class="form-check form-check-inline col-4">
+                    <label class="t-align-right form-check-label typo-1" for="inlineCheckbox1">
+                      XTRA ID:
+                    </label>
+                    <!-- <app-searchable-dropdown
+                      style="font-size: 12px"
+                      width="15rem"
+                      (optionSelected)="onXtraIdChange($event)"
+                      formControlName="xtraIdType"
+                      [listItems]="xtraIdArray"
+                      labelKey="xtraId"
+                      valueKey="xtraId"
+                    ></app-searchable-dropdown> -->
+
+                    <select class="w-350 ml-1" aria-label="Xtra Id" formControlName="xtraIdType"
+                      (change)="onXtraIdChanged($event)">
+                      <option ngValue="" value="sel" disabled>— Select —</option>
+                      <option [ngValue]="content?.xtraId" *ngFor="let content of xtraIdArray">
+                        {{ content?.xtraId }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="form-check form-check-inline col-3">
+                    <label class="t-align-right form-check-label typo-1" for="inlineCheckbox1">Type:
+                    </label>
+                    <input class="form-input w-200" id="xtraIdValue" formControlName="xtraIdValue" maxlength="20" />
+                  </div>
+
+                  <div class="form-check form-check-inline">
+                    <button type="button" (click)="addXTRAIDToGrid()"
+                      class="btn btn-sm btn-primari nextbutton mr-2 upload ml-20" id="addBtn">
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 row pb-2">
+                <div class="col-3 ml-6">
+                  <span class="addr-error-msg typo-2" *ngIf="xtraIdTypeReqError">{{ errorMsgObj?.XTRA_ID_TYPE_REQUIRED
+                    }}</span>
+                  <span class="addr-error-msg typo-2" *ngIf="addxtraIdClicked && isXtraIdExistsError">{{
+                    errorMsgObj?.XTRA_ID_TYPE_EXIST }}</span>
+                </div>
+                <div class="col-4 ml-6p">
+                  <span class="addr-error-msg typo-2" *ngIf="xtraIdValReqError">{{ errorMsgObj?.XTRA_ID_REQUIRED
+                    }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              
+              <div class="grid-margin" role="Projects Table" aria-label="Agricultural or Industrial Projects table"
+                aria-describedby="project_table">
+                <p-table styleClass="p-datatable-lg" [value]="programIdItems" class="w"
+                  [scrollable]="programIdItems?.length > 5 ? true : false" scrollHeight="175px"
+                  [totalRecords]="programIdItems.length" aria-describedby="Program ID projects table">
+                  <caption class="typo-1">
+                    For Program ID Projects table
+                  </caption>
+                  <ng-template pTemplate="header">
+                    <tr role="rowgroup" class="no-filter">
+                      <th scope="col" aria-label="SIC Codes Header" role="columnheader" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'progDistrictTypeCode'"
+                        [ngStyle]="{ width: '52%', color: '#65666B' }">
+                        Program ID Type
+                      </th>
+
+                      <th scope="col" aria-label="SIC Codes Header" role="columnheader" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'progDistrictTypeCode'"
+                        [ngStyle]="{ width: '52%', color: '#65666B' }">
+                        Program ID
+                      </th>
+
+                      <th scope="col" role="columnheader" aria-label="Bridge Cell Header" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{ width: '8%' }">
+                      </th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-programIdItem let-i="rowIndex">
+                    <tr role="rowgroup">
+                      <td scope="col" role="cell" aria-label="Program ID Codes Cell" aria-sort="none" class="table-body"
+                        [ngStyle]="{
+                          'text-align': 'left',
+                          'word-wrap': 'break-word',
+                          width: '52%'
+                        }">
+                        {{ programIdItem.programId }}
+                      </td>
+
+                      <td scope="col" role="cell" aria-label="Program ID Codes Cell" aria-sort="none" class="table-body"
+                        [ngStyle]="{
+                          'text-align': 'left',
+                          'word-wrap': 'break-word',
+                          width: '52%'
+                        }">
+                        {{ programIdItem?.programIdValue }}
+                      </td>
+
+                      <td scope="col" role="columnheader" aria-label="Bridge Cell Cell" aria-sort="ascending"
+                        class="table-body" [ngStyle]="{
+                          'text-align': 'center',
+                          'word-wrap': 'break-word',
+                          width: '8%'
+                        }">
+                        <span style="cursor: pointer; margin-left: -2px" [hidden]="programIdItem.isFromEfind == true"
+                          (click)="deleteProgramIdRow(i, programIdItem)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-trash" viewBox="0 0 16 16">
+                            <path
+                              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fill-rule="evenodd"
+                              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                          </svg>
+                        </span>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+              <div class="col-12 pl-135">
+                <div class="form-group">
+                  <div class="form-check form-check-inline col-4">
+                    <label class="t-align-right form-check-label typo-1" for="inlineCheckbox1">
+                      Program ID Type:
+                    </label>
+
+                    <select class="w-350 ml-1" aria-label="Program Id field" formControlName="programIds"
+                      (change)="onProgramIdChanged()">
+                      <option value="sel" disabled>— Select —</option>
+                      <option [ngValue]="content?.programId" *ngFor="let content of programIdArray">
+                        {{ content?.programId }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="form-check form-check-inline col-3">
+                    <label class="t-align-right form-check-label typo-1" for="inlineCheckbox1">
+                      Program ID:
+                    </label>
+                    <input class="form-input w-200" id="programId" [prefix]="programIdPrefixValue"
+                      [mask]="programIdMaskValue" formControlName="programIdValue"
+                      (input)="onInput($event.target.value)" [maxlength]="programIdMaxLength" />
+                  </div>
+
+                  <div class="form-check form-check-inline">
+                    <button type="button" (click)="addProgramIDToGrid()"
+                      class="btn btn-sm btn-primari nextbutton mr-2 upload ml-20" id="addBtn">
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="row col-12 pb-1">
+                <div class="col-3 ml-6">
+                  <span class="addr-error-msg typo-2" *ngIf="showProgramIdReqdError">{{
+                    errorMsgObj?.PROG_ID_TYPE_REQUIRED }} </span>
+                  <span class="addr-error-msg typo-2" *ngIf="addprogramIdClicked && isProgramIdExistsError">
+                    {{ errorMsgObj?.PROG_ID_EXIST }}</span>
+                </div>
+                <div class="col-4 pl-7">
+                  <span class="addr-error-msg typo-2" *ngIf="showProgramIdValReqdError">{{ errorMsgObj?.PROG_ID_REQUIRED
+                    }}</span>
+                  <span class="addr-error-msg typo-2" *ngIf="!checkResult && !programIdHasErrorText"> {{
+                    errorMsgObj?.VALUE_IS_INVALID_FORMAT }} </span>
+                  <span class="addr-error-msg typo-2" *ngIf="!checkResult && programIdHasErrorText">{{
+                    regExpressionError
+                    }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="row shadow-div">
+
+              <div class="grid-margin" role="Projects Table" aria-label="Special Attention Code Projects table"
+                aria-describedby="Spl_attention_project_table">
+                <p-table styleClass="p-datatable-lg" [value]="specialAttnCodeItems" class="w"
+                  [scrollable]="specialAttnCodeItems?.length > 5 ? true : false" scrollHeight="175px"
+                  [totalRecords]="specialAttnCodeItems.length" aria-describedby="Special Attention Code Projects table">
+                  <caption class="typo-1">
+                    For Special Attention Code Projects table
+                  </caption>
+                  <ng-template pTemplate="header">
+                    <tr role="rowgroup" class="no-filter">
+                      <th scope="col" aria-label="SIC Codes Header" role="columnheader" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'specialAttnTypeCode'"
+                        [ngStyle]="{ width: '52%', color: '#65666B' }">
+                        Special Attention Codes
+                      </th>
+
+                      <th scope="col" role="columnheader" aria-label="Bridge Cell Header" aria-sort="ascending"
+                        class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{ width: '8%' }">
+                      </th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-specialAttnCode let-i="rowIndex">
+                    <tr role="rowgroup">
+                      <td scope="col" role="cell" aria-label="SIC Codes Cell" aria-sort="none" class="table-body"
+                        [ngStyle]="{
+                          'text-align': 'left',
+                          'word-wrap': 'break-word',
+                          width: '52%'
+                        }">
+                        {{ specialAttnCode?.specialAttnCd }}
+                      </td>
+
+                      <td scope="col" role="columnheader" aria-label="Bridge Cell Cell" aria-sort="ascending"
+                        class="table-body" [ngStyle]="{
+                          'text-align': 'center',
+                          'word-wrap': 'break-word',
+                          width: '8%'
+                        }">
+                        <span style="cursor: pointer; margin-left: -2px" (click)="deleteSpecialAttnCodeRow(i)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-trash" viewBox="0 0 16 16">
+                            <path
+                              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fill-rule="evenodd"
+                              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                          </svg>
+                        </span>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+              <div class="col-12 pl-135 ">
+                <div class="form-group">
+                  <div class="form-check form-check-inline col-5">
+                    <label class="t-align-right form-check-label typo-1" for="inlineCheckbox1">
+                      Special Attention Code:
+                    </label>
+                    <select class="w-360 ml-1" aria-label="jaf field" formControlName="splAttnCodes"
+                      (change)="onSpclAttnCodeChange()">
+                      <option value="sel" disabled>— Select —</option>
+                      <option [ngValue]="content?.specialAttnCd" *ngFor="let content of specialAttnCodeArray">
+                        {{ content?.specialAttnCd }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <button type="button" (click)="addSplAttCodeToGrid()"
+                      class="btn btn-sm btn-primari nextbutton mr-2 upload ml-20" id="addBtn">
+                      Add
+                    </button>
+                  </div>
+                  <div class="col-1"></div>
+                </div>
+              </div>
+              <div class="col-12 row pb-2">
+                <div class="col-6 ml-6">
+                  <span class="addr-error-msg typo-2" *ngIf="spclAttnCodeReqError">{{
+                    errorMsgObj?.SPL_ATTN_CODE_REQUIRED }}</span>
+                  <span class="addr-error-msg typo-2" *ngIf="addsplAttnCode && isSpecialAttnExistsError">{{
+                    errorMsgObj?.SPL_ATTN_EXIST }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 pl-0">
+              <div class=" col-6 d-flex justify-content-center mt-2 ">
+                <br />
+                <h4 class="p-0 m-0 top-heading text-center mt-1 header-2b">Review and add/remove keywords to improve
+                  searching</h4>
+              </div>
+              <div class="col-lg-3 pl-0 struc-align mtop-10">
+                <h3 class="pl-0 m-0 typo-1">Keywords for Project:</h3>
+              </div>
+              <div class="grid-margin" role="KeyWords Table" aria-label="Keywords table"
+                aria-describedby="keywords_table">
+                <keyword-category-grid [checkBoxKey]="'projectSelected'" [rounded]="true" [keywordItems]="categoryList"
+                  (changedTimes)="emittedData($event)"></keyword-category-grid>
+              </div>
+              <!-- //TODO: Confirm with DEC and remove -->
+              <!-- <div *ngIf="!isValidate" class="row shadow-div"></div>
+              <div  *ngIf="isValidate"  class="col-6 d-flex pl-0" style="margin-left: 132px;">
+                <h3 class="m-0 typo-1" >System Detected Possible Keywords:</h3>
+              </div>
+              <div  *ngIf="isValidate" class="grid-margin" role="KeyWords Table" aria-label="Keywords table"
+              aria-describedby="keywords_table">
+              <keyword-category-grid [checkBoxKey]="'projectSelected'" [rounded]="true" [keywordItems]="systemList"
+                (changedTimes)="emittedData($event)"></keyword-category-grid>
+              </div> -->
+              <!-- <div *ngIf="isValidate" class="col-12 pl-0">
+                <div class="col-lg-3 struc-align mtop-10" style="margin-left:49px">
+                  <h3 class="typo-1">System Detected Possible Keywords:</h3>
+                </div>
+                <div class="grid-margin" role="KeyWords Table" aria-label="Keywords table"
+                  aria-describedby="keywords_table">
+                  <keyword-category-grid [checkBoxKey]="'projectSelected'" [rounded]="true" [keywordItems]="systemList"
+                    (changedTimes)="emittedData($event)"></keyword-category-grid>
+                </div>
+
+              </div> -->
+            </div>
+            <div *ngIf="isValidate" class="row shadow-div">
+              <div class="col-12 mt-3 row ">
+                <div class="form-group text-center col-6 ml-15">
+                  <div class="col pl-0">
+                    <div class="form-check form-check-inline col-8 struc-align mtop-10 pl-0">
+                      <label class="t-align-right form-check-label typo-1" for="inlineCheckbox1">'Other' Keywords:
+                      </label>
+                      <input [(ngModel)]="otherSearchItem" [ngModelOptions]="{standalone:true}" class="form-input col-6"
+                        placeholder="" (input)="onOtherTextChange()"/>
+                    </div>
+                    <div class="col-sm-6 sic-align">
+                      <span class="addr-error-msg typo-2"
+                        *ngIf="otherKeywordButton && !otherSearchItem">{{errorMsgObj?.OTHER_KEYWORD_REQD}}</span>
+                      <span class="" *ngIf="showOtherServerError && otherSearchItem.length>0">
+                        <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="form-check form-check-inline  t-align-right">
+                    <button type="button" (click)="addOtherkeyWord()"
+                      aria-label="Add Other keyword Button"
+                      class="btn btn-sm btn-primari nextbutton mr-2 upload ml-20" id="addBtn">
+                      Add
+                    </button>
+                  </div>
+                </div>
+                <div class="d-block form-check form-check-inline sic-m col-4">
+
+                </div>
+                <div class="d-block form-check form-check-inline sic-m col-4 t-align-right">
+                  <div class="col-sm-6 sic-align"></div>
+                  <div class="col-sm-6 sic-align">
+                    
+                  </div>
+                </div>
+              </div>
+              <div class="grid-margin" role="Others Keyword Table" aria-label="Others Keyword table"
+                aria-describedby="project_table">
+                <app-keyword-other-grid #otherKeywordItemsTable [rounded]="true" [checkBoxKey]="'projectSelected'"
+                  [otherKeywordItems]="otherKeywordItems" (changedTimes)="otherKeywordEmittedData($event)">
+                </app-keyword-other-grid>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+        <div class="float-right mr-2" *ngIf="showServerError">
+          <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+        </div>
+        <div class="footer-row">
+          <div class="col-md-12 bottom-button-container">
+            <app-validate-checkbox *ngIf="isValidate" category="PROJ-INFO" activityId="11"
+              [(validatedModel)]="projectDescriptionValidated"></app-validate-checkbox>
+            <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" type="submit" id="submitBtn">
+              Next
+            </button>
+            <button type="button" (click)="goBack()" class="btn btn-sm btn-outline-dark closebutton mb-2"
+              id="projDescCloseBtn">
+              Close
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </mat-step>
+  <mat-step role="tab" [editable]="true" [state]="selectedIndex === 2 ? 'edit' : ''">
+    <ng-template matStepLabel><span class="child-label">Application Forms</span></ng-template>
+    <app-application-contacts [avoidFormInitiate]="avoidFormInitiate" #applicationContacts
+      [isForwardClick]="isForwardClick" [selectedIndex]="selectedIndex" [selectedPermitTypes]="selectedPermitTypes"
+      (apiCalled)="setExtModPermits($event)">
+    </app-application-contacts>
+  </mat-step>
+</mat-horizontal-stepper>
+<app-pending-changes-popup #pendingPopup (onOkClick)="commonService.navigateToMainPage()"></app-pending-changes-popup>
+<ng-template #binNumbersContent>
+  <ul class="list-group">
+    <button class="btn list-group-item" (click)="addToBridgeIds(bin)" type="button" *ngFor="let bin of binHistories">
+      {{ bin?.edbBin }}
+    </button>
+  </ul>
+</ng-template>

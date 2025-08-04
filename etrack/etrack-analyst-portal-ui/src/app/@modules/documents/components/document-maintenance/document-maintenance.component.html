@@ -1,0 +1,1052 @@
+<!-- <div class="row">
+  <div class="col-12">
+          <strong class="header-3b t-center">Code Tables Maintenance is under construction.</strong>
+  </div>
+</div> -->
+
+<ng-container class="mt-4 view">
+  <div class="view">
+    <form [formGroup]="maintenanceForm">
+      <div class="row mb-3">
+        <div class="col-5">
+          <label for="catSelect" class="header-1b mr-2">Category*:</label>
+          <select
+            name="catSelect"
+            id="categorySelect"
+            class="w-80"
+            formControlName="category"
+            (change)="onCategoryChanged($event.target.value)"
+          >
+            <option value="null" disabled>--Select--</option>
+            <option *ngFor="let category of categoriesList">
+              {{ category }}
+            </option>
+          </select>
+        </div>
+        <div class="col-6">
+          <label for="tblName" class="header-1b mr-2">Table Name*:</label>
+          <select
+            name="tblName"
+            id="tblName"
+            class="w-80"
+            formControlName="tableName"
+            (change)="onTableNameChange($event.target.value)"
+          >
+            <option value="null" disabled>--Select--</option>
+            <option *ngFor="let table of tableNames" [value]="table">{{ convertedTableNames[table] }}</option>
+          </select>
+        </div>
+        <div class="col-1 ml-0 mr-0 px-0">
+          <button
+            class="btn btn-sm btn-primari nextbutton upload"
+            (click)="onAddClicked()"
+            [disabled]="formControls?.tableName.value == null"
+            *ngIf="allowAddNew"
+          >
+            Add New
+          </button>
+        </div>
+      </div>
+      <div *ngIf="false" [hidden]="formControls?.tableName.value == 'null'">
+        <p-table
+          [customSort]="true"
+          #dataTable
+          [value]="rows.controls"
+          [autoLayout]="true"
+          styleClass="p-datatable-lg"
+          [rows]="5"
+          [scrollable]="rows?.controls?.length > 10 ? true : false"
+          [totalRecords]="rows.controls?.length"
+          id="Code_Maintenance_table"
+          [scrollHeight]="'45rem'"
+        >
+
+        </p-table>
+      </div>
+
+      <!-- new TABLE!!! [value]="columns.controls" [scrollable]="columns?.controls?.length > 10 ? true : false"
+        [totalRecords]="columns.controls?.length"-->
+
+      <p-table
+        *ngIf="maintenanceForm.controls['tableName'].value && !getAllTableData"
+        styleClass="p-datatable-lg"
+        scrollHeight="175px"
+        aria-describedby="Maintence table"
+        [value]="columns.controls"
+        [autoLayout]="true"
+        styleClass="p-datatable-lg"
+        [rows]="5"
+        [scrollable]="columns?.controls?.length > 10 ? true : false"
+        [totalRecords]="columns.controls?.length"
+        id="Code_Maintenance_table"
+        [scrollHeight]="'45rem'"
+      >
+        <caption class="typo-1">
+          Maintenance Table
+        </caption>
+        <ng-template pTemplate="header">
+          <tr role="rowgroup" class="no-filter">
+            <th
+              scope="col"
+              role="columnheader"
+              id="{{ header?.columnTitle + i }}"
+              aria-label="Header Title"
+              aria-sort="descending"
+              *ngFor="let header of headers; let i = index"
+              class="table-header-primary h-30"
+              [ngStyle]="{
+                width: header?.headerWidth ? header.headerWidth : 'auto',
+                'word-break': ' break-word',
+                'max-height': '40px',
+                height: '30px',
+                'text-align': 'left'
+              }"
+            >
+            <span> {{ header?.columnLabel }}</span>
+
+             <span *ngIf="header.exportToExcel; "
+             [ngStyle]="{'margin-left':  (header?.columnLabel=='Updated URL Link')? '50%':(header?.columnLabel=='Updated URL Link(defaults to original)')? '28%':'0%'}" >
+             <img
+             src="assets/icons/export.png"
+             alt="Export Icon"
+             style="height: auto; width: 25px; cursor: pointer; placement:float-right"
+             (click)="exportToExcel(header)"
+           />
+            </span>
+
+
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template
+          pTemplate="body"
+          let-column
+          let-rowIndex="rowIndex"
+          formArrayName="columns"
+        >
+          <tr role="rowgroup" formGroupName="{{ rowIndex }}">
+            <td
+              *ngFor="let header of headers; let i = index"
+              scope="col"
+              role="cell"
+              aria-label="Column Name Codes Cell"
+              aria-sort="none"
+              class="table-body"
+              [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: header?.headerWidth ? header.headerWidth : 'auto'
+              }"
+            >
+              <select
+                *ngIf="header.columnType == 'dropdown'"
+                [ngStyle]="{ width: '90%' }"
+                formControlName="{{ header.columnTitle }}"
+                (change)="
+                  setCurrentValue($event, rowIndex);
+                  bindOtherValuesOnChange($event, rowIndex, header.columnTitle)
+                "
+              >
+                <option value="" selected>--Select--</option>
+                <option
+                  *ngFor="let item of sysParameterNames"
+                  [value]="item[header.dropdownKey]"
+                >
+                  {{ item[header.dropdownKey] }}
+                </option>
+              </select>
+
+              <input
+                *ngIf="header.columnType == 'textbox'"
+                formControlName="{{ header.columnTitle }}"
+                type="text"
+                name="updatedVal"
+                [ngStyle]="{ width: '90%' }"
+                [maxlength]="header.maxCharacter"
+              />
+
+              <div
+                class="addr-error-msg pl-2"
+                *ngIf="
+                  formSubmitted &&
+                  columns.at(rowIndex).get(header.columnTitle)?.invalid &&
+                  columns.at(rowIndex).get(header.columnTitle)?.errors?.required
+                "
+              >
+               {{errorMsgObj?.UPDATED_VAL_REQD}}
+              </div>
+              <div
+                class="addr-error-msg pl-2"
+                *ngIf="
+                  formSubmitted &&
+                  columns.at(rowIndex).get(header.columnTitle)?.invalid &&
+                  columns.at(rowIndex).get(header.columnTitle)?.errors?.duplicate
+                "
+              >
+              {{errorMsgObj?.DUP_ID_NOT_ALLOWED}}
+              </div>
+              <div
+              class="addr-error-msg pl-2"
+              *ngIf="
+                formSubmitted &&
+                columns.at(rowIndex).get(header.columnTitle)?.invalid &&
+                columns.at(rowIndex).get(header.columnTitle)?.errors?.maxlength
+              "
+            >
+              Error: Exceeded Maximum {{header.maxCharacter}}  characters Required.
+            </div>
+
+              <input
+                *ngIf="header.columnType == 'checkbox'"
+                (change)="
+                  checkBoxValidation(
+                    $event,
+                    rowIndex,
+                    header.columnTitle,
+                    header?.oppTitle
+                  )
+                "
+                [ngStyle]="{ 'text-align': 'center' }"
+                type="checkbox"
+                name="depInd"
+                checked
+                formControlName="{{ header.columnTitle }}"
+              />
+              <ng-container *ngIf="header.columnTitle == 'addBtn'">
+                <span
+                  style="cursor: pointer; margin-left: -2px"
+                  (click)="createColumn()"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    x="0px"
+                    y="0px"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    class="ml-29"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z"
+                    ></path>
+                  </svg>
+                </span>
+                <span
+                  style="cursor: pointer; margin-left: 16px"
+                  (click)="removeColumn(rowIndex)"
+                >
+                <svg fill="#000000" xmlns="http://www.w3.org/2000/svg"
+                  width="20px" height="20px" viewBox="0 0 83 83">
+                      <path d="M81,36.166H2c-1.104,0-2,0.896-2,2v6.668c0,1.104,0.896,2,2,2h79c1.104,0,2-0.896,2-2v-6.668
+                          C83,37.062,82.104,36.166,81,36.166z">
+                      </path>
+                </svg>
+                </span>
+              </ng-container>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </form>
+    <div *ngIf="maintenanceForm?.controls?.tableName?.value === 'E_REQUIRED_DOC_FOR_FAC_TYPE' ||
+      maintenanceForm?.controls?.tableName?.value === 'E_REQUIRED_DOC_FOR_PERMIT_TYPE' ||
+      maintenanceForm?.controls?.tableName?.value === 'E_TRANSACTION_TYPE_RULE'">
+      <form [formGroup]="reqdDocsForm">
+        <div class="row mb-3">
+          <div class="col-5"
+          *ngIf="maintenanceForm?.controls?.tableName?.value === 'E_REQUIRED_DOC_FOR_FAC_TYPE'">
+            <label class="header-1b mr-2">SW Facility Type*:</label>
+            <select class="w-68"
+            formControlName="swFacilityType"
+            (change)="onSwFacTypeChange()">
+              <option value="null" selected disabled>--Select--</option>
+              <option *ngFor="let swFacilityType of reqdSwFacilityTypes"
+                [value] ="swFacilityType.swFacilityTypeId">
+                {{swFacilityType.facilityType}}
+              </option>
+            </select>
+            <div
+            class="addr-error-msg pl-sw-error"
+            *ngIf="retrieveClicked && reqdDocsForm.get('swFacilityType')?.invalid"
+            >
+              {{errorMsgObj?.SW_FAC_TYPE_REQD}}
+            </div>
+
+          </div>
+          <div class="col-6"
+            *ngIf="maintenanceForm?.controls?.tableName?.value === 'E_REQUIRED_DOC_FOR_FAC_TYPE'">
+            <label class="header-1b mr-2">SW Facility Sub Type{{reqdSwFacilitySubTypes.length ? '*' : ''}}:</label>
+            <select class="w-68"
+            *ngIf="maintenanceForm.controls.tableName?.value === 'E_REQUIRED_DOC_FOR_FAC_TYPE'"
+            formControlName="swFacilitySubType"
+            (change)="onSwFacSubTypeChange()">
+            <option value="null" selected disabled>{{reqdSwFacilitySubTypes.length ? '--Select--' : ''}}</option>
+            <option *ngFor="let swFacilitySubType of reqdSwFacilitySubTypes"
+              [value]="swFacilitySubType.swFacilitySubTypeId">
+              {{swFacilitySubType.facilitySubType}}
+            </option>
+            </select>
+            <div
+            class="addr-error-msg pl-sw-sub-type-error"
+            *ngIf="retrieveClicked && reqdDocsForm.get('swFacilitySubType')?.invalid"
+            >
+              {{errorMsgObj?.SW_FAC_SUB_TYPE_REQD}}
+            </div>
+          </div>
+          <div class="col-5"
+          *ngIf="maintenanceForm?.controls?.tableName?.value === 'E_REQUIRED_DOC_FOR_PERMIT_TYPE' ||
+          maintenanceForm?.controls?.tableName?.value === 'E_TRANSACTION_TYPE_RULE'">
+
+          </div>
+          <div class="col-6"
+          *ngIf="maintenanceForm?.controls?.tableName?.value === 'E_REQUIRED_DOC_FOR_PERMIT_TYPE'">
+          <label class="header-1b mr-2">Permit Type*:</label>
+            <select
+              formControlName="permitTypeCode"
+              class="w-80"
+              (change)="onPermitTypeCodeChange()">
+              <option value="null" selected disabled>
+                --Select--
+              </option>
+              <option *ngFor="let permitType of reqdPermitTypes" [value]="permitType.permitTypeCode">
+                {{permitType.permitTypeDescription}}
+              </option>
+            </select>
+            <div
+            class="addr-error-msg pl-permit-error"
+            *ngIf="retrieveClicked && reqdDocsForm.get('permitTypeCode')?.invalid"
+            >
+              {{errorMsgObj?.PERMIT_REQD}}
+            </div>
+          </div>
+          <div class="col-6"
+            *ngIf="maintenanceForm?.controls?.tableName?.value === 'E_TRANSACTION_TYPE_RULE'">
+            <label class="header-1b mr-2">Permit Type Grouping*:</label>
+            <select
+              formControlName="permitTypeGrouping"
+              class="w-66"
+              (change)="onPermitTypeGroupingChange()">
+              <option value="null" selected disabled>
+                --Select--
+              </option>
+              <option *ngFor="let permitGroup of permitTypeGroupings" [value]="permitGroup.val">
+                {{permitGroup.name}}
+              </option>
+            </select>
+            <div
+            class="addr-error-msg"
+            style="padding-left: 10.3rem"
+            *ngIf="retrieveClicked && reqdDocsForm.get('permitTypeGrouping')?.invalid"
+            >
+              {{errorMsgObj?.PERMIT_TYPE_GRP_REQD}}
+            </div>
+          </div>
+          <div class="col-1 ml-0 mr-0 px-0">
+            <button class="btn btn-sm btn-primari nextbutton upload"
+              type="button"
+              (click)="retrieveReqdDocs()">
+              Retrieve
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <p-table *ngIf ="tableData.length && getAllTableData"
+    [value]="tableData"
+    scrollHeight="55vh"
+    [scrollable]="tableData.length > 10 ? true : false"
+    styleClass="p-datatable-lg"
+    #dataTable>
+    <ng-template pTemplate="header">
+      <tr role="rowgroup" class="no-filter">
+        <th
+          scope="col"
+          role="columnheader"
+          id="{{ header?.columnTitle + i }}"
+          aria-label="Header Title"
+          aria-sort="descending"
+          *ngFor="let header of headers; let i = index"
+          class="table-header-primary table-header-secondary h-30"
+          [pSortableColumn]="header.isSort ? header.columnTitle : null"
+          [ngStyle]="{
+            width: header?.headerWidth ? header.headerWidth : 'auto',
+            'word-break': ' break-word',
+            'max-height': '40px',
+            height: '30px',
+            'text-align': 'left',
+            position: 'relative'
+          }"
+        >
+             <span>
+              {{ header?.columnLabel }}
+             </span>
+            <span *ngIf="header.exportToExcel"
+            [ngStyle]="{'margin-left':  (header?.columnLabel=='Updated URL Link')? '50%':(header?.columnLabel=='Updated URL Link(defaults to original)')? '28%':'0%'}" >
+            <img
+            src="assets/icons/export.png"
+            alt="Export Icon"
+            style="height: auto; width: 25px; cursor: pointer"
+            (click)="exportToExcel(header)"
+              /></span>
+
+
+          <p-columnFilter *ngIf="header.isFilter" class="p-ml-auto" [field]="header?.columnTitle"
+              display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false"
+              [matchMode]="header?.columnTitle==='permitType'? 'permitFilter': 'in'" [showOperator]="false"
+              [showClearButton]="false" [showAddButton]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-multiSelect [(ngModel)]="filterValues" [options]="getFilterList(header?.filtersList)"
+                  placeholder="Select" (onChange)="filter($event.value)">
+                </p-multiSelect>
+              </ng-template>
+            </p-columnFilter>
+            <img
+            *ngIf="header.columnTitle === 'editBtn' && maintenanceForm.controls?.tableName?.value === 'E_TRANSACTION_TYPE_RULE'"
+            ngbTooltip="Reset filters"
+            placement="left"
+            alt="filter"
+            src="assets/icons/funnel-cross.jpg"
+            class="filter-icon ng-star-inserted"
+            style="height: auto; width: 20px; cursor: pointer"
+            (click)="resetFilters()"
+          />
+
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template
+      pTemplate="body"
+      let-column
+      let-item
+      let-rowIndex="rowIndex"
+    >
+      <tr role="rowgroup">
+        <td
+          *ngFor="let header of headers; let i = index"
+          scope="col"
+          role="cell"
+          aria-label="Column Name Codes Cell"
+          aria-sort="none"
+          class="table-body"
+          [ngStyle]="{
+            'text-align': header.columnType !== 'checkbox' ? 'left' : 'center',
+            'word-wrap': 'break-word',
+            width: header?.headerWidth ? header.headerWidth : 'auto'
+          }"
+        >
+        <div *ngIf="header.columnType === 'dropdown'"
+              [ngStyle]="{ width: '90%' }"
+              [ngClass]="{'pl-2': tableData.length > 10}">
+          <select (change)="onTableDropdownChange($event, item)">
+                  <option
+                    *ngFor="let opt of header.tableData"
+                    [value]="opt[header.dropdownValue]"
+                    [selected]="opt[header.dropdownValue] === item[header.dropdownValue]"
+                  >
+                    {{ opt[header.dropdownKey] }}
+                  </option>
+          </select>
+        </div>
+        <div *ngIf="header.columnType === 'text'" [ngClass]="{'pl-1': header.columnType === 'text' && i == 1 && tableData.length > 10,
+          'pl-2': header.columnType === 'text' && i == 2 && tableData.length > 10,
+          'pl-3' : ((header.columnType === 'text' && i > 2) || header.columnTitle === 'messageTypeDescription')
+            && tableData.length > 10}">
+          {{header.columnTitle === 'invoiceFee' ? '$' : ''}}{{item[header.columnTitle]}}
+        </div>
+        <div *ngIf="header.columnType === 'checkbox'" [ngClass]="{'pl-4': tableData.length > 10}">
+          <input
+            type="checkbox" [(ngModel)]="item[header.columnTitle]" (change)="onTableCheckboxChange(item)"
+            [disabled]="header.isDisabled ? true : null"/>
+        </div>
+        <div *ngIf="header.columnType === 'textbox'"
+        [ngClass]="{'pl-2': i < 3 && tableData.length > 10,
+          'pl-3': i >= 3 && tableData.length > 10}">
+          <input
+            #textinput
+            type="textbox"
+            (input)="onTextboxChange(textinput, item, header.columnTitle)"
+            [(ngModel)]="item[header.columnTitle]"
+            [ngStyle]="{ width: header.width ? header.width : '90%' }"
+            [disabled]="header.columnTitle === 'order' && !item.active"
+            [maxlength]="header.maxCharacter"/>
+        </div>
+          <div class="actions-btn-cont" [ngClass]="{'pl-2': tableData.length > 10}"
+           *ngIf="header.columnTitle === 'editBtn'">
+            <button (click)="editClicked(item)">
+
+              <img
+                    src="assets/icons/editicon.svg"
+                    alt="editicon"
+                  />
+            </button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  </div>
+  <div class="float-right mr-2 mt-2" *ngIf="showServerError && !duplicateError">
+    <app-server-error-message
+      [serverErrorMessage]="serverErrorMessage"
+    ></app-server-error-message>
+  </div>
+  <!-- <div
+  class="float-right addr-error-msg pl-2"
+  *ngIf="duplicateError"
+>
+  Error: Duplicate ID's not allowed.
+</div> -->
+</ng-container>
+<div class="row footer-row mb-0 mt-3">
+  <div class="col-12 text-right">
+    <button [disabled]="disableSaveButton"
+      class="btn btn-sm btn-primari nextbutton upload mr-2"
+      (click)="onSaveClicked()"
+      *ngIf="showSaveButton"
+    >
+      Save
+    </button>
+    <button
+      class="btn btn-sm btn-outline-dark closebutton"
+      (click)="onCloseClicked()"
+    >
+      Close
+    </button>
+  </div>
+</div>
+<app-custom-modal-popup #addPopup>
+  <ng-container *ngIf="addNewHeaders.length > 0">
+    <form [formGroup]="addNewForm">
+      <div class="modal-body-confirmation mt-3 mb-4" style="text-align: center">
+        <p class="header-3b typo-2 ">
+          Add {{maintenanceForm.controls.category?.value === 'Supporting Documents' ? ' Supporting' : ''}} {{ convertedTableNames[maintenanceForm.controls["tableName"].value] }}
+        </p>
+      </div>
+      <div *ngIf="maintenanceForm.controls.tableName.value !== 'E_TRANSACTION_TYPE_RULE'">
+        <ng-container *ngFor="let head of addNewHeaders; let i = index">
+          <div class="row col-12" [ngClass]="{'mt-4' : i == 0, 'mt-2': i > 0}"><!--mt-2 ml-4 mr-4-->
+          <div class="col-4 pl-0 pr-0"><p class="header-1b " style="float: right;">{{ head.name }}{{head.columnType !== 'text' && !head.optional ? '*' : ''}}:</p></div>
+          <div class="col-8 pl-0 pr-0">
+            <label *ngIf="head.columnTitle === 'invoiceFee'" class="header-1b ml-2">
+              $
+            </label>
+            <input
+            *ngIf="head.columnType === 'textbox'"
+              formControlName="{{ head.columnTitle }}"
+              [ngStyle]="{ width: head.width ? head.width : '90%' }"
+              [ngClass]="{'ml-4' : head.columnTitle !== 'invoiceFee', 'ml-2' : head.columnTitle === 'invoiceFee'}"
+              class="mr-4 mb-2"
+              [maxlength]="head.maxCharacter"
+              (input)="onPopupTextboxChange('add', head.columnTitle)"
+            />
+            <select
+            *ngIf="head.columnType === 'dropdown'"
+            class=" ml-4 mr-4 mb-2"
+            [ngStyle]="{ width: head.width ? head.width : '90%' }"
+            formControlName="{{ head.columnTitle }}"
+            (change)="onAddDropdownChange(head.columnTitle)"
+          >
+            <option *ngIf="!head.optional" value="" selected disabled>--Select--</option>
+            <option
+              *ngFor="let item of head.tableData"
+              [value]="item[head.dropdownValue]"
+              >
+                {{ item[head.dropdownKey] }}
+
+            </option>
+          </select>
+          <div class="typo-2 ml-4 mr-4 mb-2" *ngIf="head.columnTitle === 'regulationCode'">
+            {{ swRegulationCode }}
+          </div>
+        </div>
+          </div>
+          <div
+            class="addr-error-msg pl-error"
+            *ngIf="onPopupOkClicked && addNewForm.get(head.columnTitle)?.invalid"
+          >
+            Error: {{ head.name }} is Required.
+          </div>
+          <div
+            class="addr-error-msg pl-error"
+            *ngIf="showRegulationCodeError && head.columnTitle === 'subTypeRegulationCode'"
+          >
+            {{errorMsgObj?.SW_SUB_TYPE_RG_MUST_START}}
+          </div>
+        </ng-container>
+      </div>
+      <div *ngIf="maintenanceForm.controls.tableName.value === 'E_TRANSACTION_TYPE_RULE'">
+        <div class="row col-12 mt-4">
+          <div class="col-12 pl-3 pr-0">
+            <label class="header-1b">Permit Type*:</label>
+            <select [ngStyle]="{width: '40%'}" class="ml-4 mr-4 mb-2"
+              [formControlName]="addNewHeaders[0].columnTitle">
+              <option value="" selected disabled>--Select--</option>
+              <option
+                *ngFor="let item of addNewHeaders[0].tableData"
+                [value]="item[addNewHeaders[0].dropdownValue]"
+                >
+                  {{ item[addNewHeaders[0].dropdownKey] }}
+
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg"
+            *ngIf="onPopupOkClicked && addNewForm.get(addNewHeaders[0].columnTitle)?.invalid"
+            style="padding-left: 8.1rem">
+            {{errorMsgObj?.PERMIT_REQD}}
+        </div>
+        <div class="row col-12 mt-2">
+          <div class="col-3 pl-3 pr-0 mt-2">
+            <label class="header-1b">Selected Trans Type(s)*:</label>
+          </div>
+          <div class="col-1" style="text-align: center">
+              <div class="header-1b">NEW</div>
+              <input type="checkbox" formControlName="userSelNew">
+          </div>
+          <div class="col-1" style="text-align: center">
+              <div class="header-1b">MOD</div>
+              <input type="checkbox" formControlName="userSelMod" (change)="onModClicked()">
+          </div>
+          <div class="col-1" style="text-align: center">
+            <div class="header-1b">EXT</div>
+            <input type="checkbox" formControlName="userSelExt">
+          </div>
+          <div class="col-1" style="text-align: center">
+            <div class="header-1b">XFER</div>
+            <input type="checkbox" formControlName="userSelTransfer">
+          </div>
+          <div class="col-1" style="text-align: center">
+            <div class="header-1b">REN</div>
+            <input type="checkbox" formControlName="userSelRen">
+          </div>
+        </div>
+        <div
+            class="addr-error-msg"
+            style="padding-left: 13rem"
+            *ngIf="onPopupOkClicked &&
+              !addNewForm.controls?.userSelNew?.value &&
+              !addNewForm.controls?.userSelMod?.value &&
+              !addNewForm.controls?.userSelExt?.value &&
+              !addNewForm.controls?.userSelTransfer?.value &&
+              !addNewForm.controls?.userSelRen?.value"
+              >
+            {{errorMsgObj?.ONE_OF_TRANS_TYPE_REQD}}
+        </div>
+        <div class="row col-12 mt-2" *ngIf="addNewForm.controls?.userSelMod?.value">
+          <div class="col-12 pl-3 pr-0">
+            <label class="header-1b pr-4">
+              If MOD, is there a material change to the originally authorized project?
+            </label>
+            <input type="radio" formControlName="chgOriginalProjectInd" value="1">
+            <label class="pl-1 pr-2 typo-2">YES</label>
+            <input type="radio" formControlName="chgOriginalProjectInd" value="0">
+            <label class="pl-1 typo-2">NO</label>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg mr-2 mb-2"
+            *ngIf="onPopupOkClicked && addNewForm.get('chgOriginalProjectInd')?.invalid"
+            style="float: right">
+            {{errorMsgObj?.MAT_CHG_ANS_IS_REQD}}
+        </div>
+        <div class="row col-12 mt-2">
+          <div class="col-4 pl-0 pr-0">
+            <label class="header-1b" style="float: right">
+              DART App Type (translation)*:
+            </label>
+          </div>
+          <div class="col-8">
+            <select [ngStyle]="{width: '50%'}" class="mb-2"
+                [formControlName]="addNewHeaders[7].columnTitle">
+                <option value="" selected disabled>--Select--</option>
+                <option *ngFor="let opt of addNewHeaders[7].tableData"
+                  [value]="opt.edbTransTypeCode">
+                  {{opt.edbTransTypeCode}}
+                </option>
+            </select>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg pl-trans-error"
+            *ngIf="onPopupOkClicked && addNewForm.get(addNewHeaders[7].columnTitle)?.invalid"
+            >
+            {{errorMsgObj?.DART_APP_TYPE_REQD}}
+        </div>
+        <div class="row col-12 mt-2">
+          <div class="col-4 pl-0 pr-0">
+            <label class="header-1b" style="float: right">
+              Supporting Doc Type(s)*:
+            </label>
+          </div>
+          <div class="col-8">
+            <select [ngStyle]="{width: '50%'}" class="mb-2"
+                [formControlName]="addNewHeaders[8].columnTitle">
+                <option value="" selected disabled>--Select--</option>
+                <option *ngFor="let opt of addNewHeaders[8].tableData"
+                  [value]="opt.supportDocTransType">
+                  {{opt.supportDocTransType}}
+                </option>
+            </select>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg pl-trans-error"
+            *ngIf="onPopupOkClicked && addNewForm.get(addNewHeaders[8].columnTitle)?.invalid"
+            >
+            {{errorMsgObj?.SUPP_DOC_TYPE_REQD}}
+        </div>
+        <div class="row col-12 mt-2">
+          <div class="col-4 pl-0 pr-0">
+            <label class="header-1b" style="float: right">
+              MOD/EXT Form:
+            </label>
+          </div>
+          <div class="col-8">
+            <input type="checkbox" formControlName="modExtForm">
+          </div>
+        </div>
+      </div>
+      <div *ngIf="headers[0].hasRadioButtons">
+        <hr class="w-90 black-bar"/>
+        <div class="row ml-2" style="justify-content: center">
+          <ng-container *ngFor="let radioLabel of radioHeaders">
+            <div class="col-radio">
+              <label class="pl-1 header-1b">
+                {{radioLabel.name}}
+              </label>
+              <div *ngFor="let radioVal of radioValues">
+                <input type="radio" [formControlName]="radioLabel.columnTitle" [value]="radioVal">
+                <label class="pl-label typo-2">
+                  {{radioVal}}
+                </label>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div
+          class="addr-error-msg t-center"
+          *ngIf="onPopupOkClicked &&
+          (addNewForm.get('reqdNew')?.invalid ||
+          addNewForm.get('reqdMod')?.invalid ||
+          addNewForm.get('reqdExt')?.invalid ||
+          addNewForm.get('reqdMnm')?.invalid ||
+          addNewForm.get('reqdMtn')?.invalid ||
+          addNewForm.get('reqdRen')?.invalid ||
+          addNewForm.get('reqdRtn')?.invalid ||
+          addNewForm.get('reqdXfer')?.invalid)"
+        >
+          {{errorMsgObj?.ONE_SEL_OF_TRAN_TYPE_REQD}}
+        </div>
+      </div>
+
+      <div class="row col-12 justify-content-end mr-2" *ngIf="showPopupServerError">
+        <app-server-error-message
+          [serverErrorMessage]="popupServerErrorMessage"
+        ></app-server-error-message>
+      </div>
+
+      <div class="text-center mb-2 mt-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="onAddOkClicked()"
+        >
+          {{maintenanceForm.controls.tableName.value === 'E_GIS_LAYER_CONFIG' ? 'Add' : 'Save'}}
+        </button>
+        <button
+          class="btn btn-sm btn-outline-dark closebutton mb-2 upload"
+          (click)="onAddCancelClicked()"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </ng-container>
+</app-custom-modal-popup>
+<app-custom-modal-popup #editPopup *ngIf="editPopupOpen">
+  <ng-container *ngIf="editHeaders.length > 0">
+    <form [formGroup]="editForm">
+      <div class="modal-body-confirmation mt-3 mb-4" style="text-align: center">
+        <p class="header-3b typo-2 ">
+          Edit{{maintenanceForm.controls.category?.value === 'Supporting Documents' ? ' Supporting' : ''}} {{ convertedTableNames[maintenanceForm.controls["tableName"].value] }}
+        </p>
+      </div>
+      <div *ngIf="maintenanceForm.controls.tableName.value !== 'E_TRANSACTION_TYPE_RULE'">
+        <ng-container *ngFor="let head of editHeaders; let i = index">
+          <div class="row col-12" [ngClass]="{'mt-4' : i == 0, 'mt-2': i > 0}"><!--mt-2 ml-4 mr-4-->
+          <div class="col-4 pl-0 pr-0"><p class="header-1b " style="float: right;">{{ head.name }}{{head.columnType !== 'text' && !head.optional ? '*' : ''}}:</p></div>
+          <div class="col-8 pl-0 pr-0">
+            <label *ngIf="head.columnTitle === 'invoiceFee'" class="header-1b ml-2">
+              $
+            </label>
+            <input
+            *ngIf="head.columnType === 'textbox'"
+              formControlName="{{ head.columnTitle }}"
+              class="mr-4 mb-2"
+              [ngClass]="{'ml-4' : head.columnTitle !== 'invoiceFee', 'ml-2' : head.columnTitle === 'invoiceFee'}"
+              [ngStyle]="{ width: head.width ? head.width : '90%' }"
+              [maxlength]="head.maxCharacter"
+              (input)="onPopupTextboxChange('edit', head.columnTitle)"
+            />
+            <select
+            *ngIf="head.columnType === 'dropdown'"
+            class="ml-4 mr-4 mb-2"
+            [ngStyle]="{ width: head.width ? head.width : '90%' }"
+            formControlName="{{ head.columnTitle }}"
+            (change)="onEditDropdownChange(head.columnTitle)"
+          >
+            <option *ngIf="!head.optional" value="" disabled>--Select--</option>
+            <option
+              *ngFor="let item of head.tableData"
+              [value]="item[head.dropdownValue]"
+              >
+                {{ item[head.dropdownKey] }}
+
+            </option>
+          </select>
+          <div class="typo-2 ml-4 mr-4 mb-2" *ngIf="head.columnTitle === 'regulationCode'">
+            {{ swRegulationCode ? swRegulationCode : editRow?.facilityTypeRegulationCode }}
+          </div>
+        </div>
+          </div>
+          <div
+            class="addr-error-msg pl-error"
+            *ngIf="onPopupOkClicked && editForm.get(head.columnTitle)?.invalid"
+          >
+            Error: {{ head.name }} is Required.
+          </div>
+          <div
+            class="addr-error-msg pl-error"
+            *ngIf="showRegulationCodeError && head.columnTitle === 'subTypeRegulationCode'"
+          >
+            {{errorMsgObj?.SW_SUB_TYPE_RG_MUST_START}}
+          </div>
+        </ng-container>
+      </div>
+      <div *ngIf="maintenanceForm.controls.tableName.value === 'E_TRANSACTION_TYPE_RULE'">
+        <div class="row col-12 mt-4">
+          <div class="col-12 pl-3 pr-0">
+            <label class="header-1b">Permit Type*:</label>
+            <select [ngStyle]="{width: '40%'}" class="ml-4 mr-4 mb-2"
+              [formControlName]="editHeaders[0].columnTitle" disabled>
+              <option value="" selected disabled>--Select--</option>
+              <option
+                *ngFor="let item of editHeaders[0].tableData"
+                [value]="item[editHeaders[0].dropdownValue]"
+                >
+                  {{ item[editHeaders[0].dropdownKey] }}
+
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg"
+            *ngIf="onPopupOkClicked && editForm.get(editHeaders[0].columnTitle)?.invalid"
+            style="padding-left: 8.1rem">
+            {{errorMsgObj?.PERMIT_REQD}}
+        </div>
+        <div class="row col-12 mt-2">
+          <div class="col-3 pl-3 pr-0 mt-2">
+            <label class="header-1b">Selected Trans Type(s)*:</label>
+          </div>
+          <div class="col-1" style="text-align: center">
+              <div class="header-1b">NEW</div>
+              <input type="checkbox" formControlName="userSelNew" disabled>
+          </div>
+          <div class="col-1" style="text-align: center">
+              <div class="header-1b">MOD</div>
+              <input type="checkbox" formControlName="userSelMod" disabled>
+          </div>
+          <div class="col-1" style="text-align: center">
+            <div class="header-1b">EXT</div>
+            <input type="checkbox" formControlName="userSelExt" disabled>
+          </div>
+          <div class="col-1" style="text-align: center">
+            <div class="header-1b">XFER</div>
+            <input type="checkbox" formControlName="userSelTransfer" disabled>
+          </div>
+          <div class="col-1" style="text-align: center">
+            <div class="header-1b">REN</div>
+            <input type="checkbox" formControlName="userSelRen" disabled>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg"
+            style="padding-left: 13rem"
+            *ngIf="onPopupOkClicked &&
+              !editForm.controls?.userSelNew?.value &&
+              !editForm.controls?.userSelMod?.value &&
+              !editForm.controls?.userSelExt?.value &&
+              !editForm.controls?.userSelTransfer?.value &&
+              !editForm.controls?.userSelRen?.value"
+              >
+            {{errorMsgObj?.ONE_OF_TRANS_TYPE_REQD}}
+        </div>
+        <div class="row col-12 mt-2" *ngIf="editForm.controls?.userSelMod?.value">
+          <div class="col-12 pl-3 pr-0">
+            <label class="header-1b pr-4">
+              If MOD, is there a material change to the originally authorized project?
+            </label>
+            <input type="radio" formControlName="chgOriginalProjectInd" value="1">
+            <label class="pl-1 pr-2 typo-2">YES</label>
+            <input type="radio" formControlName="chgOriginalProjectInd" value="0">
+            <label class="pl-1 typo-2">NO</label>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg mr-2 mb-2"
+            *ngIf="onPopupOkClicked && editForm.get('chgOriginalProjectInd')?.invalid"
+            style="float: right">
+            {{errorMsgObj?.MAT_CHG_ANS_IS_REQD}}
+        </div>
+        <div class="row col-12 mt-2">
+          <div class="col-4 pl-0 pr-0">
+            <label class="header-1b" style="float: right">
+              DART App Type (translation)*:
+            </label>
+          </div>
+          <div class="col-8">
+            <select [ngStyle]="{width: '50%'}" class="mb-2"
+                [formControlName]="editHeaders[7]?.columnTitle">
+                <option value="" selected disabled>--Select--</option>
+                <option *ngFor="let opt of editHeaders[7]?.tableData"
+                  [value]="opt.edbTransTypeCode">
+                  {{opt.edbTransTypeCode}}
+                </option>
+            </select>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg pl-trans-error"
+            *ngIf="onPopupOkClicked && editForm.get(addNewHeaders[7].columnTitle)?.invalid"
+            >
+           {{errorMsgObj?.DART_APP_TYPE_REQD}}
+        </div>
+        <div class="row col-12 mt-2">
+          <div class="col-4 pl-0 pr-0">
+            <label class="header-1b" style="float: right">
+              Supporting Doc Type(s)*:
+            </label>
+          </div>
+          <div class="col-8">
+            <select [ngStyle]="{width: '50%'}" class="mb-2"
+                [formControlName]="editHeaders[8]?.columnTitle">
+                <option value="" selected disabled>--Select--</option>
+                <option *ngFor="let opt of editHeaders[8]?.tableData"
+                  [value]="opt.supportDocTransType">
+                  {{opt.supportDocTransType}}
+                </option>
+            </select>
+          </div>
+        </div>
+        <div
+            class="addr-error-msg pl-trans-error"
+            *ngIf="onPopupOkClicked && editForm.get(editHeaders[8]?.columnTitle)?.invalid"
+            >
+            {{errorMsgObj?.SUPP_DOC_TYPE_REQD}}
+        </div>
+        <div class="row col-12 mt-2">
+          <div class="col-4 pl-0 pr-0">
+            <label class="header-1b" style="float: right">
+              MOD/EXT Form:
+            </label>
+          </div>
+          <div class="col-8">
+            <input type="checkbox" formControlName="modExtForm">
+          </div>
+        </div>
+      </div>
+      <div *ngIf="headers[0].hasRadioButtons">
+        <hr class="w-90 black-bar"/>
+        <div class="row ml-2" style="justify-content: center">
+          <ng-container *ngFor="let radioLabel of radioHeaders">
+            <div class="col-radio">
+              <label class="pl-1 header-1b">
+                {{radioLabel.name}}
+              </label>
+              <div *ngFor="let radioVal of radioValues">
+                <input type="radio" [formControlName]="radioLabel.columnTitle" [value]="radioVal">
+                <label class="pl-label typo-2">
+                  {{radioVal}}
+                </label>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div
+          class="addr-error-msg t-center"
+          *ngIf="onPopupOkClicked &&
+          (editForm.get('reqdNew')?.invalid ||
+          editForm.get('reqdMod')?.invalid ||
+          editForm.get('reqdExt')?.invalid ||
+          editForm.get('reqdMnm')?.invalid ||
+          editForm.get('reqdMtn')?.invalid ||
+          editForm.get('reqdRen')?.invalid ||
+          editForm.get('reqdRtn')?.invalid ||
+          editForm.get('reqdXfer')?.invalid)"
+        >
+          {{errorMsgObj?.ONE_SEL_OF_TRAN_TYPE_REQD}}
+        </div>
+      </div>
+
+      <div class="row col-12 justify-content-end mr-2" *ngIf="showPopupServerError">
+        <app-server-error-message
+          [serverErrorMessage]="popupServerErrorMessage"
+        ></app-server-error-message>
+      </div>
+
+      <div class="text-center mb-2 mt-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="onEditSaveClicked()"
+        >
+          Save
+        </button>
+        <button
+          class="btn btn-sm btn-outline-dark closebutton mb-2 upload"
+          (click)="onEditCancelClicked()"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </ng-container>
+</app-custom-modal-popup>
+<app-custom-modal-popup #warningPopup *ngIf="warningPopupOpen">
+  <ng-container>
+    <div style="text-align: center" class="ml-2 mr-2 mt-2 mb-3">
+
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+        <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+        <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+      </svg>
+      <span class="header-1n pl-2" style="color: red">Warning: Making this change will link the permit types
+        associated with the existing permit category to the updated category name.</span>
+    </div>
+      <div class="text-center mb-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="warningOkClicked()"
+        >
+          OK
+        </button>
+        <button
+          class="btn btn-sm btn-outline-dark closebutton mb-2 upload"
+          (click)="warningCancelClicked()"
+        >
+          Cancel
+        </button>
+      </div>
+
+  </ng-container>
+</app-custom-modal-popup>
+<app-success-popup successMsg="Successfully Saved" #successPopup ></app-success-popup>
+<app-pending-changes-popup
+  #pendingPopup
+  (onOkClick)="pendingOkClicked()"
+  (onCancelClicked)="pendingCancelClicked()"
+></app-pending-changes-popup>
+

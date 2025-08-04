@@ -1,0 +1,17 @@
+<mat-accordion class="mat-expansion--has-toggle-icon-left" (click)="handleItem(type, user)">
+    <mat-expansion-panel [expanded]="isItemOpen" (opened)="isItemOpen = true" (closed)="isItemOpen = false"
+        [ngClass]="index % 2 === 0 ? 'even' : 'odd'">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <span>{{ user.emailUserName }} <span *ngIf="type === 'received'">({{user.unreadCount}})</span></span>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <ng-template matExpansionPanelContent>
+            <div class="subject-list" *ngFor="let item of emailSubjects">
+                <span (click)="Openmail(item)">{{item.emailSubject}}</span>
+            </div>
+        </ng-template>
+    </mat-expansion-panel>
+</mat-accordion>
+<app-email-compose #emailModal [existingData]='emailData'></app-email-compose>

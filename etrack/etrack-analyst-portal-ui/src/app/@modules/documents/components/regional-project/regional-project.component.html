@@ -1,0 +1,282 @@
+<app-analyst-sub-header [showButton]="true"></app-analyst-sub-header>
+<div class="search-box" *ngIf="isAssignedRegion">
+    <img width="30px" height="30px" class="search-icon" alt="Search Icon" src="assets/icons/search-icon.png" alt="Search Icon"/>
+    <input type="text" [(ngModel)]="searchItem" (keyup)="search()" class="search-field" [placeholder]="searchTitle" />
+</div>
+<div class="col-12 pr-0" *ngIf="isAssignedRegion">
+    <div class="float-right mr-2" *ngIf="showServerError">
+        <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+     <div class="inline-block col-2 offset-10 pl-0 pr-0">
+       <label class="filter-label" for="filterBy">Filter By Region: </label>
+       
+        <select  (change)="onRegionChange($event)" [(ngModel)]="region" name="region" id="filterBy">
+            <option value='' *ngIf="region !== '-1'">All</option>
+            <option value='-1' *ngIf="region === '-1'">All</option>
+            <option [value]="reg" *ngFor="let reg of regionList">
+                {{ reg }}
+            </option>
+        </select>
+    </div>
+</div>
+<div class="roww col-12" style="padding-bottom:10px !important">
+    <ng-container *ngIf="isEligibleToDisplay && isDisplayGrids && isAssignedRegion">
+
+        <div class="col-2 p-0">
+            <button (click)="innerTabChange('unvalidated', false)"
+                [ngClass]="activeTab == 'unvalidated' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100">
+                <span>Unvalidated</span>
+                <span *ngIf="activeTab == 'unvalidated'">
+                    ({{ unValidatedData?.length ? unValidatedData.length : "0" }})
+                </span>
+            </button>
+            <button (click)="innerTabChange('all-active-regional', false)"
+                [ngClass]="activeTab == 'all-active-regional' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100">
+                <span>All Active </span><span *ngIf="activeTab == 'all-active-regional'"> ({{ allActiveData?.length ?
+                    allActiveData.length : "0" }}) </span>
+            </button>
+
+            <button (click)="innerTabChange('program-review', false)"
+                [ngClass]="activeTab=='program-review'? 'active':''"
+                class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100">
+                Program Review <span *ngIf="activeTab == 'program-review'">({{ reviewerData?.length ? reviewerData.length : "0" }}) </span>
+            </button>
+            <button (click)="innerTabChange('disposed', false)" [ngClass]="activeTab == 'disposed' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100 gi-bottom-border">
+                Disposed <span *ngIf="activeTab == 'disposed'">({{ disposedData?.length ? disposedData.length : "0" }})
+                </span>
+            </button>
+            <div>
+                <button (click)="innerTabChange('allActiveInquiries',false)"
+                    [ngClass]="activeTab=='allActiveInquiries'? 'active':''"
+                    class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100 gi-top-border" id="allActiveInquiriesBtn">
+                    All Active Inquiries <span *ngIf="activeTab=='allActiveInquiries'" class="items-count">({{allActiveInquiriesData?.length}}) </span>
+                </button>
+                <button (click)="innerTabChange('bblDetermination',false)"
+                    [ngClass]="activeTab=='bblDetermination'? 'active':''"
+                    class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="bblDeterminationBtn">
+                    Borough/Block/Lot <span *ngIf="activeTab=='bblDetermination'" class="items-count">({{bblDeterminationData?.length}}) </span>
+                </button>
+                <button (click)="innerTabChange('energyProject',false)"
+                    [ngClass]="activeTab=='energyProject'? 'active':''"
+                    class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="energyProjectBtn"> Energy
+                    Projects <span *ngIf="activeTab=='energyProject'" class="items-count">({{energyProjectData?.length}}) </span>
+                </button>
+                <button (click)="innerTabChange('mgmtComp',false)" [ngClass]="activeTab=='mgmtComp'? 'active':''"
+                    class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="mgmtCompBtn"> Mgmt/Comp Plan
+                    <span *ngIf="activeTab=='mgmtComp'" class="items-count">({{mgmtCompData?.length}}) </span>
+                </button>
+                    <button (click)="innerTabChange('permitScreenings',false)"
+                    [ngClass]="activeTab=='permitScreenings'? 'active':''"
+                    class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="permitScreeningsBtn"> Permit
+                    Screenings <span *ngIf="activeTab=='permitScreenings'" class="items-count">({{permitScreeningData?.length}}) </span>
+                </button>
+                <button (click)="innerTabChange('preAppMtgRequest',false)"
+                [ngClass]="activeTab=='preAppMtgRequest'? 'active':''"
+                class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="preAppMtgRequestsBtn">
+                Pre-App Mtg
+                Req <span *ngIf="activeTab=='preAppMtgRequest'" class="items-count">({{preAppMeetingRequestData?.length}}) </span>
+                </button>
+                <button (click)="innerTabChange('sanitorySewage',false)"
+                [ngClass]="activeTab=='sanitorySewage'? 'active':''"
+                class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="sanitorySewageBtn"> Sanitary
+                Sewage
+                Extension <span *ngIf="activeTab=='sanitorySewage'" class="items-count">({{sanitorySewageData?.length}}) </span>
+                </button>
+                <button (click)="innerTabChange('leadAgencyRequest',false)"
+                    [ngClass]="activeTab=='leadAgencyRequest'? 'active':''"
+                    class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="leadAgencyRequestsBtn"> SEQR Lead Agency
+                    Req <span *ngIf="activeTab=='leadAgencyRequest'" class="items-count">({{leadAgencyRequestData?.length}}) </span>
+                </button>
+                <button (click)="innerTabChange('serpCertification',false)"
+                    [ngClass]="activeTab=='serpCertification'? 'active':''"
+                    class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="serpCertificationBtn"> SERP
+                    Certification <span *ngIf="activeTab=='serpCertification'" class="items-count">({{serpCertificationData?.length}}) </span>
+                </button>
+            </div>
+        </div>
+        <div class="col-10 grid-box">
+            <div class="grid-margin" *ngIf="isEligibleToDisplay && activeTab == 'unvalidated'">
+                <app-dashboard-table #dashboardTableComponent [activeTab]="activeTab" [isMaxHeight]="true"
+                    [isRecords]="true" [isPagination]="false" [dataList]="unValidatedData"
+                    (openModal)="openAssignPopup($event)" [headers]="unValidatedHeaders">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab == 'all-active-regional'">
+                <app-dashboard-table #dashboardTableComponent [isMaxHeight]="true" filename="all-active-regional"
+                    [isRecords]="true" [isPagination]="false" [dataList]="allActiveData" [headers]="allActiveHeaders"
+                    [activeTab]="activeTab">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab == 'disposed'">
+                <app-dashboard-table #dashboardTableComponent filename="disposed" [isMaxHeight]="true"
+                    [isRecords]="true" [isPagination]="false" [dataList]="disposedData" [headers]="disposedHeaders"
+                    [activeTab]="activeTab">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab == 'program-review'">
+                <app-dashboard-table #dashboardTableComponent [activeTab]="activeTab" [isMaxHeight]="true"
+                    [isRecords]="true" [isPagination]="false" [dataList]="reviewerData"
+                    (openModal)="openAssignPopup($event)" [headers]="programReviewHeaders">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='permitScreenings'">
+                <app-dashboard-table #dashboardTableComponent filename="permitScreenings" [isMaxHeight]="true" [isRecords]="true" [isPagination]="false"
+                    [dataList]="permitScreeningData" [headers]="permitScreeningHeaders" [activeTab]="activeTab"
+                    (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='energyProject'">
+                <app-dashboard-table #dashboardTableComponent filename="energyProject" [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="energyProjectData" [headers]="energyProjectHeaders"
+                    [activeTab]="activeTab" (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='sanitorySewage'">
+                <app-dashboard-table #dashboardTableComponent filename="sanitorySewage" [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="sanitorySewageData" [headers]="sanitorySewageHeaders"
+                    [activeTab]="activeTab" (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='mgmtComp'">
+                <app-dashboard-table #dashboardTableComponent filename="mgmtComp" [isMaxHeight]="true" [isRecords]="true" [isPagination]="false"
+                    [dataList]="mgmtCompData" [headers]="mgmtCompHeaders" [activeTab]="activeTab"
+                    (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='bblDetermination'">
+                <app-dashboard-table #dashboardTableComponent filename="bblDetermination" [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="bblDeterminationData" [headers]="bblDeterminationHeaders"
+                    [activeTab]="activeTab" (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='preAppMtgRequest'">
+                <app-dashboard-table #dashboardTableComponent filename="preAppMtgRequest" [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="preAppMeetingRequestData" [headers]="preAppMeetingRequestHeaders"
+                    [activeTab]="activeTab" (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='leadAgencyRequest'">
+                <app-dashboard-table #dashboardTableComponent filename="leadAgencyRequest" [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="leadAgencyRequestData" [headers]="leadAgencyRequestHeaders"
+                    [activeTab]="activeTab" (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='serpCertification'">
+                <app-dashboard-table #dashboardTableComponent filename="serpCertification" [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="serpCertificationData" [headers]="serpCertificationHeaders"
+                    [activeTab]="activeTab" (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="activeTab=='allActiveInquiries'">
+                <app-dashboard-table #dashboardTableComponent filename="allActiveInquiries" [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="allActiveInquiriesData" [headers]="allActiveInquiriesHeaders"
+                    [activeTab]="activeTab" (openModal)="openAssignPopup($event)">
+                </app-dashboard-table>
+            </div>
+        </div>
+    </ng-container>
+    <div style="height: 100%" class="roww col-12" *ngIf="!isEligibleToDisplay && isDisplayGrids && isAssignedRegion">
+        <div class="col-2 p-0">
+            <button (click)="innerTabChange('program-review', false)" [ngClass]="activeTab == 'program-review' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100">
+                Program Review <span *ngIf="activeTab === 'program-review'">({{ reviewerData?.length ? reviewerData.length : "0" }})</span>
+            </button>
+            <!-- <button (click)="innerTabChange('gi-program-review', false)" [ngClass]="activeTab == 'gi-program-review' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100">
+                All Active Inquiries <span *ngIf="activeTab === 'gi-program-review'">({{ GIReviewerData?.length ? GIReviewerData.length : "0" }})</span>
+            </button> -->
+            
+        </div>
+        <div class="col-10 grid-box">
+            <div class="grid-margin" *ngIf="!isEligibleToDisplay && activeTab == 'program-review'">
+                <app-dashboard-table [activeTab]="activeTab" #dashboardTableComponent [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="reviewerData" (openModal)="openAssignPopup($event)"
+                    [headers]="programReviewHeaders">
+                </app-dashboard-table>
+            </div>
+            <div class="grid-margin" *ngIf="!isEligibleToDisplay && activeTab == 'gi-program-review'">
+                <app-dashboard-table [activeTab]="activeTab" #dashboardTableComponent [isMaxHeight]="true" [isRecords]="true"
+                    [isPagination]="false" [dataList]="GIReviewerData"
+                    [headers]="GIProgramReviewHeaders">
+                </app-dashboard-table>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #assignModal>
+        <!-- (click)="clickOut($event,dropdown)"> -->
+        <div class="modal-wrapper">
+            <form [formGroup]="notesFormGroup">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <h3 class="p-0 m-0 font-weight r-align header-1b"
+                            >
+                                Analyst*:
+                            </h3>
+                            <div class="form-check">
+                                <app-searchable-dropdown [initialValue]="selectedManager"
+                                    formControlName="projectManager" [listItems]="projectManagers"
+                                    (optionSelected)="onAnalystSelect($event)">
+                                </app-searchable-dropdown>
+                                <!-- <input class="form-input form-control " aria-label="Project Manager" id="ProjectManager"
+                                    (click)="isInputClicked=!isInputClicked" (input)="onDrpdownChange()"
+                                    formControlName="projectManager" [ngStyle]="{'width': '15rem'}">
+                                <div #dropdown
+                                    [ngClass]="isInputClicked && projectManagers?.length? 'dropdown-menu-visible':'dropdown-menu-hidden'">
+                                    <li class="dropdown-option" (click)="onDropdownSelect(manager,$event)"
+                                        *ngFor="let manager of projectManagers" [value]="manager.userId"
+                                        [ngStyle]="{'width': '15rem'}">
+                                        {{manager?.managerName}}</li>
+                                </div> -->
+                                <!-- <select class="form-input form-control w-260" formControlName="projectManager" value="">
+                                    <option *ngIf="!isEdit" value="">--SELECT--</option>
+                                    <option *ngFor="let manager of projectManagers" [value]="manager.userId">
+                                        {{ manager?.managerName }}
+                                    </option>
+                                </select> -->
+                                <div class="d-block mtop-5" 
+                                    >
+                                    <span class="addr-error-msg" *ngIf="
+                      notesFormGroup?.controls?.projectManager?.errors
+                        ?.required && submitted
+                    ">{{ errorMsgObj?.PROJ_MGR_REQD }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <h3 class="width-50 p-0 m-0 font-weight r-align header-1b">Notes:</h3>
+                            <div class="form-check full-width">
+                                <app-textarea-child [formGroup]="notesFormGroup" fieldWidth="98%"
+                                    (onInputChange)="onInputChange($event)" controlName="comments" [maxLength]="maxNote"
+                                    noOfRows="6"></app-textarea-child>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button (click)="submitComment()" type="submit" style="width: 60px"
+                        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload">
+                        Assign
+                    </button>
+
+                    <button type="button" style="width: 60px" class="btn btn-sm btn-outline-dark closebutton mb-2"
+                        (click)="closeModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </ng-template>
+    <div *ngIf="!isAssignedRegion" class="addr-error-msg float-right ml-2">
+        You have not been assigned a region value within eFind. Contact the System Administrator.
+    </div>
+</div>

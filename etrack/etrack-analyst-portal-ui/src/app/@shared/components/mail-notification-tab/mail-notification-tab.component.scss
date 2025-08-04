@@ -1,0 +1,71 @@
+.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 5px 0;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+    display: flex;
+    align-items: center;
+}
+
+.active,
+.accordion:hover {
+    background-color: #ccc;
+    
+}
+.active{
+text-decoration: underline !important;
+font-weight: 600 !important;
+}
+
+.active .accordion::before {
+    content: '-';
+    padding: 10px;
+    font-size: 24px;
+}
+
+.inactive .accordion::before {
+    content: '+';
+    padding: 10px;
+    font-size: 24px;
+}
+
+.inactive .panel {
+    padding: 18px 0;
+    display: none;
+    background-color: white;
+    overflow: hidden;
+}
+.red{
+    background-color: #f8f9fa;
+}
+.blue{
+    background-color: #dae2de;  }
+
+
+.active .panel {
+    padding: 18px 0;
+    display: block;
+    background-color: white;
+    overflow: hidden;
+}
+.black{
+    color:black !important;
+}
+.mat-tab-group {
+    margin-bottom: 48px;
+  }
+
+::ng-deep .mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar {
+    background-color: #073763 !important;
+   
+}
+::ng-deep .mat-tab-label-active{
+    color: black !important;
+    font-weight: 600 !important;
+}

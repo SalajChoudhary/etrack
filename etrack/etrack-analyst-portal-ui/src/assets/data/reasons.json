@@ -1,0 +1,7 @@
+[ 
+  {"key":"INTRAG","value":"Inter-Agency intra-Agency materials (POL 87.2.g)"},
+  {"key":"HABITAT","value": "Location of habitat of endangered species (POL 3-0301.2(r))"},
+  {"key":"CRTINFRA", "value": "Critical Infrastructure (jeopardizing health, safety, welfare or security) (POL 87.2)"},
+  {"key":"PROTREC", "value": "Records protected by attorney-client privilege (CPLR 4503)"},
+  {"key":"TRDSEC" ,"value": "Trade secrets or confidential business information (POL 82)" }
+]

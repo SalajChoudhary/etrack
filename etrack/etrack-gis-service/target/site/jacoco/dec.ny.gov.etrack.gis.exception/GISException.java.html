@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GISException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.exception</a> &gt; <span class="el_source">GISException.java</span></div><h1>GISException.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.exception;
+
+import org.springframework.http.HttpStatus;
+
+/**
+ * GISException class.
+ * 
+ * @author mxmahali
+ *
+ */
+public class GISException extends RuntimeException {
+
+  private final String errorCode;
+  private final String errorMessage;
+  private final HttpStatus status;
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Default Constructor.
+   */
+  public GISException() {
+<span class="nc" id="L26">    super();</span>
+<span class="nc" id="L27">    this.errorCode = &quot;&quot;;</span>
+<span class="nc" id="L28">    this.errorMessage = &quot;&quot;;</span>
+<span class="nc" id="L29">    this.status = null;</span>
+<span class="nc" id="L30">  }</span>
+  
+  /**
+   * Overloaded constructor with Error code and Message.
+   * 
+   * @param errorCode - Error Code.
+   * @param errorMessage - Error Message.
+   */
+  public GISException(String errorCode, String errorMessage) {
+<span class="nc" id="L39">    super(errorMessage);</span>
+<span class="nc" id="L40">    this.errorCode = errorCode;</span>
+<span class="nc" id="L41">    this.errorMessage = errorMessage;</span>
+<span class="nc" id="L42">    this.status = null;</span>
+<span class="nc" id="L43">  }</span>
+  
+  /**
+   * Overloaded constructor with Error code, Message and Exception.
+   * 
+   * @param errorCode - Error code.
+   * @param errorMessage - Error Message.
+   * @param e - {@link Throwable}
+   */
+  public GISException(String errorCode, String errorMessage, Throwable e) {
+<span class="nc" id="L53">    super(errorMessage, e);</span>
+<span class="nc" id="L54">    this.errorCode = errorCode;</span>
+<span class="nc" id="L55">    this.errorMessage = errorMessage;</span>
+<span class="nc" id="L56">    this.status = null;</span>
+<span class="nc" id="L57">  }</span>
+
+  /**
+   * Overloaded constructor with Error code, Message and Exception.
+   * 
+   * @param errorCode - Error code.
+   * @param errorMessage - Error Message.
+   * @param status - {@link HttpStatus}
+   */
+  public GISException(String errorCode, String errorMessage, HttpStatus status) {
+<span class="nc" id="L67">    super(errorMessage);</span>
+<span class="nc" id="L68">    this.errorCode = errorCode;</span>
+<span class="nc" id="L69">    this.errorMessage = errorMessage;</span>
+<span class="nc" id="L70">    this.status = status;</span>
+<span class="nc" id="L71">  }</span>
+
+  /**
+   * Overloaded constructor with Error code, Message and Exception.
+   * 
+   * @param errorCode - Error code.
+   * @param errorMessage - Error Message.
+   * @param status - HttpStatus.
+   * @param e - {@link HttpStatus}
+   */
+  public GISException(String errorCode, String errorMessage, HttpStatus status, Throwable e) {
+<span class="nc" id="L82">    super(errorMessage, e);</span>
+<span class="nc" id="L83">    this.errorCode = errorCode;</span>
+<span class="nc" id="L84">    this.errorMessage = errorMessage;</span>
+<span class="nc" id="L85">    this.status = status;</span>
+<span class="nc" id="L86">  }</span>
+  
+  /**
+   * Retrieve Error code.
+   * 
+   * @return - Error code.
+   */
+  public String getErrorCode() {
+<span class="nc" id="L94">    return this.errorCode;</span>
+  }
+
+  /**
+   * Retrieve Error Message.
+   * 
+   * @return - Error Message.
+   */
+  public String getErrorMessage() {
+<span class="nc" id="L103">    return this.errorMessage;</span>
+  }
+
+  /**
+   * Retrieve the HttpStatus.
+   *  
+   * @return - Status code.
+   */
+  public HttpStatus getStatus() {
+<span class="nc" id="L112">    return status;</span>
+  }
+  
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

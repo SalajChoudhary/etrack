@@ -1,0 +1,709 @@
+<div class="header" *ngIf="mode !== 'validate'">
+  <app-analyst-sub-header [showAddress]="false"></app-analyst-sub-header>
+    <app-stepper-buttons [selectedIndex]="selectedIndex" [lastIndex]="0" [startNumber]="4" [endNumber]="5"
+       [startName]="'Supporting Documents'" [endName]="' Sign &   Submit'"
+      mainNavigation="/apply-for-permit-details" [backwardName]="'Project Information'" [forwardName]="'Sign & Submit'"
+      [backward]="'/project-informations'" [forward]="'/sign-submit'"></app-stepper-buttons>
+
+</div>
+
+<div class="validateHeader" *ngIf="mode === 'validate'">
+  <app-analyst-sub-header *ngIf="!isViewDocument" [showAddress]="false"></app-analyst-sub-header>
+  <app-analyst-sub-header *ngIf="isViewDocument" [showAddress]="true"></app-analyst-sub-header>
+    <app-stepper-buttons [selectedIndex]="selectedIndex" [lastIndex]="0" [startNumber]="4" [endNumber]="5"
+     [startName]="'Supporting Documents'" [endName]="' Sign &   Submit'"
+      mainNavigation="/apply-for-permit-details" [backwardName]="'Project Information'" [forwardName]="'Sign & Submit'"
+      [backward]="'/project-informations'" [forward]="'/sign-submit'" *ngIf="!isViewDocument"></app-stepper-buttons>
+  <!-- <mat-horizontal-stepper class="pb-3"></mat-horizontal-stepper> -->
+
+  <!-- <div class="col-12 px-0" style="border-bottom: 2px solid #000"> -->
+  <!-- <app-validate-banner class="mt-5" *ngIf="isValidate && !isViewDocument" [validated]="supportingDocumentationValidated"
+    [showBottomBorder]="true"></app-validate-banner> -->
+  <!-- </div> -->
+</div>
+<!-- <br> -->
+
+<div class="text-center mt-3" *ngIf="isViewDocument">
+  <span class="header-2b">Project ID {{projectId}} Original Submittal</span>
+</div>
+
+
+<div class="container-fluid pl-0 pr-0 mt-3 min-height" >
+  <div class="bubble-div" >
+    <h3 class="announcement text-center w-75 mt-4 header-1b"  *ngIf="!isEA && !isViewDocument">
+      Per 6 NYCRR Part 621, an application for
+      {{ this.selectedPermitTypes }} permit(s) is not complete until the
+      supporting documents have been received. <br />
+      Upon submittal, NYSDEC staff may also determine additional information is
+      necessary to adequately review and evaluate the application.
+    </h3>
+    <h3 class="announcement text-center mt-4 header-1b" *ngIf="isEA && !isViewDocument">
+      These temporary permits are only valid for a period of 30 days to respond to events that <br> immediately
+       threaten life, health, property, general welfare or natural resources.
+      </h3>
+  </div>
+  <div>
+    <p *ngIf="!isValidate && !isViewDocument" class="text-center text mt-4 header-1n">
+      Please provide the items required and/or related to this project.
+    </p>
+    <p *ngIf="isValidate && showRequiredDocuments && !isViewDocument" class="text-center text mt-4 header-1n">
+      <span><img src="assets/icons/exclaim.png" class="exclaim-icon" alt="Note"></span>
+      <span>The following documents are still missing. Please provide a reference location if an item has been received.</span>
+    </p>
+  </div>
+  <div *ngIf="!isViewDocument">
+    <p class="text-center text header-1n">
+      If an item has already been uploaded in another document, please select ‘Already
+      Uploaded’ to provide a page number of the document.
+    </p>
+  </div>
+ 
+  <div class="grid-margin mb-3 mt-15">
+    <p-table styleClass="p-datatable-lg" [value]="requiredDocs" [totalRecords]="requiredDocs?.length" 
+     
+      aria-label="A table that shows the status of required documents for this project."
+      aria-describedby="A table that shows the status of required documents for this project.">
+      <ng-template pTemplate="header">
+        <tr class="height-25">
+          <th class="table-header-primary first-header" [ngStyle]="{ width: '3%', color: '#65666B' }">
+            Recv'd
+          </th>
+          <th class="table-header-primary second-header-width">
+            Required Items
+            <a (click)="onInfoClicked('1')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-info-circle"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+              </svg>
+            </a>
+          </th>
+          <th class="table-header-primary third-header-width" [ngStyle]="{ width: '15%' }">
+            Reference Location
+          </th>
+          <th class="table-header-primary" [ngStyle]="{ width: '15%' }"></th>
+          <th class="table-header-primary" [ngStyle]="{ width: '17%' }"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-doc let-i="rowIndex">
+        <tr class="height-25">
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'center',
+              'word-wrap': 'break-word',
+              width: '3%'
+            }">
+            <div class ="displayFlex">
+            <div  class ="ml_1">
+            <input type="checkbox" class="readOnly" [checked]="isChecked(doc)" onclick="return false;"  [attr.disabled]="isReadonly ? true : null" attr.id="Received Checkbox for row {{i}} in required docs table"
+              onkeydown="e = e || window.event; if(e.keyCode !== 9) return false;" aria-label="A checkbox to show if a required document has been received." />
+            </div>
+            <div *ngIf="!isChecked(doc) && isValidate && !isViewDocument"  class= "ml_05">
+              <span><img src="assets/icons/exclaim.png" class="exclaim-icon" alt="Note"></span>
+            </div>
+          </div>
+          </td>
+          <td class="table-body" *ngIf="doc.documentTitle !== 'Other, not listed'" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <input type="hidden" name="requiredItem" />
+            {{ doc.documentTitle }}
+          </td>
+          <td class="table-body" *ngIf="doc.documentTitle === 'Other, not listed'" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <input type="hidden" name="requiredItem" />
+            <button [disabled]="isReadonly" (click)="onOtherClicked('required')"
+              class="btn btn-link public_id_btn pl-0" id="other from required">
+              Other, not listed
+            </button>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <span style="cursor: pointer; margin-left: -2px">{{doc.refDocumentDesc}}</span>
+          </td>
+
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '15%'
+            }">
+            <div *ngIf="this.showButtons(i, this.requiredDocs, this.notUploaded)" [hidden]="isReadonly">
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+              attr.aria-label="An upload button for {{doc.documentTitle}} in the required documents table" attr.id="An-uploaded-button-for-row-{{i}} in required docs." (click)="uploadClicked(doc, 'required', 'upload')" >
+                Upload
+              </button>
+              <button [hidden]="hideAlreadyUploadedButton" type="button" attr.id="An-already-uploaded-button-for-row-{{i}} in required docs." class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+              attr.aria-label="An already uploaded button for {{doc.documentTitle}} in the required documents table" (click)="alreadyUploadedClicked(doc)" >
+                Already Uploaded
+              </button>
+            </div>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '17%'
+            }">
+            <div *ngIf="isViewDocument">
+              <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.aria-label="A view button for {{doc.documentTitle}} in the required documents table" 
+              (click)="onViewButtonClicked(doc)" attr.id="An-view-button-for-row-{{i}} in required docs.">
+              View
+            </button>
+            </div>
+            <div *ngIf="this.showButtons(i, this.requiredDocs, this.uploaded)">
+              <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.aria-label="A view button for {{doc.documentTitle}} in the required documents table" 
+                (click)="onViewButtonClicked(doc)" attr.id="An-view-button-for-row-{{i}} in required docs.">
+                View
+              </button>
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+              attr.aria-label="An add additional button for {{doc.documentTitle}} in the required documents table" (click)="uploadClicked(doc, 'required', 'additional')" attr.id="An-add-additional-button-for-row-{{i}} in required docs.">
+                Add Additional
+              </button>
+              <label attr.for="Delete-button-for-row-{{i}}-in-the-required-documents-table" hidden="hidden">Delete button for row {{i}} in the required documents table</label>
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+              attr.aria-label="A delete button for {{doc.documentTitle}} in the required documents table" (click)="onDeleteClicked(doc,'req')" attr.id="A-delete-button-for-row-{{i}} in required docs.">
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <div class="text-center mt-3">
+  <span class="header-2n  text-center" *ngIf="isEmpty(requiredDocs) && isViewDocument">{{noneReceived}}</span>
+</div>
+  <br /><br /><br />
+
+  <div class="grid-margin mb-3">
+      <div>
+    <p-table styleClass="p-datatable-lg" [value]="relatedDocs" [totalRecords]="relatedDocs?.length"
+      aria-label="A table that shows the status of related documents for this project."
+      aria-describedby="A table that shows the status of related documents for this project.">
+      <ng-template pTemplate="header">
+        <tr class="height-25">
+          <th class="table-header-primary first-header" [ngStyle]="{ width: '3%', color: '#65666B' }">
+            Recv'd
+          </th>
+          <th class="table-header-primary second-header-width">
+            Related Items
+            <a (click)="onInfoClicked('1')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-info-circle"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+              </svg>
+            </a>
+          </th>
+          <th class="table-header-primary third-header-width" [ngStyle]="{ width: '15%' }">
+            Reference Location
+          </th>
+          <th class="table-header-primary" [ngStyle]="{ width: '15%' }"></th>
+          <th class="table-header-primary" [ngStyle]="{ width: '17%' }"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-doc let-i="rowIndex">
+        <tr class="height-25">
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'center',
+              'word-wrap': 'break-word',
+              width: '3%'
+            }">
+            <input type="checkbox" class="readOnly" [checked]="isChecked(doc)" onclick="return false;"  [attr.disabled]="isReadonly ? true : null" attr.id="Received Checkbox for row {{i}} in related docs table"
+
+              onkeydown="e = e || window.event; if(e.keyCode !== 9) return false;" aria-label="A checkbox to show if a related document has been received." />
+          </td>
+          <td class="table-body" *ngIf="doc.documentTitle !== 'Other, not listed'" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <input type="hidden" name="requiredItem" />
+            {{ doc.documentTitle }}
+          </td>
+          <td class="table-body" *ngIf="doc.documentTitle === 'Other, not listed'" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <input type="hidden" name="requiredItem" />
+            <button [disabled]="isReadonly" (click)="onOtherClicked('related')" class="btn btn-link public_id_btn pl-0" id="other from related">
+              Other, not listed
+            </button>
+          </td>
+
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <span style="cursor: pointer; margin-left: -2px">{{doc.refDocumentDesc}}</span>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '15%'
+            }">
+            <div *ngIf="this.showButtons(i, this.relatedDocs, this.notUploaded)" [hidden]="isReadonly">
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+              attr.aria-label="An upload button for {{doc.documentTitle}} in the related documents table" (click)="uploadClicked(doc, 'related', 'upload')" attr.id="An-uploaded-button-for-row-{{i}} in related docs.">
+                Upload
+              </button>
+              <button [hidden]="hideAlreadyUploadedButton" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+              attr.aria-label="An already uploaded button for {{doc.documentTitle}} in the related documents table" attr.id="An-already-uploaded-button-for-row-{{i}} in related docs." (click)="alreadyUploadedClicked(doc)">
+                Already Uploaded
+              </button>
+            </div>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '17%'
+            }">
+            <div *ngIf="isViewDocument">
+              <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.aria-label="A view button for {{doc.documentTitle}} in the required documents table" 
+              (click)="onViewButtonClicked(doc)" attr.id="An-view-button-for-row-{{i}} in required docs.">
+              View
+            </button>
+            </div>
+            <div *ngIf="this.showButtons(i, this.relatedDocs, this.uploaded)">
+              <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.id="An-view-button-for-row-{{i}} in related docs." attr.aria-label="A view button for {{doc.documentTitle}} in the related documents table"
+                 (click)="onViewButtonClicked(doc)" >
+                View
+              </button>
+              <!-- <label attr.for="Add-additional-button-for-row-{{i}}-in-the-related-documents-table" hidden="hidden">Add additional button for row {{i}} in the related documents table</label> -->
+              <!-- <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.id="Add-additional-button-for-row-{{i}}-in-the-related-documents-table"
+              attr.aria-label="Add additional button for row {{i}} in the related documents table" (click)="uploadClicked(doc, 'related', 'additional')">
+                Add Additional
+              </button> -->
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+              attr.aria-label="A delete button for {{doc.documentTitle}} in the related documents table" attr.id="A-delete-button-for-row-{{i}} in related docs." (click)="onDeleteClicked(doc, 'rel')" >
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    
+  </div>
+  <div class="text-center  mt-3">
+    <span class="header-2n  text-center" *ngIf="isEmpty(relatedDocs) && isViewDocument">{{noneReceived}}</span>
+  </div>
+    <br /><br />
+    <div *ngIf="isSEQR && !isEA">
+
+    <div class=" mb-20">
+      <p class="text-center header-1n" *ngIf="!isViewDocument">Please upload any State Environmental Quality Review (SEQR) documents related to this project <br> or select ‘Already Uploaded’ to provide page number of the document.</p>
+      <p-table styleClass="p-datatable-lg" [value]="SEQRDocs" class="mb-20" [totalRecords]="SEQRDocs?.length"
+      aria-label="A table that shows the status of State Environmental Quality Review (SEQR) documents for this project."
+      aria-describedby="A table that shows the status of State Environmental Quality Review (SEQR) documents for this project.">
+      <ng-template pTemplate="header">
+        <tr class="height-25">
+          <th class="table-header-primary first-header" [ngStyle]="{ width: '3%', color: '#65666B' }">
+            Recv'd
+          </th>
+          <th class="table-header-primary second-header-width">
+            SEQR Documents  
+            <a (click)="onInfoClicked('2')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-info-circle"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+              </svg>
+            </a>
+          </th>
+          <th class="table-header-primary third-header-width" [ngStyle]="{ width: '15%' }">
+            Reference Location
+          </th>
+          <th class="table-header-primary" [ngStyle]="{ width: '15%' }"></th>
+          <th class="table-header-primary" [ngStyle]="{ width: '17%' }"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-doc let-i="rowIndex">
+        <tr class="height-25">
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'center',
+              'word-wrap': 'break-word',
+              width: '3%'
+            }">
+            <input type="checkbox" class="readOnly" [checked]="isChecked(doc)" onclick="return false;"  [attr.disabled]="isReadonly ? true : null" attr.id="Received Checkbox for row {{i}} in SEQR table"
+
+              onkeydown="e = e || window.event; if(e.keyCode !== 9) return false;" aria-label="A checkbox to show if a SEQR document has been received." />
+          </td>
+          <td class="table-body" *ngIf="doc.documentTitle !== 'Other, not listed'" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <input type="hidden" name="requiredItem" />
+            {{ doc.documentTitle }}
+          </td>
+          <td class="table-body" *ngIf="doc.documentTitle === 'Other, not listed'" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <input type="hidden" name="requiredItem" />
+            <button [disabled]="isReadonly" (click)="onOtherClicked('SEQR')" class="btn btn-link public_id_btn pl-0" id="other from SEQR">
+              Other, not listed
+            </button>
+          </td>
+
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <span style="cursor: pointer; margin-left: -2px">{{doc.refDocumentDesc}}</span>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '15%'
+            }">
+            <div *ngIf="this.showButtons(i, this.SEQRDocs, this.notUploaded)" [hidden]="isReadonly">
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+              attr.aria-label="An Upload button for {{doc.documentTitle}} in the State Environmental Quality Review documents table" (click)="uploadClicked(doc, 'seqr', 'upload')"  attr.id="An-upload-button-for-row-{{i}} in seqr docs.">
+                Upload
+              </button>
+              <button [hidden]="hideAlreadyUploadedButton" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+              attr.aria-label="An already uploaded button for {{doc.documentTitle}} in the State Environmental Quality Review documents table" (click)="alreadyUploadedClicked(doc)" attr.id="An-already-uploaded-button-for-row-{{i}} in seqr docs.">
+                Already Uploaded
+              </button>
+            </div>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '17%'
+            }">
+            <div *ngIf="isViewDocument">
+              <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.aria-label="A view button for {{doc.documentTitle}} in the required documents table" 
+              (click)="onViewButtonClicked(doc)" attr.id="An-view-button-for-row-{{i}} in required docs.">
+              View
+            </button>
+            </div>
+            <div *ngIf="this.showButtons(i, this.SEQRDocs, this.uploaded)">
+              <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.aria-label="View button for {{doc.documentTitle}} in the State Environmental Quality Review documents table" 
+                 (click)="onViewButtonClicked(doc)" attr.id="A-view-button-for-row-{{i}} in seqr docs.">
+                View
+              </button>
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.id="An-add-additional-button-for-row-{{i}} in seqr docs."
+              attr.aria-label="Add additional button for {{doc.documentTitle}} in the State Environmental Quality Review documents table" (click)="uploadClicked(doc, 'related', 'additional')" >
+                Add Additional
+              </button>
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+              attr.aria-label="Delete button for {{doc.documentTitle}} in the State Environmental Quality Review documents table" attr.id="A-delete-button-for-row-{{i}} in seqr docs." (click)="onDeleteClicked(doc, 'seqr')">
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    </div> 
+    <div class="text-center">
+    <span class="header-2n  text-center mt-3" *ngIf="isEmpty(SEQRDocs) && isViewDocument">{{noneReceived}}</span>
+  </div>
+    <br>
+    <div class="">
+      <p class="text-center header-1n" *ngIf="!isViewDocument">Please upload any State Historic Preservation Act (SHPA) documents related to this project <br> or select ‘Already Uploaded’ to provide page number of the document.</p>
+      <p-table styleClass="p-datatable-lg" [value]="SHPADocs" [totalRecords]="SHPADocs?.length"
+     aria-label="A table that shows the status of State Historic Preservation Act (SHPA) documents for this project."
+      aria-describedby="A table that shows the status of State Historic Preservation Act (SHPA) documents for this project.">
+      <ng-template pTemplate="header">
+        <tr class="height-25">
+          <th class="table-header-primary first-header" [ngStyle]="{ width: '3%', color: '#65666B' }">
+            Recv'd
+          </th>
+          <th class="table-header-primary second-header-width">
+            SHPA Documents
+            <a (click)="onInfoClicked('3')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-info-circle"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+              </svg>
+            </a>
+          </th>
+          <th class="table-header-primary third-header-width" [ngStyle]="{ width: '15%' }">
+            Reference Location
+          </th>
+          <th class="table-header-primary" [ngStyle]="{ width: '15%' }"></th>
+          <th class="table-header-primary" [ngStyle]="{ width: '17%' }"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-doc let-i="rowIndex">
+        <tr class="height-25">
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'center',
+              'word-wrap': 'break-word',
+              width: '3%'
+            }">
+            <input type="checkbox" class="readOnly" [checked]="isChecked(doc)" onclick="return false;"  [attr.disabled]="isReadonly ? true : null"  attr.id="Received Checkbox for row {{i}} in SHPA table"
+
+              onkeydown="e = e || window.event; if(e.keyCode !== 9) return false;" aria-label="A checkbox to show if a related document has been received." />
+          </td>
+          <td class="table-body" *ngIf="doc.documentTitle !== 'Other, not listed'" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <input type="hidden" name="requiredItem" />
+            {{ doc.documentTitle }}
+          </td>
+          <td class="table-body" *ngIf="doc.documentTitle === 'Other, not listed'" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <input type="hidden" name="requiredItem" />
+            <button [disabled]="isReadonly" (click)="onOtherClicked('SHPA')" class="btn btn-link public_id_btn pl-0" id="other from seqr">
+              Other, not listed
+            </button>
+          </td>
+
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '20%'
+            }">
+            <span style="cursor: pointer; margin-left: -2px">{{doc.refDocumentDesc}}</span>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '15%'
+            }">
+            <div *ngIf="this.showButtons(i, this.SHPADocs, this.notUploaded)" [hidden]="isReadonly">
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.id="An-upload-button-for-row-{{i}} in shpa docs."
+              attr.aria-label="Upload button for {{doc.documentTitle}} in the State Historic Preservation Act documents table" (click)="uploadClicked(doc, 'shpa', 'upload')" >
+                Upload
+              </button>
+              <button [hidden]="hideAlreadyUploadedButton" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.id="An-already-uploaded-button-for-row-{{i}} in shpa docs."
+              attr.aria-label="Already uploaded button for {{doc.documentTitle}} in the State Historic Preservation Act documents table" (click)="alreadyUploadedClicked(doc)">
+                Already Uploaded
+              </button>
+            </div>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '17%'
+            }">
+            <div *ngIf="isViewDocument">
+              <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.aria-label="A view button for {{doc.documentTitle}} in the required documents table" 
+              (click)="onViewButtonClicked(doc)" attr.id="An-view-button-for-row-{{i}} in required docs.">
+              View
+            </button>
+            </div>
+            <div *ngIf="this.showButtons(i, this.SHPADocs, this.uploaded)">
+              <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.id="An-view-button-for-row-{{i}} in shpa docs." attr.aria-label="View button for {{doc.documentTitle}} in the State Historic Preservation Act documents table"
+                 (click)="onViewButtonClicked(doc)" >
+                View
+              </button>
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"  attr.id="An-add-additional-button-for-row-{{i}} in shpa docs."
+              attr.aria-label="Add additional button for row {{i}} in the State Historic Preservation Act documents table" (click)="uploadClicked(doc, 'related', 'additional')" >
+                Add Additional
+              </button>
+              <button [hidden]="isReadonly" type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" attr.id="A-delete-button-for-row-{{i}} in shpa docs."
+              attr.aria-label="Delete button for {{doc.documentTitle}} in the State Historic Preservation Act documents table" (click)="onDeleteClicked(doc, 'shpa')" >
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    </div> 
+    <div class="text-center mt-3">
+      <span class="header-2n  text-center" *ngIf="isEmpty(SHPADocs) && isViewDocument">{{noneReceived}}</span>
+    </div>
+  </div>
+    <app-custom-modal-popup #informationModal [modalConfig]="modalConfig">
+      <ng-container>
+        <div class="modal-body center-align">
+          <div class="d-flex justify-content-start align-items-start flex-row">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" fill="black" class="bi bi-info-circle mr-2"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+              </svg>
+            </div>
+            <div *ngIf="showRelatedRequiredInfo">
+              <div class="d-flex justify-content-center align-items-center flex-column typo-2">
+                <div>
+                  Visit the
+                  <a target="_blank" href={{systemParameters?.NYS_DEC_WEBSITE}}>NYSDEC website</a>
+                  for forms, application guidance and the recommended
+                </div>
+                <div>format and scale of project plans and reports for:</div>
+              </div>
+              <div class="d-flex justify-content-start align-items-start flex-column typo-2">
+                <div *ngFor="let permit of permitsObjList">
+    <a *ngIf="permit?.refLink?.length>0" class="" target="_blank"  href={{permit?.refLink}}> {{permit.permitTypeDesc}}</a>
+      
+    </div>
+    
+              </div>
+            </div>
+
+            <div *ngIf="showSHPAInfo">
+              <div class="d-flex justify-content-center align-items-center flex-column typo-2">
+                <div>
+                  Visit  <a target="_blank" href={{systemParameters?.NYS_HPO_WEBSITE}} > NYS Historic Preservation Office website </a> to comply with State and Federal
+                </div>
+                <div>laws that protect historic cultural resources.</div>
+              </div>
+            </div>
+
+            <div *ngIf="showSEQRInfo">
+              <div class="d-flex justify-content-center align-items-center flex-column typo-2">
+                <div>
+                  Visit <a target="_blank" href={{systemParameters?.SEQR}} > State Environmental Quality Review Act (SEQR) website </a> to understand the <br>
+                </div>
+                <div>process for accessing environmental impacts.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-confirmation model-footer-reduced">
+          <div class="text-right mt-1 mr-2">
+            <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="onInfoCloseClicked()"
+              aria-label="A close button">
+              Close
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </app-custom-modal-popup>
+  </div>
+<form>
+  <fieldset [hidden]="isReadonly">
+    <app-delete-confirm-popup [openModal]="deleteIsClicked" [deleteApplicant]="deleteSingleFiles"
+      [bodyText]="singleDeletePopupText" [closeClicked]="deletePopupCloseClicked" [deletedDocName] ="deletedDocName" [fromSupporting]="true"></app-delete-confirm-popup>
+
+
+    <app-delete-confirm-popup [openModal]="multipleDeleteIsClicked" [deleteApplicant]="deleteMultipleFiles"
+      [bodyText]="multipleDeletePopupText" [closeClicked]="deletePopupCloseClicked" [isMultiple]="true"
+      [filesList]="currentDocumentFileList"></app-delete-confirm-popup>
+
+    <app-view-document-popup [openModal]="viewButtonIsClicked" [fileNameWidth]="'90'"
+      (fileClicked)="onViewDocumentPopupFileClicked($event)" [fullData]="fullData" [fileDateWidth]="'10'"
+      [modalSize]="'md'"></app-view-document-popup>
+
+      <!-- <app-pending-changes-popup
+        #pendingPopup
+       (onOkClick)="skipClicked()"
+        isMissingDocs = true
+        ></app-pending-changes-popup> -->
+
+        <app-custom-modal-popup #missingDocsPopup [modalConfig]="modalConfig">
+          <ng-container>
+            <div class="modal-body pt-2" style="padding: 20px 0 0 0">
+              <div class="text-center">
+                <div class="ml-4">
+              <p class="mr-45"> <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red" class="bi bi-exclamation-triangle" viewBox="0 0 16 16" class="mr-4">
+                <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+                <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+              </svg>
+                <strong class="header-1b">The following required documents are still missing:</strong></p>
+              </div>
+                <p *ngIf="!isValidate">Please <a class="link-primary" (click)="returnToListClicked()">return to list</a> to produce the reference location if an item is received <br> <span class="text-center">or SKIP below.</span></p>
+              </div>
+                <div *ngFor="let doc of missingRequiredDocuments" class="ml-5">
+                  <p class="ml-4">* {{doc.documentTitle}}</p>
+                </div>
+                <div *ngIf="isValidate" class="t-center"><span class="typo-2">Do you want to track these missing items or provide an explanation?</span></div>
+                <div class="col-12" *ngIf="isValidate">
+                  <div class="form-group ">
+                   
+                      
+                      <div class="form-check full-width">
+                          <app-textarea-child [formGroup]="notesFormGroup" fieldWidth="98%"
+                              (onInputChange)="onInputChange($event)" controlName="comments" placeholderVal="Optional" [showPlaceholder]="true" [maxLength]="'300'"
+                              noOfRows="6"></app-textarea-child>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div class="modal-footer model-footer-reduced m-2">
+              <button
+                type="button"
+                class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+                aria-label="A skip button"
+                (click)="onSkipClicked()"
+                *ngIf="!isValidate"
+                id="skipBtn"
+              >
+                SKIP
+              </button>
+              <button
+              type="button"
+              class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+              aria-label="A skip button"
+              (click)="yesClicked()"
+              id="skipYesBtn"
+              *ngIf="isValidate"
+            >
+              Yes
+            </button>
+            <button
+            type="button"
+            class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+            aria-label="A skip button"
+            id="skipNoBtn"
+            (click)="onSkipClicked()"
+            *ngIf="isValidate"
+          >
+            No
+          </button>
+              <!-- <button
+                type="button"
+                class="btn btn-outline-dark p-btn  btn-sm closebutton"
+                
+              >
+                No
+              </button> -->
+            </div>
+          </ng-container>
+        </app-custom-modal-popup>
+    </fieldset>
+  </form>
+</div>
+            <div class="float-right mr-2" *ngIf="showServerError">
+              <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+            </div>
+<div class="footer-row mt-20">
+  <div class="col-md-12 bottom-button-container text-right">
+    <!-- <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent('Associated Applicants')"  matStepperPrevious>Back</button> -->
+    <app-validate-checkbox *ngIf="isValidate && !isViewDocument" category="SUPPORT-DOC" activityId="13"
+      [(validatedModel)]="supportingDocumentationValidated"></app-validate-checkbox>
+
+    <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" 
+      *ngIf="!isViewDocument"
+      aria-label="A next button"
+      (click)="onFormSubmit()"
+      id="step4SubmitBtn">
+      Next
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="onCloseClicked()"
+      aria-label="A close button"
+      id="step4CloseBtn">
+      Close
+    </button>
+  </div>
+</div>

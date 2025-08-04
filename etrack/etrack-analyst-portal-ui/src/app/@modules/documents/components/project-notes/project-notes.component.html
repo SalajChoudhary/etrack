@@ -1,0 +1,126 @@
+<div class="row ">
+    <div class="col-12" >
+        <p-table #pTable (sortFunction)="customSort($event)" [customSort]="true" class="removeBoxShadow" 
+            styleClass="p-datatable-lg no-header-scoll has-no-rounded-headers" [scrollable]="projectNotes?.length>5 ? true:false"
+            [scrollHeight]="scrollHeight" [value]="projectNotes" [rows]="5">
+            <ng-template pTemplate="header" class="white">
+                <tr>
+                    <th class="table-header-primary col-date white" [pSortableColumn]="'actionDate'">Date
+                        <p-columnFilter class="p-ml-auto" type="text" field="actionDate" matchMode="in" display="menu"
+                            [hideOnClear]="true" [showApplyButton]="false" [showClearButton]="false"
+                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [(ngModel)]="actionDate" [options]="dateFilterArray" placeholder="Select"
+                                    (onChange)="filter($event.value)">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th class="table-header-primary col-type" pSortableColumn="actionTypeDesc">Type
+                        <p-columnFilter class="p-ml-auto" type="text" field="actionTypeDesc" matchMode="in"
+                            display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false"
+                            [showOperator]="false" [showClearButton]="false" [showAddButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [(ngModel)]="actionType" [options]="typeFilterArray" placeholder="Select"
+                                    (onChange)="filter($event.value)">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th class="table-header-primary col-notes" [pSortableColumn]="'actionNote'">Note
+                    </th>
+                    <th class="table-header-primary col-comments" [pSortableColumn]="'comments'"
+                        >Comments
+                        <!-- <p-columnFilter  class="p-ml-auto" type="text" field="comments"  matchMode="in" display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false" [showOperator]="false" [showClearButton]="false" [showAddButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                              <p-multiSelect  [(ngModel)]="comments" [options]="commentFilterArray" placeholder="Select" (onChange)="filter($event.value)">
+                              </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter> -->
+                    </th>
+
+                    <th class="table-header-primary col-haction">
+                        <img *ngIf="projectNotes?.length>0" style="cursor:pointer;" width="20px" height="20px" alt="filter"
+                            src="assets/icons/funnel-cross.jpg" (click)="resetFilters()">
+                        &nbsp;
+                        <img *ngIf="projectNotes?.length>0" (click)="exportToExcel()" class="export-icon" alt="export" style="cursor: pointer;" src="assets/icons/export.png">
+                    </th>
+
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-i="rowIndex">
+                <tr>
+                    <td class="table-body col-date">
+                        <span>{{item?.actionDate}}</span>
+                    </td>
+                    <td class="table-body col-type">
+                        <span>{{item?.actionTypeDesc}}</span>
+                    </td>
+                    <td class="table-body col-notes">
+
+                        <span *ngIf="innerWidth>1024" triggers="mouseenter:mouseleave" #pop="ngbPopover"
+                            (mouseenter)="onNoteHover(item);" container="body"
+                            [ngbPopover]="item?.actionNote?.length>35 ? noteContent:''"
+                            [popoverTitle]="item?.actionNote?.length>35 ? popUpNoteHeader :''"
+                            placement="right">{{item?.actionNote?.length>35 ?
+                            item?.actionNote?.slice(0,35)+'...':item?.actionNote}}</span>
+                        <span *ngIf="innerWidth<=1024" #pop="ngbPopover" container="body" (click)="onNoteHover(item)"
+                            [ngbPopover]="item?.actionNote?.length>35 ? noteContent:''"
+                            [popoverTitle]="item?.actionNote?.length>35 ? popUpNoteHeader :''"
+                            placement="auto">{{item?.actionNote?.length>35 ?
+                            item?.actionNote?.slice(0,35)+'...':item?.actionNote}}</span>
+
+                    </td>
+                    <td class="table-body col-comments">
+                        <span *ngIf="innerWidth>1024" triggers="mouseenter:mouseleave" #pop="ngbPopover"
+                            (mouseenter)="onCommentHover(item);" container="body"
+                            [ngbPopover]="item?.comments?.length>35 ? commentContent:''"
+                            [popoverTitle]="item?.comments?.length>35 ? popUpCommentHeader :''"
+                            placement="right">{{item?.comments?.length>35 ?
+                            item?.comments?.slice(0,35)+'...':item?.comments}}</span>
+                        <span *ngIf="innerWidth<=1024" #pop="ngbPopover" container="body" (click)="onCommentHover(item)"
+                            [ngbPopover]="item?.comments?.length>35 ? commentContent:''"
+                            [popoverTitle]="item?.comments?.length>35 ? popUpCommentHeader :''"
+                            placement="auto">{{item?.comments?.length>35 ?
+                            item?.comments?.slice(0,35)+'...':item?.comments}}</span>
+
+                    </td>
+
+                    <td class="table-body col-action">
+                        <span class="action-edit" (click)="editNote(item)">
+                            <img src="assets/icons/editicon.svg" alt="editicon" />
+
+                        </span>
+                        <span *ngIf="isDeleteToBeShown(item.systemGenerated) && !isReadOnly" class="dlt-icon"
+                            (click)="deleteRow(item)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-trash" viewBox="0 0 16 16">
+                                <path
+                                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                <path fill-rule="evenodd"
+                                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                            </svg>
+                        </span>
+                    </td>
+                </tr>
+
+            </ng-template>
+        </p-table>
+        <hr class="mt-4 black" *ngIf="!projectNotes">
+    </div>
+
+</div>
+<div class="float-right mr-2" *ngIf="showServerError">
+    <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+  </div>
+
+<ng-template #noteContent>
+    <p style=" color: black !important;font-size:12px;">
+        {{popOverNote}}
+    </p>
+</ng-template>
+<ng-template #commentContent>
+    <p style=" color: black !important;font-size:12px;">
+        {{popOverComment}}
+    </p>
+</ng-template>

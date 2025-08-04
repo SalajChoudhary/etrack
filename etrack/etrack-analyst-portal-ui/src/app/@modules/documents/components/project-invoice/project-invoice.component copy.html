@@ -1,0 +1,340 @@
+<app-analyst-sub-header [showAddress]="true"></app-analyst-sub-header>
+<br />
+<br />
+<div class="top-header">
+  <div class="text-center">Tidal Wetlands</div>
+</div>
+<br />
+<div class="col-6 offset-3">
+  <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+    <div class="col-sm-10">
+      <select class="form-control" id="exampleFormControlSelect1">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div class="col-8 offset-2"
+aria-label="Project Invoice Fee Table">
+  <p-table
+    styleClass="p-datatable-lg no-header-scoll"
+    [scrollable]="false"
+    scrollHeight="65vh"
+    [value]="projectInvoiceList"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 15, 20]"
+    [showCurrentPageReport]="true"
+  >
+  <caption>Project Invoice Fee Table</caption>
+    <ng-template pTemplate="header">
+      <tr>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '10%' }"
+        ></th>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '75%', position: 'relative' }"
+        >
+          Project Type
+        </th>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '15%', position: 'relative' }"
+        >
+          Fee Amount
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr>
+        <td class="table-check-box table-body">
+          <!-- <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox> -->
+          <input
+            type="radio"
+            name="tidal"
+            id="radio{{ i }}"
+            aria-label="project type radio"
+            [value]="item?.projectTypeCode"
+            (click)="selectRow1(g.checked, item)"
+            #g
+          />
+        </td>
+        <td
+          class="table-body"
+          [ngStyle]="{
+            'text-align': 'left',
+            'word-wrap': 'break-word',
+            width: '70%',
+            position: 'relative'
+          }"
+        >
+          <span container="body" placement="right">{{ item.projectType }}</span>
+        </td>
+        <td
+          class="table-body"
+          [ngStyle]="{
+            'text-align': 'left',
+            'word-wrap': 'break-word',
+            width: '20%',
+            position: 'relative'
+          }"
+        >
+          <span container="body" placement="auto">${{ item.feeAmount }}</span>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<br />
+
+<!-- Table 2  -->
+<div class="top-header">
+  <div class="text-center">Freshwater Wetlands</div>
+</div>
+<br />
+<div class="col-8 offset-2">
+  <p-table
+    styleClass="p-datatable-lg no-header-scoll"
+    [scrollable]="false"
+    scrollHeight="65vh"
+    [value]="freshWaterprojectInvoiceList"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 15, 20]"
+    [showCurrentPageReport]="true"
+  >
+  <caption>Fresh Water Project Invoice List</caption>
+    <ng-template pTemplate="header">
+      <tr>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '5%' }"
+        ></th>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '80%', position: 'relative' }"
+        >
+          Project Type
+        </th>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '15%', position: 'relative' }"
+        >
+          Fee Amount
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr>
+        <td class="table-check-box table-body">
+          <!-- <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox> -->
+          <input
+            type="radio"
+            name="freshwater"
+            id="radio{{ i }}"
+            aria-label="Project type radio"
+            [value]="item?.projectTypeCode"
+            (click)="selectRow2(g.checked, item)"
+            #g
+          />
+        </td>
+        <td
+          class="table-body"
+          [ngStyle]="{
+            'text-align': 'left',
+            'word-wrap': 'break-word',
+            width: '80%',
+            position: 'relative'
+          }"
+        >
+          <span container="body" placement="right">{{ item.projectType }}</span>
+        </td>
+        <td
+          class="table-body"
+          [ngStyle]="{
+            'text-align': 'left',
+            'word-wrap': 'break-word',
+            width: '15%',
+            position: 'relative'
+          }"
+        >
+          <span container="body" placement="auto">${{ item.feeAmount }}</span>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<br />
+<!-- Table 3  -->
+
+<div class="top-header">
+  <div class="text-center">Liquefield Natural Gas Facility</div>
+</div>
+<br />
+
+<div class="col-8 offset-2">
+  <p-table
+    styleClass="p-datatable-lg no-header-scoll"
+    [scrollable]="false"
+    scrollHeight="65vh"
+    [value]="lngfprojectInvoiceList"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 15, 20]"
+    [showCurrentPageReport]="true"
+  >
+  <caption> Liquefield Natural Gas Facility Project Inoivce List</caption>
+    <ng-template pTemplate="header">
+      <tr>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '10%' }"
+        ></th>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '75%', position: 'relative' }"
+        >
+          Project Type
+        </th>
+        <th
+          class="table-header-primary"
+          [pSortableColumn]="'name'"
+          [ngStyle]="{ width: '15%', position: 'relative' }"
+        >
+          Fee Amount
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr>
+        <td class="table-check-box table-body">
+          <!-- <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox> -->
+          <input
+            type="radio"
+            name="liquefield"
+            id="radio{{ i }}"
+            aria-label="Project type radio"
+            [value]="item?.projectTypeCode"
+            (click)="selectRow3(g.checked, item)"
+            #g
+          />
+        </td>
+        <td
+          class="table-body"
+          [ngStyle]="{
+            'text-align': 'left',
+            'word-wrap': 'break-word',
+            width: '75%',
+            position: 'relative'
+          }"
+        >
+          <span container="body" placement="right">{{ item.projectType }}</span>
+        </td>
+        <td
+          class="table-body"
+          [ngStyle]="{
+            'text-align': 'left',
+            'word-wrap': 'break-word',
+            width: '15%',
+            position: 'relative'
+          }"
+        >
+          <span container="body" placement="auto">${{ item.feeAmount }}</span>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<div class="float-right mr-2" *ngIf="showServerError">
+  <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+</div>
+
+<br /><br />
+<div class="col-md-12">
+  <div class="text-center">
+    <button
+      type="submit"
+      (click)="onSubmit()"
+      class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+    >
+      Create Invoice
+    </button>
+
+    <button
+    *ngIf="isInvoiceCreated"
+    type="button"
+    (click)="makePayment()"
+    
+    class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+    
+  >
+  Make Payment
+
+    
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="onCancelClicked()">
+    Cancel
+</button>
+    <!-- <button
+      *ngIf="isInvoiceCreated"
+      type="button"
+      (click)="onPrint()"
+      class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+    >
+      Print
+    </button> -->
+  </div>
+</div>
+  <br />
+  <div #printContent *ngIf="isInvoiceCreated">
+    <div class="col-md-12">
+      <div class="in-text-center">
+        <p>Invoice No &nbsp; &nbsp; : {{ invoice.invoiceNum }}</p>
+      </div>
+    </div>
+    <br />
+    <div class="invoice-table">
+      <table style="width: 80%">
+        <tr>
+          <th>Project Type</th>
+          <th>Fee Amount</th>
+        </tr>
+        <tr>
+          <td>{{ as1.projectType }}</td>
+          <td>${{ as1.feeAmount }}</td>
+        </tr>
+        <tr>
+          <td>{{ as2.projectType }}</td>
+          <td>${{ as2.feeAmount }}</td>
+        </tr>
+        <tr>
+          <td>{{ as3.projectType }}</td>
+          <td>${{ as3.feeAmount }}</td>
+        </tr>
+      </table>
+      <br />
+    </div>
+    <div class="col-md-12">
+      <div class="bottom-text-center">
+        <!-- <p> {{item.projectType}}: ${{item.feeAmount}}</p> -->
+        <p>Total Amount : ${{ invoice.totalCharge }}</p>
+      </div>
+    </div>
+  </div>
+  <br />
+

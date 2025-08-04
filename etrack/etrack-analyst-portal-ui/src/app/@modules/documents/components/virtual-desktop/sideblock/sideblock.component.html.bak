@@ -1,0 +1,121 @@
+<div class="sideblock-wrapper">
+<div class="card status">
+  <div class="card-body">
+    <div class="mb-3 text-center" *ngIf="userRoles?.includes(UserRole.DEC_Program_Staff)">
+      <strong>Review Due: {{ virtualDesktopData?.milestone?.reviewDate }}</strong>
+    </div>
+    <div class="mb-3 text-center">
+      <strong *ngIf="virtualDesktopData?.milestone?.statusDate">{{ virtualDesktopData?.milestone?.currentStatus }}: {{ virtualDesktopData?.milestone?.statusDate }}</strong>
+    </div>
+    <div *ngIf="virtualDesktopData?.milestone?.suspendReason !== null" class="text-center text-italic">{{ virtualDesktopData?.milestone?.suspendReason }}</div>
+  </div>
+</div>
+<mat-accordion
+class="sideblock-accordion mat-expansion--has-toggle-icon-left" multi>
+  <mat-expansion-panel [expanded]="false" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <div class="d-flex justify-content-between align-items-center w-100">
+          <div class="header">Milestones</div>
+          <div *ngIf="panelOpenState">
+            <img  class="export-icon" (click)="exportMilestones($event)" alt="export" src="assets/icons/export.png">
+          </div>
+        </div>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="body">
+      <table aria-labelledby="Sideblock Table" class="table table-borderless table-custom-border">
+        <tbody role="rowgroup">
+          <tr role="row" *ngFor="let milestone of  virtualDesktopData?.milestone?.milestones">
+            <td role="columnheader" scope="row" >{{milestone?.milestoneStatus}}</td>
+            <td role="cell" scope="row">{{milestone?.milestoneDate}}</td>
+          </tr>
+        </tbody>
+        
+      </table>
+    </div>
+  </mat-expansion-panel>
+  <mat-expansion-panel [expanded]="true" hideToggle>
+  <div class="body">
+    <div  class="header">DEC ID: <a [href]="edbDistrictIdUrl" *ngIf="virtualDesktopData?.facility?.decId" target="_blank">{{ virtualDesktopData?.facility?.decId }}</a></div>
+    <div class="header">{{ virtualDesktopData?.facility?.facilityName }}</div>
+  </div>
+</mat-expansion-panel>
+
+<mat-expansion-panel [expanded]="true" hideToggle>
+  <div  *ngFor="let batchGroup of  batchGroups">
+
+    <div class="header" >Batch: <span *ngIf="batchGroup[0]?.batchNumber">{{batchGroup[0]?.batchNumber}}</span></div>
+    <div><span  *ngIf="batchGroup[0]?.gpInd">GP # </span></div>
+    <div *ngIf="batchGroup[0]?.eaInd"><span class="text-italic" >Emergency Authorization</span></div>
+    <div >
+      <table aria-labelledby="EA Table" class="table table-borderless table-batch" style="width:50px">
+        <tr *ngFor="let batch of batchGroup">
+            <td>{{batch?.permitCode}};</td>
+            <td>{{batch?.applType}};</td>
+            <td>{{batch?.applId}}</td>
+        </tr>
+      </table>
+  </div>
+
+  </div>
+
+</mat-expansion-panel>
+
+  <mat-expansion-panel [expanded]="true" hideToggle>    
+    <div class="header ">Contact Info  </div>
+    <br>
+    <ng-container *ngIf="virtualDesktopData?.contactAgents?.length">
+    <div class="header-summary">Application Contact:</div>
+    <div class="body">
+      <div class="my-2" *ngFor="let detail of virtualDesktopData?.contactAgents">
+        <div>
+          <div class="text-primary">
+          {{ detail?.displayName }}
+           </div>
+        </div>
+        <div>{{ detail?.street1 }}</div>
+        <div >{{ detail?.businessPhoneNumber | phone }}</div>
+        <div><div class="text-primary">{{ detail?.emailAddress }}</div></div>        
+      </div>
+    </div>
+    </ng-container>
+  </mat-expansion-panel>
+  <mat-expansion-panel [expanded]="true" hideToggle *ngIf="virtualDesktopData?.publics?.length">
+      <div class="header-summary">Legally Responsible Party:</div>
+  
+      <div class="body">
+        <div class="my-2" *ngFor="let detail of virtualDesktopData?.publics">
+          <div>
+            <div class="text-primary">
+            {{ detail?.displayName }}
+             </div>
+          </div>
+          <div>{{ detail?.street1 }}</div>
+          <div >{{ detail?.businessPhoneNumber | phone }}</div>
+          <div><div class="text-primary">{{ detail?.emailAddress }}</div></div>
+         
+        </div>
+      </div>
+  </mat-expansion-panel>
+  <mat-expansion-panel [expanded]="true" hideToggle *ngIf="virtualDesktopData?.owners?.length">
+    <div class="header-summary">Property Owner:</div>
+
+    <div class="body">
+      <div class="my-2" *ngFor="let detail of virtualDesktopData?.owners">
+        <div>
+          <div class="text-primary">
+          {{ detail?.displayName }}
+           </div>
+        </div>
+        <div>{{ detail?.street1 }}</div>
+        
+        <div >{{ detail?.businessPhoneNumber |phone}}</div>
+        <div><div class="text-primary">{{ detail?.emailAddress }}</div></div>
+        
+      </div>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>  
+<a routerLink="./" (click)="onCloseClick()" class="btn btn-sm btn-outline-dark closebutton mb-2">Close</a>
+</div>

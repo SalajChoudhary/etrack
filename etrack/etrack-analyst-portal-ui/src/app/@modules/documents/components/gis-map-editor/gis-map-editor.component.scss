@@ -1,0 +1,121 @@
+/* import the required JSAPI css*/
+@import "@arcgis/core/assets/esri/themes/light/main.css";
+
+.esri-view {
+  height: 100%;
+}
+
+#text {
+  color: white;
+  padding: 3%;
+}
+#instructions {
+  width: 300px;
+  background: #fff;
+  padding: 20px;
+}
+
+.parent {
+  position: relative;
+  height: 70vh;
+}
+
+#dynamicLayers_view{
+  width: 400px;
+  background: #fff;
+  padding: 10px;
+  height: 50vh;
+  overflow: scroll;
+}
+.sublayers_view {
+  list-style-type: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.sublayer_label_view{
+  padding-left: 10px!important;
+}
+
+.sublayers-item_view {
+  margin-right: 4rem;
+  word-break: break-word;
+}
+
+#topNav {  display: block; position: absolute;  z-index: 99; background: rgb(0, 23, 153);left: 15px;  top: 130px; }
+
+#topbar{
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+#submitLayerDiv {
+  top: 10px;
+  right: 5px;
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: black;
+  z-index: -1;
+}
+
+/*for map note text editing: bottom-left*/
+#textInputDiv {
+  width: 200px;
+  padding: 5px;
+  color: black;
+  background-color: white;
+}
+
+
+.action-button:hover,
+.action-button:focus {
+  background: #0079c1;
+  color: #e4e4e4;
+}
+
+.active {
+  background: #0079c1;
+  color: #e4e4e4;
+}
+
+button:disabled {
+  opacity: 0.4;
+  -moz-opacity: 0.4; /* Firefox and Mozilla browsers */
+  -webkit-opacity: 0.4; /* Safari */
+  cursor: default;
+}
+
+input[type="text"] {
+  width: 100%;
+}
+::ng-deep .esri-editor__panel-toolbar{
+  visibility: hidden;
+  content: none;
+}
+::ng-deep .esri-editor__feature-list-name {
+  visibility: hidden;
+  content: none;
+}
+::ng-deep  .esri-editor__feature-list-item:nth-child(1) .esri-editor__feature-list-name:before {
+  visibility: visible;
+  content: "Edit Polygon by Select";
+}
+::ng-deep .esri-legend__layer-caption {
+  display: none;
+}
+::ng-deep .esri-popup__footer{
+  display: none;
+}
+::ng-deep .esri-view-height-less-than-medium .esri-popup__main-container {
+  max-height: 200px !important;
+}
+  /*::ng-deep .esri-editor__message {
+    visibility: hidden;
+    content: none;
+  }
+  ::ng-deep  .esri-editor__message:before {
+    visibility: visible;
+    content: "Some help text";
+  }*/
+

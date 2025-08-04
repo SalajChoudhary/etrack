@@ -1,0 +1,119 @@
+<!-- <app-analyst-sub-header [showAddress]="true" [isPopUp]="true" ></app-analyst-sub-header> -->
+
+<div class="form-container outer-container">
+  <!-- <div class="row" style="border-bottom: 2px solid black;    text-transform: uppercase;">
+        <div *ngIf="currentTab !=1 || currentTab!=2"  class="top-header" >
+            {{headerText?.toUpperCase() }}
+        </div>
+    </div> -->
+
+  <!-- GOVT AGENCY SEARCH SCREEN -->
+  <ng-container>
+    <div class="row mb-2">
+      <div class="col-10 offset-1 mt-13">
+        <!-- <div class="col-12 mt-13"> -->
+        <div *ngIf="currentTab == 0" class="note-text header-1n">
+          Note: An Applicant is defined as a Legally Responsible Party
+        </div>
+        <p *ngIf="currentTab == 2" class="top-headings header-2n">
+          Our records list the following contacts at this location.
+        </p>
+        <!-- <p>Below are the applicants which were previously associated with the location</p> -->
+        <p *ngIf="currentTab != 2" class="top-headings header-2n">
+          Our records list the following {{ noteText }}
+        </p>
+
+        <p class="top-headings header-2n">Please select all that apply.</p>
+      </div>
+      <div class="col-10 offset-2 mt-13">
+        <div
+          class="mb-2"
+          *ngFor="let applicant of applicantsList; let i = index"
+        >
+          <input
+            id="applicant-check-{{ i }}"
+            type="checkbox"
+            (change)="onApplicantChange($event)"
+            value="{{ applicant?.applicantId }}"
+            class="form-check-inline"
+          />
+          <label for="applicant-check-{{ i }}" class="header-1n">{{
+            applicant?.displayName
+          }}</label>
+
+          <!-- {{applicant?.firstName +(applicant?.middleName ?(' '+ applicant?.middleName):'') +' '+applicant.lastName}} -->
+          <!-- (applicant?.middleName ?(' '+ applicant?.middleName):'') -->
+        </div>
+
+        <div class="mb-2">
+          <input
+            id="notListedCheckbox"
+            type="checkbox"
+            (change)="onApplicantChange($event)"
+            value="0"
+            class="form-check-inline"
+            #notListedCheckbox
+          />
+          <label for="notListedCheckbox" class="header-1n"
+            >{{ notListedvalue }} Not Listed</label
+          >
+        </div>
+        <span
+          *ngIf="selectedApplicants?.length == 0 && isSubmitted"
+          class="error-cls"
+          >{{ errorMsgObj?.ATLEAST_ONE_SEL_REQD_MSG }}</span
+        >
+      </div>
+    </div>
+    <!-- <div class="row"  style="border-bottom: 2px solid black;">
+            &nbsp;
+        </div> -->
+  </ng-container>
+</div>
+
+<div class="row footer-row mt-20">
+  <div class="col-md-12 bottom-button-container">
+    <button
+      (click)="navigateToAppInfo()"
+      type="submit"
+      class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+    >
+      OK
+    </button>
+    <button
+      type="button"
+      (click)="closeSearchModal($event)"
+      class="btn btn-sm btn-outline-dark closebutton mb-2"
+    >
+      Cancel
+    </button>
+  </div>
+  <div class="col-md-12 bottom-button-container">
+    <div class="float-right mr-2" *ngIf="showServerError">
+      <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+  </div>
+</div>
+
+<app-custom-modal-popup
+  #modal
+  [modalConfig]="searchConfig"
+  (modalClosed)="closeSearchModal($event)"
+>
+  <ng-container *ngIf="isOpenPopupSelectionSearch | async">
+    <app-applicant-informations-search
+      [currentTab]="currentTab"
+      (closeClicked)="closeSearchModal($event)"
+    >
+    </app-applicant-informations-search>
+  </ng-container>
+</app-custom-modal-popup>
+<app-custom-modal-popup #applicantInfoModal [modalConfig]="modalConfig">
+  <ng-container *ngIf="isOpenPopupSelectionInfo | async">
+    <app-applicant-informations
+      [currentTab]="currentTab"
+      (closeClicked)="closeInfoModal($event)"
+      [isFromScreen]="isFromSelection"
+    ></app-applicant-informations>
+  </ng-container>
+</app-custom-modal-popup>

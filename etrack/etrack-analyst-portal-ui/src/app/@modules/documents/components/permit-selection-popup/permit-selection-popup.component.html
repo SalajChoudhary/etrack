@@ -1,0 +1,41 @@
+<div class="title d-flex justify-content-center align-items-center header-3b">
+    <h4>PERMIT SELECTIONS</h4>
+</div>
+<div>
+    <div class="subtitle">Existing Permits</div>
+    <table class="table table-bordered" aria-describedby="A table showing existing permits">
+        <tbody *ngFor="let permit of existingPermits">
+            <tr role="rowgroup">
+                <td scope="row" role="columnheader">
+                    <div role="row">
+                        <label for="" *ngIf="permit.extend" class="existing-permit--checkbox">
+                            <input type="checkbox"> Extend
+                        </label>
+                        <label for="" *ngIf="permit.modify" class="existing-permit--checkbox">
+                            <input type="checkbox"> Modify
+                        </label>
+                        <label for="" *ngIf="permit.transfer" class="existing-permit--checkbox">
+                            <input type="checkbox"> Transfer
+                        </label>
+                        <label for="" *ngIf="permit.renew" class="existing-permit--checkbox">
+                            <input type="checkbox"> Renew
+                        </label>
+                    </div>
+                    <!-- <mat-checkbox name="existingPermitType" *ngIf="permit.extend" class="existing-permit--checkbox" [(ngModel)]="permit.extend">Extend</mat-checkbox>
+                    <mat-checkbox name="existingPermitType" *ngIf="permit.modify" class="existing-permit--checkbox" [(ngModel)]="permit.modify">Modify</mat-checkbox>
+                    <mat-checkbox name="existingPermitType" *ngIf="permit.transfer" class="existing-permit--checkbox" [(ngModel)]="permit.transfer">Transfer</mat-checkbox>
+                    <mat-checkbox name="existingPermitType" *ngIf="permit.renew" class="existing-permit--checkbox" [(ngModel)]="permit.renew">Renew</mat-checkbox> -->
+                </td>
+                <td role="rowgroup">
+                    <div scope="col" role="cell">{{permit?.address?.line1}}</div>
+                    <div scope="col" role="cell">{{permit?.address?.line2}}</div>
+                </td>
+                <td>
+                    <div scope="col" role="cell">{{permit?.address?.line3}}</div>
+                    <div scope="col" role="cell">{{permit?.address?.description}}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="subtitle">Pending Permits</div>
+</div>

@@ -1,0 +1,18 @@
+.odd {
+    background-color: white;
+}
+
+.even {
+    background-color: #eaebf0
+}
+.subject-list {
+    border-bottom: 1px dashed black;
+    padding: 5px 0;
+    cursor: pointer;
+}
+
+:host ::ng-deep .mat-expansion-panel-header:not(.mat-expanded) {
+    .mat-expansion-indicator::after {
+        transform: rotate(315deg) !important;
+    }
+}

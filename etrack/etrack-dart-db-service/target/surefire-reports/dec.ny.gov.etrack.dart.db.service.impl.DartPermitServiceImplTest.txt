@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: dec.ny.gov.etrack.dart.db.service.impl.DartPermitServiceImplTest
+-------------------------------------------------------------------------------
+Tests run: 14, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.073 s <<< FAILURE! - in dec.ny.gov.etrack.dart.db.service.impl.DartPermitServiceImplTest
+retrieveAllPermitApplicationsTest  Time elapsed: 0.034 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.dart.db.service.impl.DartPermitServiceImplTest.retrieveAllPermitApplicationsTest(DartPermitServiceImplTest.java:198)
+

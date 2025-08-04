@@ -1,0 +1,292 @@
+mat-horizontal-stepper {
+  margin-top: 55px;
+  min-height: 1000px;
+}
+.form-container .form-row {
+  min-height: 100px;
+}
+.pop-over-content{
+  color: black !important; 
+  font-size: 12px;
+  max-height: 20rem !important;
+  overflow-y: auto;
+}
+.single-line {
+  white-space: nowrap;
+}
+.error-cls {
+  margin-left: 37%;
+  color: red;
+  margin-bottom: 5px;
+}
+.mr-20 {
+  margin-right: 20px;
+}
+.size-align {
+  margin-left: -16px !important;
+  width: 103% !important;
+}
+.eerror-cls {
+  margin-left: 47%;
+  color: red;
+}
+
+.eerror-individual-cls {
+  margin-left: 47%;
+  color: red;
+}
+
+.shadow-div{
+  padding-top: 0px;
+  margin-top: -25px;
+ }
+
+.exceptionerror-cls {
+  margin-top: 2%;
+  color: black;
+  margin-bottom: 2%;
+  text-align: center;
+}
+span.info {
+  color: blue;
+  padding: 0;
+  margin: 0;
+  font-style: italic;
+}
+.form-name .form-check-label {
+  width: 220px;
+}
+.ml-60 {
+  margin-left: 60px;
+}
+.head {
+  padding: 0;
+  background: #233E2A;
+  color: #fff;
+  padding-left: 10px;
+  padding-top: 12px;
+}
+.head p {
+  width: 50%;
+}
+.business-search-form .form-check {
+  width: 100%;
+}
+
+.font-weight {
+  font-weight: 500 !important;
+}
+.business-search-form select {
+  width: 135px;
+}
+label.label-inline {
+  min-width: 220px;
+}
+.top-header {
+  width: 100%;
+  background: #233E2A;
+  color: #fff;
+  text-align: center;
+  padding: 8px;
+  border-top: solid 2px black;
+  border-bottom: solid 2px black;
+  margin: 2px;
+  font-size: larger;
+}
+.t-center {
+  text-align: center;
+}
+::ng-deep {
+  .popover-header {
+    text-align: center;
+    font-weight: 700;
+  }
+
+.p-datatable table {
+  }
+  
+}
+
+.applicant_type {
+  width: 350px;
+}
+
+.p-2 {
+  margin-top: -45px;
+}
+
+.section-wrapper {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.btn {
+  min-width: 70px;
+}
+
+.search-space {
+}
+
+.search-height {
+  height: 20%;
+}
+.app-search-width{
+  width: 98%;
+}
+
+.search-container {
+  display: flex;
+  padding-top: 20px;
+  margin-top: -10px;
+  padding-bottom: -10px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: end;
+  margin-top:53px;
+}
+button {
+  height: 30px;
+}
+
+.form-check-section {
+  display: flex;
+  justify-content: flex-start;
+}
+.ddl-options {
+  width: 150px;
+}
+
+.input-name {
+  width: 200px;
+}
+
+
+::ng-deep {
+  /* Add application styles & imports to this file! */
+  .tooltip {
+    // position: fixed !important;
+    // left:57% !important;
+    // top: 10% !important;
+  }
+  .tooltip-inner {
+    //background-color: white !important;
+    // width: 300px !important;
+    // max-width: unset !important;
+    // border: 1px solid black !important;
+    // max-height: 200px;
+    // overflow-y: scroll;
+  }
+  .bs-tooltip-auto[x-placement^="right"] .arrow::before,
+  .bs-tooltip-right .arrow::before {
+    border-right-color: black !important;
+  }
+
+  .bs-tooltip-auto[x-placement^="left"] .arrow::before,
+  .bs-tooltip-left .arrow::before {
+    border-left-color: black !important;
+  }
+
+  .bs-tooltip-auto[x-placement^="top"] .arrow::before,
+  .bs-tooltip-top .arrow::before {
+    border-top-color: black !important;
+  }
+
+  .bs-tooltip-auto[x-placement^="bottom"] .arrow::before,
+  .bs-tooltip-bottom .arrow::before {
+    border-bottom-color: black !important;
+  }
+}
+
+.p-datatable table {
+    border: solid grey 0px; 
+}
+
+.form-group {
+  flex-wrap: nowrap;
+}
+
+@media(min-width:800px){
+    .input-container {
+        .input-name {
+            width: 100%;
+        }
+        .addr-error-msg {
+             margin-left: calc(100% - 310px)!important;
+           
+        }
+        .addr-error-msg1 {
+            // margin-left: calc(100% - 348px);
+            margin-left: 85px;
+           // font-size: medium;
+            color: red;
+        }
+    }
+    .business-search-form {
+        flex-direction: column;
+        .addr-error-msg {
+            margin-left: 345px; // width of label + select + margin
+            margin-top: 10px;
+            
+        }
+        .addr-error-msg1 {
+            // margin-left: calc(100% - 348px);
+            margin-left: 230px;
+            //font-size: medium;
+            color: red;
+        }
+    }
+}
+@media(min-width:1024px){
+    .input-container {
+        .input-name {
+            width: 100%;
+        }
+        .addr-error-msg {
+             margin-left: calc(100% - 365px)!important;
+           
+        }
+        .addr-error-msg1 {
+            // margin-left: calc(100% - 348px);
+            margin-left: 145px;
+            //font-size: medium;
+            color: red;
+        }
+    }
+    .business-search-form {
+        flex-direction: column;
+        .addr-error-msg {
+            margin-left: 345px; // width of label + select + margin
+            margin-top: 10px;
+            
+        }
+        .addr-error-msg1 {
+            // margin-left: calc(100% - 348px);
+            margin-left: 230px;
+            //font-size: medium;
+            color: red;
+        }
+    }
+}
+
+.min-width-label {
+    min-width: 80px;
+}
+.row{
+  margin-top: -5px;
+}
+
+.addr-error-msg-placeholder{
+  height: 20px;
+}
+
+:host ::ng-deep{
+  .popover-title{
+    font-weight: 500 !important;
+    font-size: 14px !important;
+  }
+}
+.affiliated-facilities-button{
+  border: none;
+  background:transparent;
+}

@@ -1,0 +1,86 @@
+<p-table
+[styleClass]="!rounded ? 'p-datatable-lg has-no-rounded-headers' : 'p-datatable-lg'"
+  [value]="otherKeywordItems"
+  class="w removeBoxShadow"
+  [scrollable]="otherKeywordItems?.length > 5 ? true : false"
+  scrollHeight="175px"
+  [totalRecords]="otherKeywordItems.length"
+  aria-describedby="Others Keyword table"
+>
+  <caption class="typo-1">
+    Candidate  Keywords table
+  </caption>
+  <ng-template pTemplate="header">
+    <tr role="rowgroup" class="no-filter">
+      <th
+        scope="col"
+        role="columnheader"
+        aria-label="SIC Codes Header"
+        aria-sort="ascending"
+        class="table-header-primary"
+        [ngStyle]="{
+          'text-align': 'left',
+           width: '70%' }"
+      >
+        Keyword Text
+      </th>
+      <th
+        scope="col"
+        aria-label="Others Keyword Header"
+        role="columnheader"
+        aria-sort="ascending"
+        class="table-header-primary"
+        [ngStyle]="{ width: '30%', 'text-align': 'center', color: '#65666B' }"
+      >
+        Add/Remove 
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-otherItem let-i="rowIndex">
+    <tr role="rowgroup">
+      <td
+        scope="col"
+        role="columnheader"
+        aria-label="NAICS Codes Cell"
+        aria-sort="ascending"
+        class="table-body"
+        [ngStyle]="{
+          'text-align': 'left',
+          'word-wrap': 'break-word',
+          width: '70%'
+        }"
+      >
+        {{ otherItem.keywordText }}
+      </td>
+      <td
+        scope="col"
+        role="columnheader"
+        aria-label="Bridge Cell Cell"
+        aria-sort="ascending"
+        class="table-body"
+        [ngStyle]="{
+          'text-align': 'center',
+          'word-wrap': 'break-word',
+          width: '30%'
+        }"
+      >
+        <span style="cursor: pointer; margin-left: -2px">
+          <input
+            #keywordCheckBox
+            class="form-check-input"
+            type="checkbox"
+            [ngModel]="otherItem[checkBoxKey] == 1"
+            (ngModelChange)="
+              otherItem[checkBoxKey] = $event ? 1 : 0; emitChanges(otherItem)
+            "
+          />
+        </span>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td style="text-align:center ;" colspan="100">No Records Available.</td>
+    </tr>
+  </ng-template>
+</p-table>

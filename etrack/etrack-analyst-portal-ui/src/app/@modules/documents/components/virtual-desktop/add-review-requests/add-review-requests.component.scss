@@ -1,0 +1,128 @@
+.top-header {
+  width: 100%;
+  margin: 2px;
+  margin-left: 10px;
+  margin-bottom: 25px;
+  //text-align: center;
+  font-size: 18px;
+  padding: 8px;
+  font-weight: 500;
+}
+.font-weight {
+  font-weight: 500 !important;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-menu-hidden {
+  background-color: white;
+  position: absolute;
+  display: none;
+  width: 5rem;
+}
+.dropdown-menu-visible {
+  background-color: white;
+  position: absolute;
+  display: block;
+  width: 15rem;
+  z-index: 99;
+  max-height: 15rem !important;
+  overflow-y: scroll;
+}
+.dropdown-option {
+  list-style-type: none;
+  padding: 0 1rem;
+}
+.dropdown-option:hover {
+  background-color: #dfe0e6;
+}
+.w-100 {
+  width: 125px !important;
+}
+.r-align {
+  text-align: right;
+}
+.bold {
+  font-weight: 600;
+}
+.margin-l {
+  margin-left: 7rem !important;
+}
+
+.t-width {
+  width: 98%;
+}
+.w-260 {
+  width: 260px;
+}
+.counter-brief {
+  display: block;
+  text-align: right;
+  margin-right: 3%;
+  margin-top: -28px;
+  position: inherit;
+}
+.mtop-3 {
+  margin-top: 4px;
+}
+
+::ng-deep {
+  .container {
+    width: 100% !important;
+    max-width: 1400px !important;
+  }
+}
+.modal-head {
+  text-align: left;
+  font-weight: 500 !important;
+  padding-left: 5px;
+}
+.modal-footer {
+  text-align: right;
+  padding-right: 10px;
+  border: none;
+  //border-top: 1px solid black !important;
+}
+.mtop-5 {
+  margin-top: 5px;
+}
+@media (max-width: 1023px) {
+  .full-width {
+    width: 82%;
+  }
+}
+@media (min-width: 1024px) {
+  .full-width {
+    width: 86%;
+  }
+}
+
+.description {
+  padding: 15px;
+  border: 1px solid #65666b;
+}
+.title {
+  font-weight: bold;
+}
+.lh {
+  line-height: 1.8rem;
+}
+.js-center {
+  justify-content: center !important;
+}
+.w-70p {
+  width: 64% !important;
+}
+.marginl-4 {
+  margin-left: 4rem;
+}
+.marginl-10 {
+  margin-left: 8rem;
+}
+
+
+.ml-3rem{
+  margin-left: 3rem;
+}

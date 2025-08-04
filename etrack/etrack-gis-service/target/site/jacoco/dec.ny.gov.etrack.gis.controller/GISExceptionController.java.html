@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GISExceptionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.controller</a> &gt; <span class="el_source">GISExceptionController.java</span></div><h1>GISExceptionController.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.controller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import dec.ny.gov.etrack.gis.exception.BadRequestException;
+import dec.ny.gov.etrack.gis.exception.DataNotFoundException;
+import dec.ny.gov.etrack.gis.exception.GISException;
+import dec.ny.gov.etrack.gis.exception.URLInvalidException;
+import dec.ny.gov.etrack.gis.model.Response;
+
+@ControllerAdvice
+<span class="nc" id="L18">public class GISExceptionController {</span>
+
+  /**
+   * Logging
+   */
+<span class="nc" id="L23">  private static final Logger LOGGER = LoggerFactory.getLogger(GISExceptionController.class.getName());</span>
+  
+  @ExceptionHandler(value = BadRequestException.class)
+  public ResponseEntity&lt;Object&gt; handleBadRequestException(BadRequestException bre) {
+<span class="nc" id="L27">    LOGGER.error(&quot;Bad request error message details &quot;, bre);</span>
+<span class="nc" id="L28">    return new ResponseEntity&lt;&gt;(new Response(bre.getErrorCode(), bre.getErrorMessage()), HttpStatus.BAD_REQUEST);</span>
+  }
+
+  @ExceptionHandler(value = DataNotFoundException.class)
+  public ResponseEntity&lt;Object&gt; handleDataNotFoundException(DataNotFoundException dnfe) {
+<span class="nc" id="L33">    LOGGER.error(&quot;Data not found error message details &quot;, dnfe);</span>
+<span class="nc" id="L34">    return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+  }
+
+  @ExceptionHandler(value= GISException.class)
+  public ResponseEntity&lt;Object&gt; handleGISException(GISException ge) {
+<span class="nc" id="L39">    LOGGER.error(&quot;General error occurred while procesing the request &quot;, ge);</span>
+<span class="nc" id="L40">    Response errorResponse = new Response();</span>
+<span class="nc" id="L41">    errorResponse.setResultCode(ge.getErrorCode());</span>
+<span class="nc" id="L42">    errorResponse.setResultResponse(ge.getMessage());</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">    if (ge.getStatus() == null) {</span>
+<span class="nc" id="L44">      return new ResponseEntity&lt;&gt;(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+    } else {
+<span class="nc" id="L46">      return new ResponseEntity&lt;&gt;(ge.getMessage(), ge.getStatus());</span>
+    }
+  }
+ 
+  @ExceptionHandler(value= URLInvalidException.class)
+  public ResponseEntity&lt;Object&gt; handleURLInvalidException(URLInvalidException uie) {
+<span class="nc" id="L52">    LOGGER.error(&quot;Unsupported encoded details are available in the URL &quot;, uie);</span>
+<span class="nc" id="L53">    return new ResponseEntity&lt;&gt;(HttpStatus.METHOD_NOT_ALLOWED);</span>
+  }
+  
+  @ExceptionHandler(value= HttpServerErrorException.class)
+  public ResponseEntity&lt;Object&gt; handleHttpServerErrorException(HttpServerErrorException hse) {
+<span class="nc" id="L58">    LOGGER.error(&quot;Unsuccessful response received while making a call to GIS service or other eTrack service &quot;, hse);</span>
+<span class="nc" id="L59">    return new ResponseEntity&lt;&gt;(hse.getResponseBodyAsString(), hse.getStatusCode());</span>
+  }
+
+  @ExceptionHandler(value= HttpClientErrorException.class)
+  public ResponseEntity&lt;Object&gt; handleHttpClientErrorException(HttpClientErrorException hse) {
+<span class="nc" id="L64">    LOGGER.error(&quot;Unsuccessful response reported while making a call to GIS service or other eTrack service &quot;, hse);</span>
+<span class="nc" id="L65">    return new ResponseEntity&lt;&gt;(hse.getResponseBodyAsString(), hse.getStatusCode());</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

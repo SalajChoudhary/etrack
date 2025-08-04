@@ -1,0 +1,261 @@
+.label-row {
+  //margin-top: 15px;
+  // position: absolute;
+  //z-index: 9;
+  padding-left: 55px;
+  display: flex;
+  flex-wrap: wrap;
+  // height: 20px;
+  background-color: white;
+  
+  // margin-right: -55px;
+}
+.lablled-row{
+  padding-left: 80px;
+  display: flex;
+  flex-wrap: wrap;
+  // height: 20px;
+  background-color: white;
+  min-height: 7.1rem;
+  border-bottom: 2px solid black;
+}
+
+
+.lbl-align {
+  margin-left: auto;
+  margin-right: 45px;
+}
+.check-icon{
+  margin-left:4px;
+  margin-top: 6px;
+  height: 36px;
+  width: 36px;
+}
+.round-btn {
+  font-size: x-large;
+  background-color: #233E2A;
+  border-radius: 50%;
+  color: white;
+  border: none;
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  width: 50px;
+  height: 50px;
+  cursor: default !important;
+}
+
+.skip-track {
+  margin-left: auto;
+  margin-right: 60px;
+  cursor: pointer;
+}
+@media(max-width:1400px){
+  .skipp-track {
+    margin-left: auto;
+    margin-right: 65px;
+    cursor: pointer;
+  }
+}
+@media(min-width:1400px){
+  .skipp-track {
+    margin-left: auto;
+    margin-right: 75px;
+    cursor: pointer;
+  }
+}
+
+.skip-track-disabled {
+  margin-left: auto;
+  margin-right: 60px;
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.skip-round-button-disabled {
+  font-size: x-large;
+  background-color: grey;
+  border-radius: 50%;
+  color: #dae2de;
+  border: none;
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  width: 50px;
+  height: 50px;
+  cursor: default !important;
+}
+.mat-step-icon-state-number {
+  display: none !important;
+}
+.stepper-row {
+   // margin-top: 35px;
+  // position: absolute;
+  // // z-index: 9;
+  // margin-left: 60px;
+  // width: calc(100vw - 300px);
+  // position: absolute;
+  // top: 60px;
+  // margin: 0 250px;
+
+  width: calc(100vw - 27vw);
+  position: absolute;
+  top: 60px;
+  margin-left: 20vw;
+
+  @media (max-width: 1024px) {
+    width: calc(100vw - 32vw);
+    margin-left: 25vw;
+  }
+}
+.stepper-row.supporting-documentation--stepper {
+  // margin-top: 35px;
+ // position: absolute;
+ // // z-index: 9;
+ // margin-left: 60px;
+ width: calc(100vw - 131px);
+ position: absolute;
+ top: 50px;
+ margin: 0 65px;
+ margin-top: 10px;
+}
+.stepper-row.sign-submit{
+  // margin-top: 35px;
+ // position: absolute;
+ // // z-index: 9;
+ // margin-left: 60px;
+ width: calc(100vw - 131px);
+ position: absolute;
+ top: 50px;
+ margin: 0 50px;
+}
+// @media (min-width: 2000px) {
+//   .rt-align {
+//     margin-left: 2250px;
+//   }
+// }
+// @media (max-width: 2000px) {
+//   .rt-align {
+//     margin-left: 1615px;
+//   }
+//   .marginl {
+//     margin-left: -60px;
+//   }
+// }
+// @media (max-width: 1800px) {
+//   .rt-align {
+//     margin-left: 1403px;
+//   }
+//   .marginl {
+//     margin-left: -30px;
+//   }
+// }
+
+
+// @media (max-width: 1620px) {
+//   .rt-align {
+//     margin-left: 1275px;
+//   }
+//   .marginl {
+//     margin-left: 0px;
+//   }
+// }
+// @media (max-width: 1440px) {
+//   .rt-align {
+//     margin-left: 1105px;
+//   }
+//   .marginl {
+//     margin-left: 20px;
+//   }
+// }
+// @media (max-width: 1290px) {
+//   .rt-align {
+//     margin-left: 970px;
+//   }
+//   .marginl {
+//     margin-left: 40px;
+//   }
+// }
+// @media (max-width: 1180px) {
+//   .rt-align {
+//     margin-left: 860px;
+//   }
+//   .marginl {
+//     margin-left: 45px;
+//   }
+// }
+// @media (max-width: 1025px) {
+//   .rt-align {
+//     margin-left: 710px;
+//   }
+//   .marginl {
+//     margin-left: 45px;
+//   }
+// }
+// @media (max-width: 820px) {
+//   .rt-align {
+//     margin-left: 600px;
+//   }
+//   .marginl {
+//     margin-left: 45px;
+//   }
+//   .stepper-row {
+//     margin-top: 35px;
+//     position: absolute;
+//     // z-index: 9;
+//     margin-left: 0px !important;
+//   }
+//   .dev-align {
+//     text-align: left;
+//     margin-left: 30px !important;
+//   }
+//   .block-align {
+//     margin-right: -20px !important;
+//   }
+// }
+.label-row{
+  .title{
+    width: 100px;
+    text-align: center;
+    &.start{
+      margin-left: 40px;
+      margin-bottom: 0px;
+    }
+  }
+}
+
+.button-disabled{
+  opacity: 0.3;
+}
+.btn-visible{
+  visibility: visible;
+}
+.btn-hidden{
+  visibility: hidden;
+}
+
+.font-15{
+  font-size: 15px;
+}
+
+.increase-contrast{
+  filter: contrast(2);
+}
+
+.step-names{
+  letter-spacing: normal;
+  margin: 0 0 16px;
+}
+
+.mt-25{
+  margin-top: -21px;
+}
+
+.p{
+
+}
+
+// .fwd-arrow{
+// margin-left: 1480px !important;
+// }

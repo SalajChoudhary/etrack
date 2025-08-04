@@ -1,0 +1,131 @@
+<div class="bg-white modal_popup">
+    <div class="top-header header-align">
+        <div class="top-headings header-2b mb-3">Additional Application for Project ID {{ projectId }}</div>
+    </div>
+    <div class="container mb-15">
+      <div class="">
+        When choosing to add Renewal or Modification, please verify that the Permit Type you are adding is 
+        listed as an Active Authorization on the Virtual Workspace below.
+      </div>
+    </div>
+    <div class="col-10 offset-1">
+        <div class="row">
+            <div class="col-12">
+                <form [formGroup]="form">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label for="" class="col-form-label">Permit Type*:</label>
+                        </div>
+                        <div class="col-8">
+                            <select formControlName="permit"  class="form-control">
+                                <option value="">Select Permit</option>
+                                <option *ngFor="let permit of availablePermits" [value]="permit.permitType">{{permit.permitTypeDesc}}</option>
+                            </select>
+                            <div class="error-msg" *ngIf="isSubmitted || form.get('permit')?.touched">
+                                <div *ngIf="form.get('permit')?.errors?.required">
+                                  {{errorMsgObj?.ATLEAST_ONE_PERMIT_REQD}}
+                                  <span *ngIf="!errorMsgObj?.ATLEAST_ONE_PERMIT_REQD">Error: At least one Permit Type selection Required.</span>
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label for="" class="col-form-label">Add to Batch*:</label>
+                        </div>
+                        <div class="col-3">
+                            <select formControlName="batchId" class="form-control" (change)="setTransTypeValue()">
+                                <option value="">Select Batch Id</option>
+                                <option *ngFor="let batch of availableBatchId" [value]="batch.batchId">{{batch.batchId}}</option>
+                            </select>
+                            <div class="error-msg" *ngIf="isSubmitted || form.get('batchId')?.touched">
+                                <div *ngIf="form.get('batchId')?.errors?.required">Error: Select a Batch Id</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label for="" class="col-form-label">Application Type*:</label>
+                        </div>
+                        <div class="col-2">
+                            <select formControlName="transType"  class="form-control" >
+                                <!-- <option value="">Select Trans Type</option>                                 -->
+                                <option *ngFor="let item of availableTransTypes" [value]="item.transTypeCode">{{item.transTypeCode}}</option>
+                            </select>
+                            <div class="error-msg" *ngIf="isSubmitted || form.get('transType')?.touched">
+                                <div *ngIf="form.get('transType')?.errors?.required">Error: Select a transType</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <div class="row">
+          <div class="col-10">
+            <div class="d-flex justify-content-end align-items-end flex-column">
+          
+              <div>
+                <button type="button"  (click)="onSaveClick($event)"
+                class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload margin toLowerCase">
+                Save
+              </button>
+              <button ngbAutofocus  type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="onCancelClicked($event)">
+                Close
+              </button>
+              </div>
+              <div class="my-2 mr-2" *ngIf="serverErrorMessage">
+                <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+              </div>
+        </div>
+          </div>
+        </div>
+        
+    </div>
+</div>
+
+
+<app-pending-changes-popup #pendingPopup (onOkClick)="onConfirmExit($event)"></app-pending-changes-popup>
+
+<app-custom-modal-popup #confirmModal [modalConfig]="warningConfig">
+    <ng-container>
+      <!-- *ngIf="isOpenConfirmPopUp | async" -->
+      <div class="modal-body center-align">
+        <div class="text-center">
+          
+          <span  class="text-left mt-2 typo-2"
+            >Are you sure you are ready to submit your project?</span
+          >
+          <!-- <br />
+          <span class="typo-2">and start a new one.</span> -->
+        </div>
+      </div>
+      <div class="text-center ml-23 typo-2">
+       
+        <span  class=""
+          >Click <strong>OK</strong> to continue to submit your project.</span
+        >
+        <br />
+        <span class="mb-5 typo-2"
+          >Click <strong>Cancel</strong> to return to current screen.</span
+        >
+      </div>
+      <div class="modal-footer-confirmation model-footer-reduced">
+        <div class="text-center mt-4">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark btn-primari mb-2 mr-2 okButton"
+            (click)="okClicked($event)"
+          >
+            OK
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark closebutton mb-2"
+            (click)="this.closeModal($event)"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </app-custom-modal-popup>

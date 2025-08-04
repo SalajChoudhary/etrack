@@ -1,0 +1,49 @@
+
+ 
+ <p-table [customSort]="true" (sortFunction)="customSort($event)"  #dataTable [value]="dataList" [autoLayout]="true" styleClass="p-datatable-lg" 
+  [paginator]="isPagination"
+    [rows]="5"  [scrollable]="dataList?.length > 0 ? true : false" id="search_results_table" [scrollHeight]="'45rem'">
+    <ng-template pTemplate="header">
+      <tr role="rowgroup" [ngClass]="isMaxHeight?'height-max':null" id="Search Results Header" class="h-10">
+        <th scope="col" role="columnheader" id="{{header?.columnTitle+i}}" aria-label="Header Title"
+          aria-sort="descending" *ngFor="let header of headers;let i=index;" class="table-header-primary"
+          [ngStyle]="{'width':header?.headerWidth ? header.headerWidth : 'auto', 'word-break':' break-word' , 'height': '85px'}"
+          [pSortableColumn]="header.isSort? header.columnTitle :'anyField'+i">{{header?.columnLabel}}
+          <br>
+          <p-columnFilter *ngIf="header.isFilter" class=" text-left" type="text" [field]="header?.columnTitle"
+            display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false"
+            matchMode= 'in' [showOperator]="false"
+            [showClearButton]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect [(ngModel)]="filterValues[i]" [options]="getFilterList(header?.filtersList)"
+                placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+          <img *ngIf="header?.isClearFilterIcon && dataList.length>0" style="cursor:pointer;" class="filter-icon"
+            ngbTooltip="Reset filters" placement = "left" alt="filter" src="assets/icons/funnel-cross.jpg" (click)="resetFilters()">
+          <span *ngIf="header?.isExportIcon && dataList.length>0"> &nbsp; <img class="export-icon" alt="export"
+            ngbTooltip="Export to Excel" placement = "left" src="assets/icons/export.png" (click)="exportToExcel()" style="cursor: 'pointer';"></span>
+
+        </th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr role="rowgroup">
+        <ng-container *ngFor="let header of headers">
+            <td *ngIf="!header?.isExportIcon" [ngStyle]="{'width':header?.bodyWidth ? header?.bodyWidth :'auto'}" class="pr-0"> {{item[header.columnTitle]}}</td>
+          <td scope="col" role="cell" aria-label="Search grid Item"  aria-sort="descending" class="table-body"
+            *ngIf="header?.isExportIcon || header?.isAction"
+            [ngStyle]="{'width':header?.bodyWidth ? header?.bodyWidth :'auto'}">
+          </td>
+        </ng-container>
+      </tr>
+
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td style="text-align:center ;" colspan="100">No Records Available.</td>
+      </tr>
+    </ng-template>
+  </p-table>

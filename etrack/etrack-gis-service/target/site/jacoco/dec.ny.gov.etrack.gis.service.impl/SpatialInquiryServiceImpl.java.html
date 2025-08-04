@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpatialInquiryServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.service.impl</a> &gt; <span class="el_source">SpatialInquiryServiceImpl.java</span></div><h1>SpatialInquiryServiceImpl.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.service.impl;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dec.ny.gov.etrack.gis.exception.BadRequestException;
+import dec.ny.gov.etrack.gis.exception.GISException;
+import dec.ny.gov.etrack.gis.exception.URLInvalidException;
+import dec.ny.gov.etrack.gis.model.GISResponse;
+import dec.ny.gov.etrack.gis.model.GISServiceResponse;
+import dec.ny.gov.etrack.gis.service.SpatialInquiryService;
+import dec.ny.gov.etrack.gis.util.GISServiceUtil;
+
+@Service
+<span class="nc" id="L35">public class SpatialInquiryServiceImpl implements SpatialInquiryService {</span>
+
+  @Autowired
+  @Qualifier(&quot;eTrackOtherServiceRestTemplate&quot;)
+  private RestTemplate eTrackOtherServiceRestTemplate;
+  @Autowired
+  @Qualifier(&quot;gisInternalServiceRestTemplate&quot;)
+  private RestTemplate gisInternalServiceRestTemplate;
+  @Autowired
+  private GISServiceUtil gisServiceUtil;
+
+  private static final String POLYGON_URL_TEMPLATE = &quot;/%1$s/FeatureServer/0/%2$s&quot;;
+  private static final String SAVE_ACTION = &quot;S&quot;;
+  private static final String UPDATE_ACTION = &quot;U&quot;;
+  private static final String PJSON_FIELD = &quot;pjson&quot;;
+  private static final String OUTFIELDS_TEXT = &quot;outFields&quot;;
+  private static final String INVALID_URL_LOG_INFO =
+      &quot;URL {} contains invalid encoded value. Error Message {}&quot;;
+<span class="nc" id="L53">  private static final Logger LOGGER =</span>
+<span class="nc" id="L54">      LoggerFactory.getLogger(SpatialInquiryServiceImpl.class.getName());</span>
+
+  @Override
+  public Object spatialInquiryApplicantPolygon(List&lt;Object&gt; featureMap, String value, String action,
+      final String contextId) {
+<span class="nc" id="L59">    String url = null;</span>
+<span class="nc bnc" id="L60" title="All 3 branches missed.">    switch (action) {</span>
+      case SAVE_ACTION:
+<span class="nc" id="L62">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_spatial_inquiry_poly&quot;, &quot;addFeatures&quot;);</span>
+<span class="nc" id="L63">        break;</span>
+      case UPDATE_ACTION:
+<span class="nc" id="L65">        url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_spatial_inquiry_poly&quot;, &quot;updateFeatures&quot;);</span>
+<span class="nc" id="L66">        break;</span>
+      default:
+<span class="nc" id="L68">        throw new BadRequestException(&quot;NOT_VALID_ACTION&quot;,</span>
+            &quot;Not a valid an action indicator passed to the Spatial Inquiry &quot;, action);
+
+    }
+<span class="nc" id="L72">    LOGGER.info(&quot;URL for Spatial Inquiry Polygon {}&quot;, url);</span>
+<span class="nc" id="L73">    return gisServiceUtil.submitPolygonRequest(url, featureMap, value, &quot;INTERNAL&quot;, contextId);</span>
+  }
+
+  @Override
+  public Object deleteSpatialInqPolygonByObjId(String objectId, final String contextId) {
+
+<span class="nc" id="L79">    LOGGER.info(&quot;Entering into deleteSpatialInqPolygonByObjId {}, Context Id {}&quot;, objectId,</span>
+        contextId);
+
+<span class="nc" id="L82">    String url =</span>
+<span class="nc" id="L83">        String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_spatial_inquiry_poly&quot;, &quot;deleteFeatures&quot;);</span>
+
+<span class="nc" id="L85">    MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L86">    HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L87">    formheaders.setContentType(MediaType.TEXT_PLAIN);</span>
+<span class="nc" id="L88">    HttpEntity&lt;String&gt; formJson = new HttpEntity&lt;&gt;(&quot;objectId=&quot; + objectId, formheaders);</span>
+<span class="nc" id="L89">    featureMapDetails.add(&quot;where&quot;, formJson);</span>
+
+<span class="nc" id="L91">    HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L92">    HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L93">    featureMapDetails.set(&quot;f&quot;, form);</span>
+
+<span class="nc" id="L95">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L96">    httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L97">    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+        new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+    try {
+<span class="nc" id="L100">      LOGGER.info(&quot;URL for delete the Spatial Inquiry Polygon ById {}&quot;,</span>
+<span class="nc" id="L101">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L102">      return gisInternalServiceRestTemplate.postForEntity(</span>
+<span class="nc" id="L103">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity, Object.class).getBody();</span>
+<span class="nc" id="L104">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L105">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L106">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L107">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L108">      throw new GISException(&quot;GIS_DEL_SPATIAL_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(),</span>
+<span class="nc" id="L109">          ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  @Override
+  public Object saveSpatialInqDetails(String userId, String contextId, String jwtToken,
+      JsonNode spatialInqDetails) {
+<span class="nc" id="L116">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L117">    httpHeaders.add(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L118">    httpHeaders.add(&quot;contextId&quot;, contextId);</span>
+<span class="nc" id="L119">    httpHeaders.add(HttpHeaders.AUTHORIZATION, jwtToken);</span>
+<span class="nc" id="L120">    String url = UriComponentsBuilder.fromUriString(&quot;/etrack-permit/spatial-inquiry&quot;).toUriString();</span>
+<span class="nc" id="L121">    HttpEntity&lt;JsonNode&gt; entity = new HttpEntity&lt;&gt;(spatialInqDetails, httpHeaders);</span>
+    try {
+<span class="nc" id="L123">      return eTrackOtherServiceRestTemplate.postForEntity(url, entity, JsonNode.class).getBody();</span>
+<span class="nc" id="L124">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L125">      throw new GISException(&quot;ETRACK_SAVE_SPATIAL_ERROR&quot;, ex.getResponseBodyAsString(),</span>
+<span class="nc" id="L126">          ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  @Override
+  public String getSpatialPolygonByApplicationId(String spatialInquiryId, String contextId) {
+<span class="nc" id="L132">    String query = &quot;SI_ID='&quot; + spatialInquiryId + &quot;'&quot;;</span>
+<span class="nc" id="L133">    String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_spatial_inquiry_poly&quot;, &quot;query&quot;);</span>
+<span class="nc" id="L134">    String uri = UriComponentsBuilder.fromUriString(url).queryParam(&quot;where&quot;, query)</span>
+<span class="nc" id="L135">        .queryParam(&quot;f&quot;, PJSON_FIELD).queryParam(OUTFIELDS_TEXT, &quot;*&quot;).queryParam(&quot;outSR&quot;, &quot;3857&quot;)</span>
+<span class="nc" id="L136">        .queryParam(&quot;returnCentroid&quot;, true).toUriString();</span>
+
+    try {
+<span class="nc" id="L139">      LOGGER.info(&quot;getSpatialPolygonByApplicationId URL {}&quot;,</span>
+<span class="nc" id="L140">          URLDecoder.decode(uri, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L141">      return gisInternalServiceRestTemplate</span>
+<span class="nc" id="L142">          .getForObject(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), String.class);</span>
+<span class="nc" id="L143">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L144">      LOGGER.error(INVALID_URL_LOG_INFO, uri, e);</span>
+<span class="nc" id="L145">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L146">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L147">      throw new GISException(&quot;GIS_SPATIAL_POLYGON_ERROR&quot;, ex.getResponseBodyAsString(),</span>
+<span class="nc" id="L148">          ex.getStatusCode(), ex);</span>
+    }
+  }
+
+  @Override
+  public Object getSpatialInquiryDetails(String userId, String contextId, String jwtToken,
+      Long inquiryId, final String requestorName) {
+    try {
+<span class="nc" id="L156">      HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L157">      httpHeaders.add(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L158">      httpHeaders.add(&quot;contextId&quot;, contextId);</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">      if (StringUtils.hasLength(requestorName)) {</span>
+<span class="nc" id="L160">        httpHeaders.add(&quot;requestorName&quot;, requestorName);</span>
+      }
+<span class="nc" id="L162">      httpHeaders.add(HttpHeaders.AUTHORIZATION, jwtToken);</span>
+<span class="nc" id="L163">      String path = &quot;/etrack-dart-db/spatial-inq/spatial-inquiry&quot;;</span>
+<span class="nc" id="L164">      String url = null;</span>
+<span class="nc bnc" id="L165" title="All 4 branches missed.">      if (inquiryId != null &amp;&amp; inquiryId &gt; 0) {</span>
+<span class="nc" id="L166">        url = UriComponentsBuilder.fromUriString(path + &quot;/&quot; + inquiryId).toUriString();</span>
+      } else {
+<span class="nc" id="L168">        url = UriComponentsBuilder.fromUriString(path).toUriString();</span>
+      }
+<span class="nc" id="L170">      HttpEntity&lt;JsonNode&gt; entity = new HttpEntity&lt;&gt;(httpHeaders);</span>
+<span class="nc" id="L171">      return eTrackOtherServiceRestTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class)</span>
+<span class="nc" id="L172">          .getBody();</span>
+<span class="nc" id="L173">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L174">      return new GISException(&quot;GIS_GET_SPATIAL_INQ_ERROR&quot;, ex.getResponseBodyAsString(),</span>
+<span class="nc" id="L175">          ex.getStatusCode(), ex);</span>
+<span class="nc" id="L176">    } catch (Exception e) {</span>
+<span class="nc" id="L177">      return new GISException(&quot;GENERAL_ERROR&quot;, &quot;General Error Occurred&quot;, e);</span>
+    }
+  }
+
+  @Override
+  public GISServiceResponse saveSpatialInquiryResponseDetails(String userId, String contextId, String jwtToken,
+      JsonNode spatialInqPolygonResponse) {
+
+<span class="nc" id="L185">    LOGGER.info(</span>
+        &quot;Entering into requesting GIS Service details to update the Inquiry response details. User Id {}, Context Id {}&quot;,
+        userId, contextId);
+<span class="nc" id="L188">    String url = String.format(POLYGON_URL_TEMPLATE, &quot;eTrack_spatial_inquiry_poly&quot;, &quot;applyEdits&quot;);</span>
+    try {
+<span class="nc" id="L190">      LOGGER.info(&quot;saveSpatialInquiryResponseDetails URL {}, User Id {}, Context Id {} &quot;,</span>
+<span class="nc" id="L191">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()), userId, contextId);</span>
+
+<span class="nc" id="L193">      LOGGER.debug(&quot;GIS inquiry request to upload. User Id {}, Context Id {}, &quot;</span>
+<span class="nc" id="L194">          + &quot;Request {}&quot;, new ObjectMapper().writeValueAsString(spatialInqPolygonResponse));</span>
+
+<span class="nc" id="L196">      MultiValueMap&lt;String, Object&gt; featureMapDetails = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L197">      HttpHeaders formheaders = new HttpHeaders();</span>
+<span class="nc" id="L198">      formheaders.setContentType(MediaType.APPLICATION_JSON);</span>
+<span class="nc" id="L199">      HttpEntity&lt;JsonNode&gt; formJson = new HttpEntity&lt;&gt;(spatialInqPolygonResponse, formheaders);</span>
+<span class="nc" id="L200">      featureMapDetails.add(&quot;updates&quot;, formJson);</span>
+      
+<span class="nc" id="L202">      HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L203">      HttpEntity&lt;String&gt; form = new HttpEntity&lt;&gt;(PJSON_FIELD, headers);</span>
+<span class="nc" id="L204">      featureMapDetails.set(&quot;f&quot;, form);</span>
+      
+<span class="nc" id="L206">      HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L207">      httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);</span>
+<span class="nc" id="L208">      HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity =</span>
+          new HttpEntity&lt;&gt;(featureMapDetails, httpHeaders);
+<span class="nc" id="L210">      GISServiceResponse response = gisInternalServiceRestTemplate.postForObject(</span>
+<span class="nc" id="L211">          URLDecoder.decode(url, StandardCharsets.UTF_8.name()), entity, GISServiceResponse.class);</span>
+<span class="nc" id="L212">      LOGGER.debug(&quot;Response from GIS after upload the inquiry response. User Id {}, Context Id {}, &quot;</span>
+<span class="nc" id="L213">          + &quot;Response {}&quot;, new ObjectMapper().writeValueAsString(response));</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">      if (response != null) {</span>
+<span class="nc" id="L215">        List&lt;GISResponse&gt; gisResponse =</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">            !CollectionUtils.isEmpty(response.getAddResults()) ? response.getAddResults()</span>
+<span class="nc" id="L217">                : response.getUpdateResults();</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">        if (!CollectionUtils.isEmpty(gisResponse)) {</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">          if (!gisResponse.get(0).isSuccess()) {</span>
+<span class="nc" id="L220">            throw new BadRequestException(&quot;GIS Error Code &quot; + gisResponse.get(0).getError().getCode(),</span>
+<span class="nc" id="L221">                gisResponse.get(0).getError().getDescription(), spatialInqPolygonResponse);</span>
+          }
+        }
+      }
+<span class="nc" id="L225">      return response;</span>
+<span class="nc" id="L226">    } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L227">      LOGGER.error(INVALID_URL_LOG_INFO, url, e);</span>
+<span class="nc" id="L228">      throw new URLInvalidException(e.getMessage(), e);</span>
+<span class="nc" id="L229">    } catch (HttpClientErrorException | HttpServerErrorException ex) {</span>
+<span class="nc" id="L230">      throw new GISException(&quot;GIS_INQ_RESP_UPLOAD_ERR&quot;, ex.getResponseBodyAsString(),</span>
+<span class="nc" id="L231">          ex.getStatusCode(), ex);</span>
+<span class="nc" id="L232">    } catch (Exception e) {</span>
+<span class="nc" id="L233">      throw new GISException(&quot;GIS_INQ_RESP_UPLOAD_GEN_ERR&quot;, &quot;General error occurred while uploading the Inquiry response&quot;, e);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

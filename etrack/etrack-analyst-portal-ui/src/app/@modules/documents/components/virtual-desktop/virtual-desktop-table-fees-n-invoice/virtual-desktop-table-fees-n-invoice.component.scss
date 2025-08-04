@@ -1,0 +1,62 @@
+.header{
+    max-height: 50px;
+    justify-content: space-between;
+    display:flex;
+    align-items: center;
+    h3{
+        font-weight: 700;
+    }
+}
+
+table {
+  //  border: 1px solid gray;
+    font-size: 1rem;
+    td{
+        color: #000;
+    }
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: white;
+}
+.scrollable{
+    min-height: 20px;
+    max-height: 130px;
+    overflow:auto;
+    width:100%;
+}
+
+
+.text-blue{
+    color:rgb(71,146,234);
+}
+.font-weight-700{
+    font-weight: 700;
+}
+.invoiceNumberLink{
+    cursor: pointer;
+    color: #007bff;
+    text-decoration: none;
+    background-color: transparent;
+}
+.mr5{
+    margin-right: 5px;
+}
+.fees_invoice_tableWidth{
+    width: 42%;
+}
+.mr10{
+    margin-right: 10px;
+}
+.mr6{
+    margin-right: 6px;
+}
+.mr65{
+    margin-right: 65px;
+}
+.mr21{
+    margin-right: 21px;
+}

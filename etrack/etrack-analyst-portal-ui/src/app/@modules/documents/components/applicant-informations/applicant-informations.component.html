@@ -1,0 +1,1003 @@
+<form [formGroup]="basicDetailsFormGroup" (ngSubmit)="onFormSubmit()" *ngIf="!hideForm" #ngForm="ngForm"
+  class="top-margin">
+  <div class="top-header header-align">
+    <div class="top-headings header-3b mb-3">
+      {{ headerText?.toUpperCase() }}
+    </div>
+    <p class="info-txt header-1n">
+      Please complete the form so that we can confirm, update, or add
+      information in our system.
+    </p>
+  </div>
+
+  <!-- <app-validate-banner
+    *ngIf="mode == 'validate'"
+    [validated]="applicantsValidated"
+    [showBottomBorder]="showBottomBorder"
+  ></app-validate-banner> -->
+  <div class="shadow-div" [hidden]="mode == 'validate'"></div>
+
+  <!-- <ng-template matStepLabel>Location Search</ng-template> -->
+
+  <fieldset [disabled]="applicantsValidated || applicantsReadonly">
+    <div class="container form-container">
+      <div class="row">
+        <div class="col-9 offset-3 d-flex align-items-center">
+          <div class="form-group d-flex mt-4 mr-5 mb-0">
+           <h3 class="single-line typo-2">Applicant Type*:</h3>
+            <select name="applicantType" formControlName="applicantType" class="form-control ml-2"
+              [(ngModel)]="selectedApplicantType" [attr.disabled]="true" [ngStyle]="{ width: '250px' }">
+              <option value="" selected>--SELECT--</option>
+              <option *ngFor="let type of configObject?.publicTypes" value="{{ type?.publicTypeCode }}">
+                {{ type?.publicTypeDesc }}
+              </option>
+            </select>
+          </div>
+          <p class="typo-2-500" *ngIf="applicantDetails?.edbApplicantId && mode === 'validate'">
+            Public ID:<button type="button" (click)="publicId()" class="btn btn-link public_id_btn pl-0">
+              {{ applicantDetails?.edbApplicantId }}
+            </button>
+            <!-- </a> -->
+          </p>
+          <p class="typo-2-500" *ngIf="!applicantDetails?.edbApplicantId && mode === 'validate' && applicantId">
+            Public ID:
+            <span (click)="emptyPublicId()" *ngIf="
+                isModeValidate &&
+                !(
+                  applicantDetails?.edbApplicantId 
+                )
+              " class="text-primary hand-cursor">NEW
+              <img src="assets/icons/edit_square-blue.svg" alt="Edit Square" /></span>
+            
+            <button type="button" *ngIf="!isModeValidate" (click)="emptyPublicId()" class="btn pl-0">
+              Public ID:
+            </button>
+            <span>{{ applicantDetails?.edbApplicantId }}</span>
+
+          </p>
+
+        </div>
+      </div>
+    </div>
+    <div *ngIf="applicantId && mode === 'validate' "><a class="public-link typo-2" target="_blank"
+      href={{systemParameters?.E_FIND_PUBLIC_SEARCH}}>Search eFind public records</a></div>
+    <div class="row">
+      <div class="col-3 offset-5" id="applicantTypeError">
+        <span class="addr-error-msg" id="applicantTypeSpanError" *ngIf="
+            (ngForm?.submitted || isClosevalidationCheck) &&
+            formControls.applicantType?.errors?.required
+          ">{{ errorMsgObj?.APLCT_TYPE_REQD_MSG }}</span>
+      </div>
+    </div>
+    <!-- scenario - 1 -->
+    <ng-container *ngIf="
+        ['I', 'P'].includes(basicDetailsFormGroup.controls.applicantType.value)
+      ">
+      <div class="row form-row pl-2 pr-2">
+        <div class="col-3 pl-0">
+          <div class="form-group d-flex">
+            <div class="form-check form-check-input">
+              <label class="form-check-label typo-2" for="inlineCheckbox1">First Name*:
+              </label>
+              <div class="input-box-wrap">
+                <input maxlength="30" class="form-control" formControlName="firstName" type="text"
+                  id="inlineCheckbox1" />
+                <ng-container *ngIf="
+                    applicantDetailsHistory?.individual?.firstName.toUpperCase() !==
+                      applicantDetails?.individual?.firstName.toUpperCase() &&
+                    applicantDetailsHistory
+                  ">
+                  <div class="icon-holder-1" *ngIf="
+                      basicDetailsFormGroup?.get('firstName')?.value ===
+                      applicantDetails?.individual?.firstName
+                    ">
+                    <img [src]="yieldSignPath" alt="A yellow yield sign" (click)="
+                        toggleValue(
+                          'firstName',
+                          applicantDetailsHistory?.individual?.firstName
+                        )
+                      " [ngbTooltip]="
+                        applicantDetailsHistory?.individual?.firstName
+                      " />
+                  </div>
+                  <div class="icon-holder-1" *ngIf="
+                      basicDetailsFormGroup?.get('firstName')?.value ===
+                      applicantDetailsHistory?.individual?.firstName
+                    ">
+                    <img [src]="editSignPath" alt="A yellow yield sign" (click)="
+                        toggleValue(
+                          'firstName',
+                          applicantDetails?.individual?.firstName
+                        )
+                      " [ngbTooltip]="applicantDetails?.individual?.firstName" />
+                  </div>
+                </ng-container>
+                <!-- <div class="icon-holder"  [hidden] = "!applicantDetailsHistory?.individual?.firstName || applicantDetailsHistory?.individual?.firstName === currentApplicantData?.individual?.firstName" >
+                  <img [src]="yieldSignPath" class="mt-25"
+                   alt="A yellow yield sign" 
+                  ngbTooltip="{{
+                    applicantDetailsHistory?.individual?.firstName
+                    }}"
+                    />
+                </div> -->
+              </div>
+              <span class="addr-error-msg" *ngIf="
+                  (ngForm?.submitted || isClosevalidationCheck) &&
+                  formControls.firstName?.errors?.required
+                ">{{ errorMsgObj?.FIRST_NAME_REQD_MSG }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 pl-0">
+          <div class="form-group d-flex">
+            <div class="form-check form-check-input">
+              <label class="form-check-label typo-2" for="inlineCheckbox1">Middle Name/Initial:</label>
+              <div class="input-box-wrap">
+                <input maxlength="15" class="form-control" formControlName="middleName" type="text" id="inlineCheckbox1"
+                  (keydown)="onMiddleKeyPress($event)" />
+
+                <ng-container *ngIf="
+                    applicantDetailsHistory?.individual?.middleName &&
+                    applicantDetailsHistory?.individual?.middleName.toUpperCase() !==
+                      applicantDetails?.individual?.middleName &&
+                    applicantDetailsHistory
+                  ">
+                  <div class="icon-holder-1" *ngIf="
+                      basicDetailsFormGroup?.get('middleName')?.value ===
+                      applicantDetails?.individual?.middleName
+                    ">
+                    <img [src]="yieldSignPath" alt="A yellow yield sign" (click)="
+                        toggleValue(
+                          'middleName',
+                          applicantDetailsHistory?.individual?.middleName
+                        )
+                      " [ngbTooltip]="
+                        applicantDetailsHistory?.individual?.middleName
+                      " />
+                  </div>
+                  <div class="icon-holder-1" *ngIf="
+                      basicDetailsFormGroup?.get('middleName')?.value ===
+                      applicantDetailsHistory?.individual?.middleName
+                    ">
+                    <img [src]="editSignPath" alt="A yellow yield sign" (click)="
+                        toggleValue(
+                          'middleName',
+                          applicantDetails?.individual?.middleName
+                        )
+                      " [ngbTooltip]="applicantDetails?.individual?.middleName" />
+                  </div>
+                </ng-container>
+                <!-- <div class="icon-holder"  [hidden] ="!applicantDetailsHistory?.individual?.middleName || applicantDetailsHistory?.individual?.middleName === currentApplicantData?.individual?.middleName" >
+                    <img [src]="yieldSignPath" alt="A yellow yield sign"  class="mt-25"
+                    ngbTooltip="{{
+                      applicantDetailsHistory?.individual?.middleName
+                      }}"
+                      />
+                  </div> -->
+              </div>
+              <span class="addr-error-msg" *ngIf="
+                  (ngForm?.submitted || isClosevalidationCheck) &&
+                  formControls.middleName?.errors?.isSpecialChar
+                ">{{ errorMsgObj?.INVALID_MID_NAME_MSG }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 pl-0">
+          <div class="form-group d-flex">
+            <div class="form-check form-check-input">
+              <label class="form-check-label typo-2" for="inlineCheckbox1">Last Name*:</label>
+
+              <div class="input-box-wrap">
+                <input maxlength="40" class="form-control" type="text" formControlName="lastName"
+                  id="inlineCheckbox1" />
+
+                <ng-container *ngIf="
+                    applicantDetailsHistory?.individual?.lastName.toUpperCase() !==
+                      applicantDetails?.individual?.lastName.toUpperCase() &&
+                    applicantDetailsHistory
+                  ">
+                  <div class="icon-holder-1" *ngIf="
+                      basicDetailsFormGroup?.get('lastName')?.value ===
+                      applicantDetails?.individual?.lastName
+                    ">
+                    <img [src]="yieldSignPath" alt="A yellow yield sign" (click)="
+                        toggleValue(
+                          'lastName',
+                          applicantDetailsHistory?.individual?.lastName
+                        )
+                      " [ngbTooltip]="
+                        applicantDetailsHistory?.individual?.lastName
+                      " />
+                  </div>
+                  <div class="icon-holder-1" *ngIf="
+                      basicDetailsFormGroup?.get('lastName')?.value ===
+                      applicantDetailsHistory?.individual?.lastName
+                    ">
+                    <img [src]="editSignPath" alt="A yellow yield sign" (click)="
+                        toggleValue(
+                          'lastName',
+                          applicantDetails?.individual?.lastName
+                        )
+                      " [ngbTooltip]="applicantDetails?.individual?.lastName" />
+                  </div>
+                </ng-container>
+                <!-- <div class="icon-holder"  [hidden] ="!applicantDetailsHistory?.individual?.lastName || applicantDetailsHistory?.individual?.lastName === currentApplicantData?.individual?.lastName" >
+                  <img [src]="yieldSignPath" alt="A yellow yield sign"  class="mt-25"
+                  ngbTooltip="{{
+                    applicantDetailsHistory?.individual?.lastName
+                    }}"
+                    />
+                </div> -->
+              </div>
+              <span class="addr-error-msg" *ngIf="
+                  (ngForm?.submitted || isClosevalidationCheck) &&
+                  formControls.lastName?.errors?.required
+                ">{{ errorMsgObj?.LAST_NAME_REQD_MSG }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 pl-0">
+          <div class="form-group d-flex">
+            <div class="form-check form-check-input">
+              <label class="form-check-label typo-2" for="inlineCheckbox1">Suffix:</label>
+              <input maxlength="10" class="form-control" formControlName="suffix" type="text" id="inlineCheckbox1" />
+              <div class="icon-holder" [hidden]="
+                  !applicantDetailsHistory?.individual?.suffix ||
+                  applicantDetailsHistory?.individual?.suffix ===
+                    currentApplicantData?.individual?.suffix
+                ">
+                <img [src]="yieldSignPath" alt="A yellow yield sign" class="mt-25 mr-100"
+                  ngbTooltip="{{ applicantDetailsHistory?.individual?.suffix }}" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- At least one checkbox must be chosen to indicate the relationship to this property. -->
+      <br />
+      <div class="shadow-div mt-3"></div>
+      <div class="row mt-4" *ngIf="currentTab == 0">
+        <div class="col-12">
+          <div class="form-group d-flex">
+            <h3 class="w-145 p-0 m-0 typo-2">Relationship to Property*:</h3>
+            <div class="form-check form-check-inline">
+              <input formControlName="owner" class="form-check-input" type="checkbox" id="ownerCheckbox1"
+                value="option1" (click)="isOwnerChanged()" />
+              <label class="form-check-label typo-2" for="ownerCheckbox1">Owner</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input formControlName="operator" class="form-check-input" type="checkbox" id="operatorCheckbox1"
+                value="option2" />
+              <label class="form-check-label typo-2" for="operatorCheckbox1">Operator</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input formControlName="lessee" class="form-check-input" type="checkbox" id="lesseeCheckbox1"
+                value="option3" />
+              <label class="form-check-label typo-2 mr-4" for="lesseeCheckbox1">Lessee</label>
+              <span class="info typo-2">(Check all that apply) </span>
+            </div>
+          </div>
+          <span class="d-block addr-error-msg ml-200 mt-15" *ngIf="
+              formControls.owner?.errors?.checkboxRequired &&
+              formControls.operator?.errors?.checkboxRequired &&
+              formControls.lessee?.errors?.checkboxRequired &&
+              (ngForm?.submitted || isClosevalidationCheck)
+            ">{{ errorMsgObj?.RLNP_TO_PROP_MISS_MSG }}</span>
+        </div>
+      </div>
+      <div *ngIf="currentTab == 0" class="shadow-div"></div>
+
+      <div *ngIf="isDetailsEmpty()">
+        <app-address [applicantsValidated]="applicantsValidated" (addressChange)="onAddressChange($event)"
+          [applicantDetails]="applicantDetails" [applicantDetailsHistory]="applicantDetailsHistory"
+          [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm" [basicDetailsFormGroup]="basicDetailsFormGroup"
+          [selectedApplicantType]="selectedApplicantType" [addressLocation]="addressType"
+          [isClosevalidationCheck]="isClosevalidationCheck" [currentTab]="currentTab"></app-address>
+      </div>
+      <div *ngIf="!isDetailsEmpty()">
+        <app-address [applicantsValidated]="applicantsValidated" (addressChange)="onAddressChange($event)"
+          [applicantDetails]="applicantDetails" [applicantDetailsHistory]="applicantDetailsHistory"
+          [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm" [basicDetailsFormGroup]="basicDetailsFormGroup"
+          [selectedApplicantType]="selectedApplicantType" [addressLocation]="addressType"
+          [isClosevalidationCheck]="isClosevalidationCheck" [currentTab]="currentTab"></app-address>
+      </div>
+
+      <div class="shadow-div"></div>
+      <app-contact-details [applicantsValidated]="applicantsValidated"
+        [applicantDetailsHistory]="applicantDetailsHistory" [addressType]="currentAddressType"
+        [applicantDetails]="applicantDetails" [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm"
+        [selectedApplicantType]="selectedApplicantType"
+        [contactDetailsFormGroup]="formControls?.contactDetailsFormGroup"
+        [isClosevalidationCheck]="isClosevalidationCheck"></app-contact-details>
+      <!-- <div class="shadow-div"></div> -->
+      <!-- </form> -->
+    </ng-container>
+
+    <!--Scenario 2 starts here: -->
+    <ng-container *ngIf="
+        ['X', 'T', 'C'].includes(
+          basicDetailsFormGroup.controls.applicantType.value
+        )
+      ">
+      <div class="bizContainer">
+        <div class="row">
+          <div class="col-10 offset-1 pl-0">
+            <div class="form-check form-check-inline center-align">
+              <label class="form-check-label typo-2" [ngStyle]="{ width: '390px' }">Business/Organization Name*:</label>
+              <input class="form-control" type="text" (input)="onBusinessNameChange($event)" minlength="3"
+                maxlength="100" formControlName="businessName" #businessNameInput />
+              <ng-container *ngIf="
+                  applicantDetailsHistory?.organization?.busOrgName &&
+                  applicantDetailsHistory?.organization?.busOrgName.toUpperCase() !==
+                    currentApplicantData?.organization?.busOrgName.toUpperCase()
+                ">
+                <div class="icon-holder-1" *ngIf="
+                    basicDetailsFormGroup?.get('businessName')?.value ===
+                    applicantDetailsHistory?.organization?.busOrgName
+                  ">
+                  <img [src]="editSignPath" alt="A yellow yield sign" (click)="
+                      toggleValue(
+                        'businessName',
+                        currentApplicantData?.organization?.busOrgName
+                      )
+                    " [ngbTooltip]="
+                      currentApplicantData?.organization?.busOrgName
+                    " />
+                </div>
+                <div class="icon-holder-1" *ngIf="
+                    basicDetailsFormGroup?.get('businessName')?.value ===
+                    currentApplicantData?.organization?.busOrgName
+                  ">
+                  <img [src]="yieldSignPath" alt="A yellow yield sign" (click)="
+                      toggleValue(
+                        'businessName',
+                        applicantDetailsHistory?.organization?.busOrgName
+                      )
+                    " [ngbTooltip]="
+                      applicantDetailsHistory?.organization?.busOrgName
+                    " />
+                </div>
+              </ng-container>
+              <!-- <div class="icon-holder-1" [hidden]="!applicantDetailsHistory?.organization?.busOrgName || applicantDetailsHistory?.organization?.busOrgName === currentApplicantData?.organization?.busOrgName" >
+                <img [src]="yieldSignPath" alt="A yellow yield sign"
+                ngbTooltip="{{
+                  applicantDetailsHistory?.organization?.busOrgName
+                }}"/>
+              </div> -->
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-7 offset-4">
+            <span class="addr-error-msg" *ngIf="
+                formControls.businessName?.errors?.required &&
+                (ngForm?.submitted || isClosevalidationCheck)
+              ">{{ errorMsgObj?.BUS_ORG_REQD_MSG }}</span>
+            <span class="addr-error-msg" *ngIf="
+                formControls.businessName?.errors?.minlength &&
+                (ngForm?.submitted || isClosevalidationCheck)
+              ">{{ errorMsgObj?.BUS_ORG_MIN_CHAR_REQD }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="shadow-div"></div>
+      <div class="row" *ngIf="currentTab == 0">
+        <div class="col-12 mt-4">
+          <div class="form-group d-flex">
+            <h3 class="w-145 p-0 m-0 typo-2">Relationship to Property*:</h3>
+            <div class="form-check form-check-inline">
+              <input formControlName="owner" class="form-check-input" type="checkbox" id="ownerCheckbox2"
+                value="option1" (click)="isOwnerChanged()" />
+              <label class="form-check-label typo-2" for="ownerCheckbox2">Owner</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input formControlName="operator" class="form-check-input" type="checkbox" id="operatorCheckbox2"
+                value="option2" />
+              <label class="form-check-label typo-2" for="operatorCheckbox2">Operator</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input formControlName="lessee" class="form-check-input" type="checkbox" id="lesseeCheckbox2"
+                value="option3" />
+              <label class="form-check-label mr-4 typo-2" for="lesseeCheckbox2">Lessee</label>
+              <span class="info typo-2">(Check all that apply)</span>
+            </div>
+          </div>
+          <span class="d-block addr-error-msg ml-200 mt-15" *ngIf="
+              formControls.owner?.errors?.checkboxRequired &&
+              formControls.operator?.errors?.checkboxRequired &&
+              formControls.lessee?.errors?.checkboxRequired &&
+              (ngForm?.submitted || isClosevalidationCheck)
+            ">{{ errorMsgObj?.RLNP_TO_PROP_MISS_MSG }}</span>
+        </div>
+      </div>
+      <div class="shadow-div" *ngIf="currentTab == 0"></div>
+
+      <div *ngIf="isDetailsEmpty()">
+        <app-address [applicantsValidated]="applicantsValidated" [applicantDetails]="applicantDetails"
+          [applicantDetailsHistory]="applicantDetailsHistory" [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm"
+          [basicDetailsFormGroup]="basicDetailsFormGroup" [selectedApplicantType]="selectedApplicantType"
+          [addressLocation]="addressType" [isClosevalidationCheck]="isClosevalidationCheck" [currentTab]="currentTab">
+        </app-address>
+      </div>
+
+      <div *ngIf="!isDetailsEmpty()">
+        <app-address [applicantsValidated]="applicantsValidated" (addressChange)="onAddressChange($event)"
+          [applicantDetails]="applicantDetails" [applicantDetailsHistory]="applicantDetailsHistory"
+          [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm" [basicDetailsFormGroup]="basicDetailsFormGroup"
+          [selectedApplicantType]="selectedApplicantType" [addressLocation]="addressType"
+          [isClosevalidationCheck]="isClosevalidationCheck" [currentTab]="currentTab"></app-address>
+      </div>
+
+      <div class="container form-container mt-20">
+        <div class="col-12 pl-0">
+          <div class="form-group d-flex">
+            <div class="form-check form-check-inline">
+              <label class="form-check-label typo-2 w-97 text-right">
+                Attention:</label>
+              <input tabindex="0" id="attentionId" class="form-control ml-12" type="text" [ngStyle]="{ width: '500px' }"
+                maxlength="150" (keyup)="attentionKeyUp()" formControlName="attention" />
+                <ng-container *ngIf="
+                    applicantDetailsHistory?.address?.attentionName &&
+                    applicantDetailsHistory?.address?.attentionName !==
+                      applicantDetails?.address?.attentionName &&
+                    applicantDetailsHistory
+                  ">
+                  <div class="icon-holder-1" *ngIf="
+                      basicDetailsFormGroup?.get('attentionName')?.value ===
+                      applicantDetails?.address?.attentionName
+                    ">
+                    <img [src]="yieldSignPath" alt="A yellow yield sign" (click)="
+                        toggleValue(
+                          'attentionName',
+                          applicantDetailsHistory?.address?.attentionName
+                        )
+                      " [ngbTooltip]="
+                        applicantDetailsHistory?.address?.attentionName
+                      " />
+                  </div>
+                  <div class="icon-holder-1" *ngIf="
+                      basicDetailsFormGroup?.get('attentionName')?.value ===
+                      applicantDetailsHistory?.address?.attentionName
+                    ">
+                    <img [src]="editSignPath" alt="A yellow yield sign" (click)="
+                        toggleValue(
+                          'attentionName',
+                          applicantDetails?.address?.attentionName
+                        )
+                      " [ngbTooltip]="applicantDetails?.address?.attentionName" />
+                  </div>
+                </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="shadow-div"></div>
+
+      <app-contact-details [applicantsValidated]="applicantsValidated"
+        [applicantDetailsHistory]="applicantDetailsHistory" [addressType]="currentAddressType"
+        [applicantDetails]="applicantDetails" [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm"
+        [selectedApplicantType]="selectedApplicantType"
+        [contactDetailsFormGroup]="formControls?.contactDetailsFormGroup"
+        [isClosevalidationCheck]="isClosevalidationCheck"></app-contact-details>
+
+      <!--
+    <app-contact-details [applicantDetails]="applicantDetails" [errorMessages]="errorMsgObj"
+    [ngFormInstance]="ngForm" [selectedApplicantType]="selectedApplicantType"
+    [contactDetailsFormGroup]="formControls?.contactDetailsFormGroup"></app-contact-details>
+
+-->
+
+      <div class="shadow-div"></div>
+
+      <div class="container form-container mt-20" id="container">
+        <div class="row mb-0">
+          <div class="col-5 pr-0 mr-0 form-check-inline">
+            <label class="form-check-label typo-2 left-align">Are you Incorporated?</label>
+            <select name="incorporated" class="form-control w-35" (change)="onAreYouIncorporatedSelected($event)"
+              formControlName="incorporated">
+              <!-- <option value="" disabled selected>--SELECT--</option> -->
+              <option value="Y" selected>Yes</option>
+              <option value="N">No</option>
+            </select>
+          </div>
+          <div class="col-1"></div>
+          <div class="col-6 mr-0 pr-0 form-check-inline text-right" *ngIf="areYouIncorporatedBoolean">
+            <label class="form-check-label typo-2 text-right" id="incorpLabel">Taxpayer ID:</label>
+            <input class="form-control" type="text" mask="00-0000000" formControlName="taxpayerId" maxlength="10" />
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-8 taxErr" *ngIf="
+              formControls.taxpayerId.errors?.minlength &&
+              (ngForm?.submitted || isClosevalidationCheck)
+            ">
+            <span class="addr-error-msg">{{
+              errorMsgObj?.TAX_PAYER_ID_INVALID
+              }}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-5 mr-0 pr-0 form-check-inline" *ngIf="areYouIncorporatedBoolean">
+            <label class="form-check-label typo-2 left-align">State of Incorporation:</label>
+            <select class="form-control w-40" (change)="onStateSelected($event)" formControlName="stateOfIncorporation">
+              <option value="" disabled>--SELECT--</option>
+              <option *ngFor="let state of configObject.states" selected="state.stateCode === 'NY'"
+                [value]="state.stateCode">
+                {{ state.stateCode }}
+              </option>
+              <option value="OT">Other</option>
+            </select>
+          </div>
+          <div class="col-6 offset-1 mr-0 pr-0 form-check-inline text-right"
+            *ngIf="areYouIncorporatedBoolean && isOtherSelected">
+            <label class="form-check-label typo-2" id="incorpLabel" *ngIf="isOtherSelected">Territory/Country:</label>
+            <select class="form-control" formControlName="territoryOrCountry">
+              <option value="" disabled>--SELECT--</option>
+              <option *ngFor="let country of configObject.countries" [value]="country.countryCode">
+                {{ country.countryName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3" *ngIf="
+            stateOfIncorporationString == 'NY' && areYouIncorporatedBoolean
+          ">
+          <div class="col-5 form-check-inline pr-0 mr-0">
+            <label class="form-check-label typo-2 left-align mr-0">Please verify your business*:</label>
+            <div class="col-4 pl-0 ml-1" *ngIf="
+                areYouIncorporatedBoolean && stateOfIncorporationString == 'NY'
+              ">
+              <button type="button" (click)="verifyBusinessName()" [ngClass]="{
+                  verifyBizNameButtonReadOnly:
+                    applicantsValidated === true || applicantsReadonly,
+                  verifyBizNameButton: applicantsValidated === false
+                }">
+                NYS Corporation Search
+              </button>
+              <div class="row">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" formControlName="verified" />
+                  <label class="form-check-label typo-2" id="verification">VERIFIED</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" formControlName="unverified" />
+                  <label class="form-check-label typo-2" id="verification">UNVERIFIED</label>
+                  <!-- <div class="icon-holder-1 ml-10" [hidden]="!applicantDetailsHistory?.organization?.businessVerified || applicantDetailsHistory?.organization?.businessVerified === currentApplicantData?.organization?.businessVerifiedv" >
+                    <img [src]="yieldSignPath" alt="icon-history" aria-label="icon-history" aria-labelledby="icon-history"
+                    [ngbTooltip]="showVerifiedHistory()"/>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-7 pr-0" *ngIf="this.showVerifyListBox">
+            <select class="form-control w-100 verifySelect" (change)="onBusinessNameVerified($event)" size="5">
+              <option value="NL">Not Listed</option>
+              <option *ngFor="let businessName of verifyBusinessList" [value]="businessName">
+                {{ businessName }}
+              </option>
+            </select>
+          </div>
+          <div class="col-5 offset-2 pr-0" *ngIf="this.showUpdateBusinessNameError">
+            <div>
+              <a class="typo-2" target="_blank"
+              href={{systemParameters?.NYS_DOS_URL}}>NYS Business and Corporate Entity Database</a>
+            </div>
+            <div class="typo-2">
+              Incorporated entities must be verified in the NYS Business and Corporate Entity Database. If no match is
+              found, the analyst must follow up with the applicant to resolve identification.
+            </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="this.showUpdateBusinessNameError">
+          <div class="col-6 pl-0">
+            <span class="typo-2 form-check-inline">{{
+              errorMsgObj?.BIZ_ORG_NO_RESULT
+              }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="this.showBizNameLessThanWarning">
+          <span class="typo-2 form-check-inline">{{
+            errorMsgObj?.BIZ_ORG_MIN_CHAR_LENGTH
+            }}</span>
+        </div>
+        <div class="row" *ngIf="this.showTooManyResultsError">
+          <div class="col-6 pl-0">
+            <span class="typo-2 form-check-inline">{{
+              errorMsgObj?.BIZ_ORG_TOO_MANY_RESULT
+              }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="this.showDOSDownError">
+          <div class="col-6 pl-0">
+            <span class="addr-error-msg form-check-inline">{{
+              errorMsgObj?.UNABLE_TO_PROCESS_NOW
+              }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="showVerifyListBox && !nextClicked">
+          <div class="col-6 pl-0">
+            <span class="typo-2 form-check-inline">Select the verified business name from the retrieved list that accurately matches your business name; if not an exact match, choose Not Listed.</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="
+            (ngForm?.submitted || isClosevalidationCheck) &&
+            formControls.incorporated.value == 'Y' &&
+            this.stateOfIncorporationString == 'NY' &&
+            formControls.verified.value == false &&
+            formControls.unverified.value == false &&
+            showBizLookUpRequiredError &&
+            !showVerifyListBox
+          ">
+          <div class="col-6 pl-0">
+            <span class="addr-error-msg form-check-inline">{{
+              errorMsgObj?.NYS_CORPN_DATA_REQD_MSG
+              }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="
+            (ngForm?.submitted || isClosevalidationCheck) &&
+            formControls.incorporated.value == 'Y' &&
+            this.stateOfIncorporationString == 'NY' &&
+            showBizLookUpRequiredError &&
+            !verifyBusinessSelected &&
+            showVerifyListBox
+          ">
+          <div class="col-6 pl-0">
+            <span class="addr-error-msg form-check-inline">{{
+              errorMsgObj?.SELECT_VERFD_BIZ
+              }}</span>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="shadow-div"></div> -->
+    </ng-container>
+    <!-- scenario-2 end -->
+
+    <!-- Scenario 3 starts-->
+    <ng-container *ngIf="
+        ['F', 'S', 'M'].includes(
+          basicDetailsFormGroup.controls.applicantType.value
+        )
+      ">
+      <div class="row">
+        <div class="col-11 offset-1 pl-0">
+          <div class="col-9 form-check form-check-inline text-center">
+            <label class="form-check-label typo-2" id="govtLabel">Government Agency Name*:</label>
+            <input class="form-control" type="text" maxlength="100" formControlName="governmentAgencyName" />
+            <ng-container *ngIf="
+                isModeValidate &&
+                applicantDetailsHistory?.govtAgencyName &&
+                applicantDetailsHistory?.govtAgencyName.toUpperCase() !==
+                  applicantDetails?.govtAgencyName.toUpperCase()
+              ">
+              <div class="icon-holder-1" *ngIf="
+                  basicDetailsFormGroup?.get('governmentAgencyName')?.value ===
+                  applicantDetails?.govtAgencyName
+                ">
+                <img [src]="yieldSignPath" alt="A yellow yield sign" (click)="
+                    toggleValue(
+                      'governmentAgencyName',
+                      applicantDetailsHistory?.govtAgencyName
+                    )
+                  " [ngbTooltip]="applicantDetailsHistory?.govtAgencyName" />
+              </div>
+              <div class="icon-holder-1" *ngIf="
+                  basicDetailsFormGroup?.get('governmentAgencyName')?.value ===
+                  applicantDetailsHistory?.govtAgencyName
+                ">
+                <img [src]="editSignPath" alt="A yellow yield sign" (click)="
+                    toggleValue(
+                      'governmentAgencyName',
+                      applicantDetails?.govtAgencyName
+                    )
+                  " [ngbTooltip]="applicantDetails?.govtAgencyName" />
+              </div>
+            </ng-container>
+            <!-- <div class="icon-holder-1" [hidden]="!applicantDetailsHistory?.govtAgencyName || applicantDetailsHistory?.govtAgencyName === currentApplicantData?.govtAgencyName" >
+              <img [src]="yieldSignPath" alt="A yellow yield sign"
+              ngbTooltip="{{
+                applicantDetailsHistory?.govtAgencyName
+              }}"/>
+            </div> -->
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-7 offset-4">
+          <span class="addr-error-msg" id="govError" *ngIf="
+              (ngForm?.submitted || isClosevalidationCheck) &&
+              formControls.governmentAgencyName?.errors?.required
+            ">{{ errorMsgObj?.GOVT_AGY_REQD_MSG }}</span>
+        </div>
+      </div>
+
+      <div class="shadow-div"></div>
+      <div class="row" *ngIf="currentTab == 0">
+        <div class="col-12 mt-4">
+          <div class="form-group d-flex">
+            <h3 class="w-145 p-0 m-0 typo-2">Relationship to Property*:</h3>
+            <div class="form-check form-check-inline">
+              <input formControlName="owner" class="form-check-input" type="checkbox" id="ownerCheckbox3"
+                value="option1" (click)="isOwnerChanged()" />
+              <label class="form-check-label typo-2" for="ownerCheckbox3">Owner</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input formControlName="operator" class="form-check-input" type="checkbox" id="operatorcheckbox3"
+                value="option2" />
+              <label class="form-check-label typo-2" for="operatorcheckbox3">Operator</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input formControlName="lessee" class="form-check-input" type="checkbox" id="lesseeCheckbox3"
+                value="option3" />
+              <label class="form-check-label mr-4 typo-2" for="lesseeCheckbox3">Lessee</label>
+              <span class="info typo-2">(Check all that apply)</span>
+            </div>
+          </div>
+          <span class="d-block addr-error-msg ml-200 mt-15" *ngIf="
+              formControls.owner?.errors?.checkboxRequired &&
+              formControls.operator?.errors?.checkboxRequired &&
+              formControls.lessee?.errors?.checkboxRequired &&
+              (ngForm?.submitted || isClosevalidationCheck)
+            ">{{ errorMsgObj?.RLNP_TO_PROP_MISS_MSG }}</span>
+        </div>
+      </div>
+      <div class="shadow-div" *ngIf="currentTab == 0"></div>
+
+      <div *ngIf="isDetailsEmpty()">
+        <app-address [applicantsValidated]="applicantsValidated" [applicantDetails]="applicantDetails"
+          [applicantDetailsHistory]="applicantDetailsHistory" [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm"
+          [basicDetailsFormGroup]="basicDetailsFormGroup" [selectedApplicantType]="selectedApplicantType"
+          [addressLocation]="addressType" [isClosevalidationCheck]="isClosevalidationCheck" [currentTab]="currentTab">
+        </app-address>
+      </div>
+
+      <div *ngIf="!isDetailsEmpty()">
+        <app-address [applicantsValidated]="applicantsValidated" (addressChange)="onAddressChange($event)"
+          [applicantDetails]="applicantDetails" [applicantDetailsHistory]="applicantDetailsHistory"
+          [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm" [basicDetailsFormGroup]="basicDetailsFormGroup"
+          [selectedApplicantType]="selectedApplicantType" [addressLocation]="addressType"
+          [isClosevalidationCheck]="isClosevalidationCheck" [currentTab]="currentTab"></app-address>
+      </div>
+
+      <div class="container form-container mt-20">
+        <div class="col-12 pl-0">
+          <div class="form-group d-flex">
+            <div class="form-check form-check-inline">
+              <label class="form-check-label typo-2 w-97 text-right">
+                Attention:</label>
+              <input class="form-control ml-12" type="text" [ngStyle]="{ width: '500px' }" maxlength="150"
+                (keyup)="attentionKeyUp()" formControlName="attention" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="shadow-div"></div>
+
+      <app-contact-details [applicantsValidated]="applicantsValidated"
+        [applicantDetailsHistory]="applicantDetailsHistory" [addressType]="currentAddressType"
+        [applicantDetails]="applicantDetails" [errorMessages]="errorMsgObj" [ngFormInstance]="ngForm"
+        [selectedApplicantType]="selectedApplicantType"
+        [contactDetailsFormGroup]="formControls?.contactDetailsFormGroup"
+        [isClosevalidationCheck]="isClosevalidationCheck"></app-contact-details>
+    </ng-container>
+  </fieldset>
+  <div class="float-right mr-2" *ngIf="showServerError">
+    <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+  </div> 
+ 
+  <div class="row footer-row mt-20">
+    <div class="col-md-12">
+      <div class="float-right">
+        <app-validate-checkbox [isDisabled]="applicantsReadonly" *ngIf="mode == 'validate'"
+          [(validatedModel)]="applicantsValidated">
+        </app-validate-checkbox>
+        <button type="submit" class="btn btn-sm btn-primari nextbutton button-width mb-2 mr-2 upload">
+          Next
+        </button>
+        <button (click)="closeModal()" type="button"
+          class="btn btn-sm btn-outline-dark closebutton button-width mb-2 mr-2">
+          Close
+        </button>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <!-- " -->
+      <div class=" addr-error-msg float-right mr-2"  *ngIf="applicantDetails?.cannotBeLrpInd==1 && headerText != 'Contact/Agent'">
+        {{ errorMsgObj?.CANNOT_BE_LRP_MSG}}
+      </div>
+    </div>
+  </div>
+</form>
+<!-- </ng-template> -->
+<!-- </mat-step> -->
+
+<!-- <mat-step> -->
+<!-- <ng-template matStepLabel>Location Detail</ng-template>
+          <p>You are now done.</p>
+          <div>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button routerLink="/apply-for-permit-details">Save</button>
+          </div> -->
+<!-- </mat-step>
+  </mat-horizontal-stepper> -->
+<app-custom-modal-popup #confirmApplicant [modalConfig]="confirmConfig">
+  <ng-container *ngIf="isOpenConfirmPopUp | async">
+    <div class="modal-body center-align" style="padding: 20px 0 0 0">
+      <p>Do you want to add another {{ headerText }}?</p>
+    </div>
+    <div class="modal-footer model-footer-reduced" style="padding: 0 0 20px 0">
+      <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="yesClicked()"
+        id="AddAnotherYes">
+        Yes
+      </button>
+      <button type="button" class="btn btn-outline-dark p-btn btn-sm closebutton" (click)="noClicked()"
+        id="AddAnotherNo">
+        No
+      </button>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+<app-custom-modal-popup #confirmContact [modalConfig]="confirmConfig">
+  <ng-container *ngIf="isOpenContactPop | async">
+    <div class="modal-body center-align" style="padding: 20px 0 0 0">
+      <p *ngIf="currentTab == 2">
+        {{ applicantData }} has already been added as an Applicant/Owner. 
+         Remove {{ applicantData }} as an Applicant/Owner, and then you 
+         can add {{ applicantData }}  as a Contact/Agent, or you can select a different Contact/Agent.
+
+      </p>
+      <p *ngIf="currentTab == 1">
+        {{ applicantData }} has already been added as a Contact/Agent. 
+        Remove {{ applicantData }} as a Contact/Agent, and then you can add {{ applicantData }}
+        as an Owner, or you can select a different Owner.
+      </p>
+      <p *ngIf="currentTab == 0">
+         {{ applicantData }} has already been added as a Contact/Agent. 
+        Remove {{ applicantData }} as a Contact/Agent, and then you can add {{ applicantData }}
+        as an Applicant, or you can select a different Applicant.
+      </p>
+    </div>
+    <div class="modal-footer model-footer-reduced" style="padding: 0 0 20px 0">
+      <button type="button" class="btn btn-sm btn-primari mb-2 mr-2 okButton" (click)="yesCClicked()">
+        OK
+      </button>
+      <!-- <button type="button" class="btn btn-outline-dark p-btn  btn-sm closebutton" (click)="noCClicked()">
+        No
+      </button> -->
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+<ng-template #closeSearchApplicantInfoModal let-modal>
+  <div class="modal-body center-align" style="padding: 20px 0 0 0">
+    <p>Would you like to associate this {{ headerText }} to this project?</p>
+  </div>
+  <div class="modal-footer model-footer-reduced" style="padding: 0 0 20px 0">
+    <button type="button" class="btn btn-outline-dark p-btn btn-sm closebutton"
+      (click)="yesCloseSearchApplicantInformation()">
+      Yes
+    </button>
+    <button type="button" class="btn btn-outline-dark p-btn btn-sm closebutton"
+      (click)="noCloseSearchApplicantInformation()">
+      No
+    </button>
+  </div>
+</ng-template>
+
+<app-custom-modal-popup #searchModal (modalClosed)="closeSearchModal($event)" [modalConfig]="searchConfig">
+  <ng-container *ngIf="isOpenPopUp | async">
+    <app-applicant-informations-search [currentTab]="currentTab" (closeClicked)="closeSearchModal($event)">
+    </app-applicant-informations-search>
+  </ng-container>
+</app-custom-modal-popup>
+
+<app-pending-changes-popup #pendingPopup (onOkClick)="onPendingChangesOkclick($event)" (onCloseClicked)="ngOnDestroy()">
+</app-pending-changes-popup>
+
+<ng-template #warningModal let-modal>
+  <div class="modal-body-confirmation pt-4">
+    <div class="d-flex justify-content-start align-items-start">
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red" class="bi bi-exclamation-triangle"
+          viewBox="0 0 16 16">
+          <path
+            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+          <path
+            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+        </svg>
+      </div>
+      <div class="d-flex justify-content-center align-items-center flex-column">
+        <div class="text-center mb-2">
+          When signing in, you indicated that the applicant who is legally
+          responsible for the permit is also the owner of the project property.
+        </div>
+        <div class="text-center mb-2">
+          Click <strong>OK</strong> button and enter the correct property owner
+          information on the next screen within Step 2 Applicant Information.
+        </div>
+        <div class="text-center mb-2">
+          Click <strong>Cancel</strong> button to continue with the property
+          owner already assigned.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer-confirmation model-footer-reduced">
+    <button type="button" class="btn btn-sm btn-primari mb-2 mr-2 okButton"
+      (click)="warningOkClicked(); modal.dismiss('Cross click')">
+      OK
+    </button>
+
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2"
+      (click)="modal.dismiss('Cross click'); onWarningCancelClicked()">
+      Cancel
+    </button>
+  </div>
+  <!-- <app-custom-modal-popup #modal [modalConfig]="modalConfig2">
+   <ng-container>
+       <app-applicant-informations-search [currentTab]="currentTab"></app-applicant-informations-search>
+   </ng-container>
+</app-custom-modal-popup> -->
+</ng-template>
+
+<app-custom-modal-popup #selectionModal [modalConfig]="modalConfig">
+  <ng-container *ngIf="isOpenPopupApplicants | async">
+    <app-applicant-selection [currentTab]="currentTab" [popupData]="popupData" (closeBtnClicked)="closePopup($event)">
+    </app-applicant-selection>
+  </ng-container>
+</app-custom-modal-popup>
+
+<ng-template #emptyPublicIdModal let-modal>
+  <div class="modal-body">
+    <div class="d-flex justify-content-center align-item-center">
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="green" class="bi bi-exclamation-triangle"
+          viewBox="0 0 16 16">
+          <path
+            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+          <path
+            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+        </svg>
+      </div>
+      <div class="d-flex justify-content-center align-items-center flex-column ml-2">
+        <!-- <div>By entering a Public ID you are confirming that</div>
+        <div class="py-2">you wish to assign the existing Public, instead of</div>
+        <div >creating a possible duplicate</div> -->
+        <div class="">
+          Transfer details to existing Public ID *:
+          <input type="text" mask="9999999999" [formControl]="publicIdIfEmpty" />
+        </div>
+        <div *ngIf="publicIdIfEmpty?.dirty">
+          <br />
+
+          <div class="addr-error-msg pb-2" *ngIf="publicIdIfEmpty?.errors?.required">
+            Error: Public ID is Required.
+          </div>
+          <div class="addr-error-msg pb-2" *ngIf="
+              publicIdIfEmpty?.errors?.maxlength ||
+              publicIdIfEmpty?.errors?.pattern ||
+              (!isValidPublicId && !publicIdIfEmpty?.errors?.required)
+            ">
+            {{errorMsgObj?.INVALID_PUBLIC_ID}}
+          </div>
+          <div class="addr-error-msg pb-2" *ngIf="!publicIdIfEmpty?.errors?.required && duplicatePublicId">
+            Error: This Public ID is already associated with this project.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer model-footer-reduced" style="padding: 0 0 20px 0">
+    <button type="button" [disabled]="publicIdIfEmpty.invalid" class="btn btn-primari btn-sm"
+      (click)="validatePublicID(publicIdIfEmpty.value)">
+      OK
+    </button>
+    <button type="button" class="btn btn-outline-dark p-btn btn-sm closebutton" (click)="modal.dismiss('Cross click')">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<app-pending-changes-popup #confirmationWarningPopup (onOkClick)="confirmOkCliked()"></app-pending-changes-popup>

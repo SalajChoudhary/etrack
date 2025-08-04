@@ -1,0 +1,121 @@
+
+.modal_popup {
+    padding: 30px 10px 0px;
+    border-radius: 3rem;
+    font-weight: 500;
+}
+
+.subject {
+    width: 100%;
+}
+
+.t-center {
+    text-align: center;
+    display: block;
+}
+
+.add-btn {
+    // position: absolute;
+    // margin-top: 1rem;
+    justify-content: right;
+    margin-right: 31px;
+}
+
+.doc-name {
+    position: relative;
+    right: 15px;
+}
+
+.heade-text {
+    width: 300px;
+}
+
+.form-check-label {
+    min-width: 100px;
+}
+
+.input-doc {
+    border-radius: 10px !important;
+}
+
+table {
+    // border: 1px solid #65666b;
+     td{
+         color: #000;
+     }
+ }
+ 
+ .table-striped tbody tr:nth-of-type(odd) {
+     background-color: rgba(0, 0, 0, 0.05);
+ }
+ .table-striped tbody tr:nth-of-type(even) {
+     background-color: white;
+ }
+ .col-type {
+    padding-left: 0.4rem;
+ }
+ .col-sub-type {
+    padding-left: 0.7rem;
+ }
+ .scrollable{
+     height: 130px;
+     overflow:auto;
+     width:100%;
+ }
+
+.table-center {
+    margin-right: auto;
+    margin-left: auto;
+    width: 90%;
+}
+
+.modal-footer {
+    text-align: center;
+    padding-right: 10px;
+    border: none;
+    //border-top: 1px solid black !important;
+}
+
+.ml-80 {
+    margin-left: 80px;
+}
+
+.ml-150 {
+    margin-left: 150px;
+}
+
+.ml-163 {
+    margin-left: 163px;
+}
+
+.form-check-label {
+    min-width: 100px;
+}
+
+.heade-text {
+    width: 300px;
+}
+
+.selected {
+    box-shadow: inset 0 0 0 0.15rem #a6d5fa;
+    outline: 0 none;
+}
+
+.type-radio {
+    text-align: left;
+}
+
+.typo-2 {
+    font-size: 12px!important;
+    font-weight: 500!important;
+}
+
+.correspondence-type-radio {
+    margin-left: 15px;
+    margin-right: 0.5rem;
+}
+
+.header-height {
+    min-height: 19px!important;
+    max-height: 19px!important;
+}

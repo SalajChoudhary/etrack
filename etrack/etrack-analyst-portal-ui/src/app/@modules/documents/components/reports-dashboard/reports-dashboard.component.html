@@ -1,0 +1,39 @@
+<app-analyst-sub-header [showButton]="true"></app-analyst-sub-header>
+
+<div class="roww col-12" style="padding-bottom:10px !important">
+    <ng-container >
+
+        <div class="col-2 p-0">
+            <button (click)="innerTabChange('reports')"
+                [ngClass]="activeTab == 'reports' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100">
+                <span>eTrack Submittal Report</span>
+            </button>
+            <button (click)="innerTabChange('candidate')"
+                [ngClass]="activeTab == 'candidate' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100">
+                <span>Candidate Keywords</span>
+            </button>
+            <!-- <button (click)="innerTabChange('document')"
+                [ngClass]="activeTab == 'document' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100">
+                <span>Administrative</span>
+            </button> -->
+            </div>
+
+        <div class="col-10 grid-box">
+
+            <div class="grid-margin"
+                *ngIf="activeTab=='reports'">
+                <app-submittal-report></app-submittal-report>
+                
+            </div>
+            <div class="grid-margin"
+            *ngIf="activeTab=='candidate'">
+            <app-candidate-keywords-report> </app-candidate-keywords-report>
+            </div>
+            </div>
+
+            </ng-container>
+            </div>
+

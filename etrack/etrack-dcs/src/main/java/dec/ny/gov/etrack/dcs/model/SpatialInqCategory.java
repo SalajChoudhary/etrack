@@ -1,0 +1,12 @@
+package dec.ny.gov.etrack.dcs.model;
+
+public enum SpatialInqCategory {
+  BOROUGH_DETERMINATION,
+  JURISDICTION_DETERMINATION,
+  SEQR_LA_REQ,
+  PRE_APPLN_REQ,
+  SERP_CERT,
+  MGMT_COMPRE_PLAN,
+  SANITARY_SEWER_EXT,
+  ENERGY_PROJ;
+}

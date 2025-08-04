@@ -1,0 +1,10 @@
+-------------------------------------------------------------------------------
+Test set: dec.ny.gov.etrack.permit.service.impl.EtrackPermitServiceTest
+-------------------------------------------------------------------------------
+Tests run: 24, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.152 s <<< FAILURE! - in dec.ny.gov.etrack.permit.service.impl.EtrackPermitServiceTest
+testSaveAdditionalApplicationPermitSavesAdditionalPermitToEtrack(dec.ny.gov.etrack.permit.service.impl.EtrackPermitServiceTest)  Time elapsed: 0.003 s  <<< ERROR!
+dec.ny.gov.etrack.permit.exception.ETrackPermitException: java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.EtrackPermitServiceTest.testSaveAdditionalApplicationPermitSavesAdditionalPermitToEtrack(EtrackPermitServiceTest.java:437)
+Caused by: java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.EtrackPermitServiceTest.testSaveAdditionalApplicationPermitSavesAdditionalPermitToEtrack(EtrackPermitServiceTest.java:437)
+

@@ -1,0 +1,121 @@
+<div class="header">
+
+  <app-analyst-sub-header [showAddress]="false"></app-analyst-sub-header>
+
+
+    <app-stepper-buttons  selectedIndex="0" [lastIndex]="0" [startNumber]="5" [endNumber]="6"
+      [startName]="'Sign and Submit'" [endName]="'Complete'" mainNavigation="/apply-for-permit-details"
+      [backwardName]="'Supporting Documents'" [forwardName]="''" [backward]="'/supporting-documentation'"
+      [forward]="''" [isChecked]="true"></app-stepper-buttons>
+  
+
+  <!-- <app-validate-banner *ngIf="isValidate" [validated]="signSubmitValidated" [showBottomBorder]="false">
+  </app-validate-banner> -->
+  <div class="row spacing-row ">
+    <br>
+    <br>
+  </div>
+</div>
+
+
+<div class="content-wrapper">
+<div class="roww">
+  <fieldset [disabled]="isReadonly">
+  <div class="col-8 offset-2 note-header p-0">
+    
+
+    <div class="p-3 note-text header-1b">
+      Verify that the applicant(s), owner(s) and contact(s) have provided the appropriate signatures for attestations,
+      permission to inspect, and authorizations for the permit application(s).
+    </div>
+  </div>
+  <div class="sign-header col-6 offset-3">
+    <button type="button" (click)="redirectToDocumentUpload()" class="header-1n btn btn-link public_id_btn p-0 btn-upload">Upload additional signature documentation</button> <span class="header-1n"> as appropriate</span>
+  </div>
+  <div class="col-6 offset-3 p-0 mb-5" role="rowgroup" aria-label="Upload additional signature documentation "
+    aria-describedby="upload_sign_table">
+    <p-table id="upload_sign_table" styleClass="p-datatable-lg no-header-scoll" [scrollable]="signList?.length>5? true:false"
+      aria-label="A table that shows the status of appropriate signatures for this project." scrollHeight="280px"
+      [value]="signList" [rows]="10" [rowsPerPageOptions]="[5,10,15,20]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+      [totalRecords]="signList?.length ? signList?.length:0">
+      <ng-template pTemplate="header">
+        <tr role="rowgroup">
+          <th scope="col" role="columnheader" aria-sort="none" class="table-header-primary"
+            [pSortableColumn]="'ischeck'" [ngStyle]="{'text-align':'left','width':'20%'}">Recv'd</th>
+          <th scope="col" role="columnheader" aria-sort="none" class="table-header-primary"
+            [pSortableColumn]="'reqd_signs'" [ngStyle]="{'text-align':'left','width':'40%','position':'relative'}">
+            Signatures</th>
+          <th scope="col" role="columnheader" aria-sort="none" class="table-header-primary" [pSortableColumn]="'role'"
+            [ngStyle]="{'text-align':'left','width':'40%','position':'relative'}">
+            Role</th>
+          <!-- <th scope="col" role="columnheader" aria-label="Action Column" aria-sort="none" class="table-header-primary" [pSortableColumn]="'name'"
+            [ngStyle]="{'width':'40%','position':'relative'}">
+          </th> -->
+
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item let-i="rowIndex">
+        <tr role="rowgroup">
+          <td scope="col" role="cell" aria-sort="none" class="table-body"
+            [ngStyle]="{'text-align':'left', 'width':'20%','position':'relative'}">
+            <!-- <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox> -->
+            <input type="checkbox" aria-label="Checkbox" [checked]="item?.acknowledgeInd=='Y'? true:false" 
+              (change)="onCheckBoxChange($event,item)" name="scene1" id="radio{{i}}" [value]="item?.acknowledgeInd" #g>
+          </td>
+          <td scope="col" role="cell" aria-sort="none" class="table-body"
+            [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'40%','position':'relative'}" [ngClass]="{'disabled-row':item.acknowledgeInd=='Y'}">
+            {{item?.displayName}}
+          </td>
+          <td scope="col" role="cell" aria-sort="none" class="table-body"
+            [ngStyle]="{'text-align':'left','word-wrap':'break-word', 'width':'40%','position':'relative'}" [ngClass]="{'disabled-row':item.acknowledgeInd=='Y'}">
+            {{item?.role}}
+          </td>
+          <!-- <td scope="col" role="cell" aria-sort="none" class="table-body"
+            [ngStyle]="{'text-align':'center','word-wrap':'break-word', 'width':'40%','position':'relative'}" [ngClass]="{'disabled-row':item.isAlreadySaved}">
+            <div role="row" class="row m-0 d-none">
+              <button (click)="docUpload(item)" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+                type="button">
+                Upload
+              </button> &nbsp;
+              <button (click)="alreadyUploadedClicked(item)" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+                type="button">
+                Already Uploaded
+              </button>
+            </div>
+          </td> -->
+
+        </tr>
+
+      </ng-template>
+    </p-table>
+  </div>
+</fieldset>
+</div>
+<div class="float-right mr-2" *ngIf="showServerError">
+  <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+</div>
+  <div class="row m-0 col-12 footer-row">
+    <div class="col-6 offset-3 center-align">
+      
+      <!-- <button *ngIf="!isValidate" [disabled]="isValidate" (click)="onSubmitProject()"
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" type="button" id="submitBtn">
+        SUBMIT PROJECT
+      </button> -->
+    </div>
+    <div class="col-3 end-align">
+      <app-validate-checkbox *ngIf="isValidate" category="SIGN-SUBMIT" activityId="14"  [(validatedModel)]="signSubmitValidated"></app-validate-checkbox>
+
+      <button (click)="onSaveClick()"
+        class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" type="button" id="saveBtn">
+        Next
+      </button>
+      <button (click)="openConfirmModal()" type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" id="closeBtn">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+<app-pending-changes-popup #pendingPopup (onOkClick)="goBack()"></app-pending-changes-popup>
+<app-pending-changes-popup #pendingChangesPopup (onOkClick)="pendingOkClicked()"></app-pending-changes-popup>
+<app-success-popup #successPopup (onOkClick)="onSuccesPopupOkClicked()"></app-success-popup>

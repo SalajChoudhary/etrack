@@ -1,0 +1,45 @@
+.close_button{
+        margin: 2%;
+        float: right;
+       
+    button{
+    background: white;
+    color: black;
+    font-size: large;
+    border: none;
+    &:focus-visible {
+        border: none;
+        outline: none;
+    }
+    &:focus{
+        border: none;
+        outline: none;
+    }
+    }
+
+}
+.checkedClass {
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid gray;
+    white-space: pre-line;
+}
+.email_content {
+    padding: 0 40px;
+}
+
+.email_body {
+    font-weight: 600;
+    color: darkgrey;
+}
+.existingBody {
+    margin-left: 20px
+}
+.displayFlex {
+    float: right;
+    width: 100%;
+}
+
+.black{
+    color: black !important;
+}

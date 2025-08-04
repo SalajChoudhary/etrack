@@ -1,0 +1,115 @@
+<div class="bg-white typo-primary">
+  <div class="container-fluid mt-5" style="min-height: calc(100vh - 260px);">
+    <div class="col-12 t-center">
+      <label class="header-1b form-check-label"
+        >
+          Please select the uploaded file that contains the
+          {{ displayName ? displayName : "" }} and provide the page number
+          below.
+      </label>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <form [formGroup]="uploadedForm" class="formHeight">
+          <div class="form-check form-check-inline mt-4 t-center">
+            <label class="typo-1 form-check-label"> Reference Location*: </label
+            >&nbsp;
+            <select
+              #refLoc
+              formControlName="refLocation"
+              class="form-check-input heade-text"
+              value=""
+              id="alreadyUploadedSelect"
+            >
+              <option value="">-- SELECT --</option>
+              <option *ngFor="let item of refTypes" [ngValue]="item">
+                {{ item.displayName }}
+              </option>
+            </select>
+          </div>
+          <div class="errors">
+            <span
+              *ngIf="
+                formSubmitted &&
+                uploadedForm.controls.refLocation.errors?.required
+              "
+              class="errors ml-3percent"
+              >{{ errorMessages?.REF_LOC_REQD }}</span
+            >
+          </div>
+          <br />
+
+          <div class="row mt-4">
+            <div class="form-row col col-12 pl-4">
+              <textarea
+                placeholder="Provide the page number(s) where the {{
+                  displayName ? displayName : '<display name>'
+                }} is found in the {{
+                  uploadedForm?.controls?.refLocation?.value
+                    ? uploadedForm?.controls?.refLocation?.value?.displayName
+                    : '<reference location>'
+                }}"
+                formControlName="description"
+                rows="5"
+                maxlength="255"
+                class="form-control"
+                id="alreadyUploadedTxtArea"
+              ></textarea>
+              <span class="desc-count typo-2"
+                >{{
+                  uploadedForm.controls.description.value
+                    ? uploadedForm.controls.description.value.length
+                    : 0
+                }}/255</span
+              >
+            </div>
+            <div class="errors">
+              <span
+                *ngIf="
+                  formSubmitted &&
+                  uploadedForm.controls.description.errors?.required
+                "
+                class="errors"
+                >{{ errorMessages?.REF_LOC_DESC_REQD }}</span
+              >
+            </div>
+          </div>
+
+          <!-- <button (click)="getError()">Get 500 error!</button> -->
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="float-right mr-2" *ngIf="showServerError">
+    <app-server-error-message
+      [serverErrorMessage]="serverErrorMessage"
+    ></app-server-error-message>
+  </div>
+  <div class="col-12 mt-5 footer-row">
+    <div class="float-right">
+      <button
+        type="submit"
+        (click)="onFormSubmit()"
+        (keydown.enter)="onFormSubmit()"
+        class="btn btn-sm btn-primari mb-2 mr-2 upload"
+        id="saveBtn"
+      >
+        Save
+      </button>
+      <button
+        (click)="openConfirmModal()"
+        type="button"
+        class="btn btn-sm btn-outline-dark closebutton mb-2"
+        id="closeBtn"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-pending-changes-popup
+  #pendingPopup
+  (onOkClick)="goBack()"
+></app-pending-changes-popup>

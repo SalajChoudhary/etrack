@@ -1,0 +1,51 @@
+<app-header [showAlertNotification]='showAlertNotification'></app-header>
+<app-inactive-session-popup></app-inactive-session-popup>
+
+    <div class="main-app-container" id="main-content">
+        <router-outlet></router-outlet>
+    </div>
+    <footer [ngClass]="isFixed? 'fixed-footer':''">
+        <div class="footer-dashboard col-12 p-0">
+            <p class="ml-4" style="margin-bottom:0px !important ;"><strong>Division of Environmental
+                    Permits</strong></p>
+            <p class="ml-4 mb-0">Protecting New York's air, water, mineral and biological resources under the
+                Uniform Procedures Act (UPA)</p>
+           
+            <div class="display-flex mt-1">
+                <div>
+                    <p class="ml-4 mb-0"> <strong>Resources</strong></p>
+                    
+                    <p class="ml-4 mb-0">
+                        <a class="pr-10 footer-items" href={{systemParameters?.EAF_MAPPER}} target="_blank"><strong>EAF
+                                Mapper</strong></a> |
+                        <a class="pr-10 pl-10 footer-items" href={{systemParameters?.DEC_INFO_LOCATOR}} target="_blank"><strong>DECinfo
+                                Locator</strong></a> |
+                        <a class="pr-10 pl-10 footer-items" href={{systemParameters?.ENVIRON_PERMIT}} target="_blank"><strong>Environmental Permits</strong></a> |
+                        <a class="pr-10 pl-10 footer-items" href={{systemParameters?.SEQR}} target="_blank"> <strong> SEQR
+                            </strong></a>|
+                        <a class="pl-10 footer-items"  target="_blank" href={{systemParameters?.FORMS}} target="_blank"> <strong> Forms
+                            </strong></a>
+                    </p>
+                </div>
+                <div class="pl-25">
+                    <p class="ml-4 mb-0"> <strong>Help</strong></p>
+                    <p class="ml-4 mb-0">
+                        <a class="pr-10 footer-items" href="" (click)="openHelpPdf()"><strong> User Guide</strong> </a> |
+                        <a class="pl-10 footer-items" href={{systemParameters?.CONTACT_US}}  target="_blank"><strong> Contact Us</strong></a>
+                           
+                    </p>                    
+                </div>   
+                <div class="" style="padding-left: 10%;">
+                    <p class="ml-4 mb-0">&nbsp;</p>
+                    <p class="ml-4 mb-0">
+                          <strong> {{rolename}}
+                        </strong>
+                    </p>
+                </div>           
+            </div>
+    
+        </div>
+    </footer>
+
+
+<ngx-loading [show]="loading" [config]="{animationType:'circleSwish', fullScreenBackdrop:true}"></ngx-loading>

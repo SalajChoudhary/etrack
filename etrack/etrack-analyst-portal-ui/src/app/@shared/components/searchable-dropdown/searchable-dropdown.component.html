@@ -1,0 +1,11 @@
+<div class="form-check dropdown" class="z-i-100"
+#dropdown>
+    <input [attr.disabled]="disabled? true: null" name="ProjectManager" aria-label="Project Manager" id="ProjectManagerInput" (click)="isInputClicked=!isInputClicked"
+        (input)="onDrpdownChange($event)" [ngModel]="value" [ngStyle]="{'width': width}" [maxlength]="maxLength">
+    <div 
+        [ngClass]="isInputClicked && _listItems?.length ? 'dropdown-menu-visible' : 'dropdown-menu-hidden'">
+        <li class="dropdown-option" (click)="onDropdownSelect(manager)" *ngFor="let manager of _listItems"
+            [value]="manager[valueKey]" [ngStyle]="{'width': width}">
+            {{manager[labelKey]}}</li>
+    </div>
+</div>

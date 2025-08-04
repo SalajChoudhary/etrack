@@ -1,0 +1,43 @@
+<div #notificationalert class="notificationbox">
+  <div class="header fullWidth">
+    <div>
+      <ul class="notify">
+        <div class="notificationTitle justifyContent">
+          <div class="headerText fullWidth header-1b" *ngIf="projectId || regularHeader">{{regularHeader? 'Mail Notification(s)':('Project: ' + projectId)}}</div>
+          <div class="headerText fullWidth header-1b" *ngIf="!regularHeader && inquiryId">{{'Inquiry: ' + inquiryId}}</div>
+          <div class="close_button">
+            <button (click)="close()" class="headerClose">X</button>
+          </div>
+        </div>
+        <div class="scroll-body typo-2">
+          <div *ngIf="!regularHeader" class="action_container headerbutton">
+            <app-mail-notification-tab [data]="envelopData" [projectId]="projectId"></app-mail-notification-tab>
+          </div>
+          <div *ngIf="envelopData?.length === 0">
+            <mat-list role="list">
+              <mat-list-item role="listitem">No New Mail Notifications
+              </mat-list-item>
+            </mat-list>
+          </div>
+          <!-- TODO: crosscheck below code is required. This can be moved to mail-notification-tab -->
+          <li *ngFor="let notifyemail of envelopData; let odd=odd;let even=even;" class="justifyContent"
+            [ngClass]="odd? 'red':'blue'">
+            <div *ngIf="regularHeader">
+              <div *ngIf="envelopData?.length > 0">
+                <p style="margin-left:10px; margin-bottom: 0px; height:auto;"> There are {{notifyemail.unreadCount}}
+                  message(s) for
+                  {{notifyemail.facilityName}},<br>Project ID:
+                  <a (click)="navigateToVirtualDesktop(notifyemail)"
+                    class="link-primary pointer">{{notifyemail.projectId}}</a>
+                </p>
+              </div>
+            </div>
+
+          </li>
+        </div>
+      </ul>
+    </div>
+  </div>
+  <app-email-compose #emailModal [existingData]='emailData'></app-email-compose>
+  <app-delete-email-notification #deleteModal></app-delete-email-notification>
+</div>

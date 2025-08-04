@@ -1,0 +1,142 @@
+.top-header {
+    width: fit-content;
+    margin-bottom: 25px;
+    font-size: 18px;
+    font-weight: 500;
+    margin-top: 10px;
+    background-color: white;
+    padding: 10px 20px 10px 20px;
+    border-radius: 20px;
+  }
+
+ .field-row{
+    display: flex;
+    display: nowrap;
+    justify-content: space-between;
+ }
+ .w-210{
+  width: 210x !important;
+ }
+ .footer-row {
+    bottom: 0;
+  width: 100%;
+  padding: 2px;
+  }
+  .green-body{
+    background-color: #DAE2DE;
+  }
+ 
+  .bottom-button-container {
+    display: flex;
+    justify-content: end;
+    padding: 0.5rem 1rem 0;
+    margin-right: 1%;
+  }
+ .input-header{
+    font-weight: 600;
+  padding: 0px 10px 0px 5px;
+ }
+ .i{
+  padding: 0px 10px 0px 5px;
+ }
+ .body-padding{
+  padding: 0 5rem;
+ }
+ .ml-30{
+    margin-left: 30%;
+ }
+ .ml-25{
+  margin-left: 23%;
+}
+ .permit-options {
+    margin-left: 5%;
+  }
+  .form-container {
+    width: 100%;
+  }
+  .container-header-title {
+ 
+    padding: 10px 20px 10px 20px;
+    border-radius: 30px;
+    margin-top: -15px;
+    margin-bottom: 20px;
+    text-align: center;
+    background-color: rgb(202, 209, 204) !important;
+    border-bottom: 1px solid black;
+    
+  }
+  .modal-basic-title-dec {
+    margin: 10px 0px 10px 10px;
+    text-align: left;
+  }
+  .delete-cnf-message {
+    font-weight: 600;
+    line-height: 25px;
+    margin-top: 10px;
+  }
+  .modal-footer-confirmation {
+    text-align: center;
+  }
+  .ml-35 {
+    margin-left: 35px;
+  }
+  .modal-body-confirmation {
+    margin: 10px 0px 10px 10px;
+  }
+  ::ng-deep{
+      .modal-30vh{
+          margin-top:12rem!important;
+      }
+    }
+
+    .content-wrapper {
+      margin-top: -20px;
+  }
+
+  .ml-11-percent{
+    margin-left: 11%;
+  }
+
+  .ml-56-percent{
+    margin-left: 56%;
+    margin-bottom: 1%;
+  }
+
+  .counter-brief {
+    display: block;
+    text-align: right;
+    margin-right: 6%;
+    margin-top: -28px;
+    position: inherit;
+  }
+
+  .font-24{
+    font-size: 24px;
+  }
+
+ .font-16{
+  font-size: 16px;
+ }
+
+ .color-gray{
+  color:gray
+ }
+
+ .completeText{
+  font-weight: bold;
+  font-style: italic;
+}
+
+.italic{
+  font-style: italic;
+}
+.border-radius-25{
+  border-radius: 25px;;
+}
+
+.box-shadow{
+  box-shadow: 0 4px 4px 0 #d4d2d2, 0 6px 10px 0 #d4d2d2;
+}
+.formHeight{
+  min-height: calc(100vh - 250px);
+}

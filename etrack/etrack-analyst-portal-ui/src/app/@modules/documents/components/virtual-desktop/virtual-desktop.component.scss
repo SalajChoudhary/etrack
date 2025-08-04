@@ -1,0 +1,281 @@
+.font-weight {
+    font-weight: 500 !important;
+  }
+
+  .w-100{
+      width: 125px!important;
+  }
+  .r-align{
+      text-align: right;
+  }
+
+
+  .t-width{
+      width: 98%;
+  }
+  .w-260{
+      width: 260px;
+  }
+  .counter-brief{
+    display: block;
+  text-align: right;
+  margin-right: 3%;
+  margin-top: -28px;
+  position: inherit;
+}
+.mtop-3{
+margin-top: 4px;
+}
+
+.ml-1r{
+    margin-left: 1rem;
+}
+
+.header-notes{
+    max-height: 50px;
+    justify-content: space-between;
+    display:flex;
+    align-items: center;
+}
+.export-icon{
+    margin-left: 79%;
+    margin-top: 10px;
+    cursor: pointer;
+    position: absolute;
+    right: 25px;
+}
+.add-note{
+    justify-content:right;
+    //margin-top: 10px;
+    text-align: right;
+    margin-right: 15px;
+}
+.mleft-15{
+margin-left: 15px;
+}
+.items-apart{
+    justify-content: space-between;
+}
+.horizontal-break{
+    border-bottom: 1px solid black;
+    margin-left: -15px;
+    margin-right: -15px;
+}
+.vertical-line{
+  //  border-left: 2px solid black;
+    height: 100%;
+    min-height: 900px !important;
+}
+::ng-deep{
+    .container{
+        width: 100% !important;
+        max-width: 1400px !important;
+    }
+}
+.modal-head{
+    text-align: left;
+    font-weight: 500 !important;
+    padding-left: 5px;
+}
+.modal-footer{
+    text-align: right;
+    padding-right:10px;
+    border:none;
+    //border-top: 1px solid black !important;
+}
+.mtop-5{
+    margin-top: 5px;
+}
+
+//   .top-header {
+//     width: 100%;
+//     margin: 2px;
+//     margin-left: 0px;
+//     margin-bottom: 25px;
+//     background: #233E2A;
+//     color: #fff;
+//     text-align: center;
+//     outline: solid 2px black;
+//     //border-top: solid 2px white;
+//     border: solid 2px white;
+//     font-size: larger;
+//     padding: 8px;
+//   }
+.bg-color{
+    // background-color: #dae2de;
+    margin: 0;
+}
+  .top-header {
+    width: 100%;
+    margin: 2px;
+    margin-left: 0px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 18px;
+    padding: 8px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 1210px) {
+    .max-width{
+        padding-right: 0px;
+    }
+  }
+
+
+  @media(max-width:1023px){
+    .full-width{
+        width: 82%;
+    }
+  }
+  @media(min-width:1024px){
+    .full-width{
+        width: 86%;
+    }
+  }
+
+  
+@media(max-width:1500px){
+    .max-width{
+        padding-right: 0px;
+        margin-right: 0px;
+}
+  }
+
+  .description{
+    padding: 15px;
+   // border: 1px solid #65666b;
+  }
+  .title{
+    font-weight: bold;
+  }
+
+  .table-custom-border{
+    tbody{
+        tr {
+            td {
+                border: 0;
+            }
+            td:first-child{
+                border-left:1px solid #65666b;
+            }
+            td:last-child{
+                border-right:1px solid #65666b;
+            }
+        }
+        tr+tr > td{
+            border-top:1px solid #65666b;
+            
+        }
+        tr:first-child > td {
+            border-top:1px solid #65666b;
+        }
+        
+        tr:last-child > td {
+            border-bottom:1px solid #65666b;
+        }
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 0;
+        }
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 0;
+        }
+    }
+}
+        .right{
+    text-align: right;
+}
+.p-datatable {
+    border-radius: 0rem !important;
+  }
+
+  .p-datatable.has-no-rounded-headers .p-datatable-thead > tr > th{
+    border-radius: 0px !important;
+  }
+
+  .mr-22{
+    margin-right:2.2rem
+
+  }
+
+.vd-mat-padding-left {
+    padding-left: 7px !important;
+}
+
+.form-container {
+    text-align: center;
+    min-height: calc(100vh - 120px);
+  }
+
+
+
+  .alert-primary {
+    color: #004085;
+    background-color: rgba(204, 229, 255, 0.25);
+    border-color: rgba(204, 229, 255, 0.25);
+}
+
+.font-12{
+    font-size: 12px;
+}
+
+.w-42 {
+    min-width: 42px;
+    max-width: 43px;
+}
+
+.w-45 {
+    min-width: 44px;
+    max-width: 45px;
+}
+
+.w-60 {
+    min-width: 59px;
+    max-width: 60px;
+}
+
+.w-108 {
+    min-width: 107px;
+    max-width: 108px;
+}
+
+
+.w-110 {
+    min-width: 109px;
+    max-width: 110px;
+}
+
+.w-120 {
+    min-width: 120px;
+    max-width: 121px;
+}
+
+.w-147 {
+    min-width: 146px;
+    max-width: 147px;
+}
+
+.w-153 {
+    min-width: 153px;
+    max-width: 154px;
+}
+
+.w-150 {
+    min-width: 150px;
+    max-width: 165px;
+}
+
+.w-170 {
+    min-width: 170px;
+    max-width: 171px;
+}
+
+.w-260 {
+    min-width: 260px;
+    max-width: 261px;
+}
+
+.w-300 {
+    min-width: 300px;
+    max-width: 301px;
+}

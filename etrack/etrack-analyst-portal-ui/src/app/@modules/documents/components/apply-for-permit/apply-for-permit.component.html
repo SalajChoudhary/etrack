@@ -1,0 +1,176 @@
+<form [formGroup]="frm">
+  <div class="form-row">
+    <ng-container *ngIf="userIsAnalyst || userIsOverrideAdmin || userIsSystemAdmin">
+      <div class="form-group d-flex col-md-12">
+        <div class="form-labels">
+          <label for="inputEmail4" class="typo-1 mr-4">Application Received By:</label>
+        </div>
+        <select class="form-control w-150" formControlName="receivedBy">
+          <option [value]="i" *ngFor="let item of applicationReceipts; let i = index">
+            {{ item }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group d-flex col-md-12">
+        <div class="form-labels">
+          <label for="inputEmail4" class="typo-1 mr-4">Date Received*:</label>
+        </div>
+        <input type="date" class="form-input datepicker" formControlName="date" />
+        <!-- max="{{today}}" -->
+      </div>
+      <div *ngIf="isSubmitted && frm.get('date')?.errors?.required"
+        class="inv-error-msg form-group d-flex justify-content-center col-md-12">
+        {{ errorMsgObj?.DATE_RCVD_REQD || "Error: Date Received is Required." }}
+      </div>
+      <div *ngIf=" !frm.get('date')?.errors?.required && !isFormDateValid
+        " class="inv-error-msg form-group d-flex justify-content-center col-md-12">
+        {{
+        errorMsgObj?.DATE_RCVD_NOT_FUTURE || "Error: Date Received cannot be a future Date."
+
+        }}
+      </div>
+      <div class="hr mb-2"></div>
+      <div class="form-group col-md-12 d-flex">
+        <div class="form-labels">
+          <label for="inputEmail4" *ngIf="!userRoles.includes('Online Submitter')" class="typo-1 mr-4">Who signed the
+            application form you are entering?:
+          </label>
+          <label for="inputEmail4" *ngIf="userRoles.includes('Online Submitter')" class="typo-1 mr-4">Who is filling out
+            this application for you?:
+          </label>
+        </div>
+        <!--
+            <select class="form-control w-200" formControlName="filledBy" >
+                <option [value]="0"> Applicant / Owner</option>
+                <option [value]="1"> Applicant / Non-Owner</option>
+            </select> -->
+        <div class="form-check form-check-inline mr-4 typo-2" *ngFor="
+            let applicantType of getApplicantTypes();
+            let i = index
+          ">
+          <input class="form-check-input" type="radio" name="filledBy" [value]="applicantType?.applicantTypeCode"
+            formControlName="filledBy" id="applicantOwner-{{ i }}" />
+          <label for="applicantOwner-{{ i }}" class="form-check-label width-fit text-uppercase">{{
+            applicantType?.applicantTypeDesc }}</label>
+        </div>
+
+        <!-- <div class="form-check form-check-inline mr-4">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="filledBy"
+                  value="0"
+                  formControlName="filledBy"
+                  id="applicantOwner"
+                />
+                <label for="applicantOwner" class="form-check-label width-fit"
+                  >APPLICANT / OWNER</label
+                >
+              </div>
+              <div class="form-check form-check-inline mr-4">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="filledBy"
+                  value="1"
+                  formControlName="filledBy"
+                  id="applicantNonOwner"
+                />
+                <label for="applicantNonOwner" class="form-check-label width-fitt"
+                  >APPLICANT / NON-OWNER</label
+                >
+              </div> -->
+      </div>
+    </ng-container>
+    <ng-container *ngIf="userIsOnlineSubmitter">
+      <div class="d-flex justify-content-center align-items-center flex-column w-100 mb-2">
+        <div class="typo-1">Below we get started, please answer some questions</div>
+      </div>
+      <div class="d-flex justify-content-center align-items-center flex-column w-100 mb-2">
+        <div class="typo-1">Are you the owner of the property?</div>
+        <div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" formControlName="ownerOfProperty" type="radio" id="ownerOfPropertyRadio1"
+              value="1" />
+            <label class="form-check-label typo-2" for="ownerOfPropertyRadio1">Yes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" formControlName="ownerOfProperty" type="radio" id="ownerOfPropertyRadio2"
+              value="2" />
+            <label class="form-check-label typo-2" for="ownerOfPropertyRadio2">No</label>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center align-items-center flex-column w-100 mb-2">
+        <div class="typo-1">
+          On Step 5, the property owner will need to sign the application
+          granting permission
+        </div>
+        <div class="typo-1">to work on their prperty or to applly on their behalf</div>
+      </div>
+    </ng-container>
+    <!-- <div *ngIf="frm.get('filledBy')?.value == '2'"
+      class="d-flex justify-content-center align-items-center flex-column w-100 mb-2">
+      <div class="typo-1">
+        On Step 5, the property owner will need to sign the application granting
+        permission
+      </div>
+      <div class="typo-1">
+        to work on their property or to apply on their behalf.
+      </div> 
+    </div>-->
+    <div class="hr mb-2"></div>
+    <div class="d-flex justify-content-center align-items-center flex-column w-100 mb-2">
+      <div class="typo-2">
+        All projects must be classified under the
+        <a href={{systemParameters?.SEQR}} target="_blank">'State Environmental Quality Review Act'
+          (SEQR)</a>
+      </div>
+      <div class="typo-2">
+        to determine potential impacts to NYS environmental, social, and economic resources.
+      </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center flex-column w-100 mb-2">
+      <div class="typo-2">
+        Is this project classified under SEQR as
+        <a href={{systemParameters?.TYPE_II_URL}} target="_blank">Type II?</a>
+      </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center flex-row w-100 mb-2">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" formControlName="classifiedUnderSeqr" type="radio" id="classifiedUnderRadio1"
+          value="1" />
+        <label class="form-check-label typo-2" for="classifiedUnderRadio1">Yes</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" formControlName="classifiedUnderSeqr" type="radio" id="classifiedUnderRadio2"
+          value="2" />
+        <label class="form-check-label typo-2" for="classifiedUnderRadio2">No</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" formControlName="classifiedUnderSeqr" type="radio" id="classifiedUnderRadio3"
+          value="3" />
+        <label class="form-check-label typo-2" for="classifiedUnderRadio3">Not Sure</label>
+      </div>
+    </div>
+
+    <!-- <div class="form-group col-md-12">
+            <label class="footer-label">*Non Owners are required to fill out a Landowner attestation form with the
+                owner's signature </label> 
+        </div> -->
+  </div>
+  <!-- <div class="note-txt">**Non-Owners need to fill out Landowner Attestation Form for Permittee</div> -->
+</form>
+
+<div class="row footer-row">
+  <div class="col-md-12">
+    <div class="float-right">
+      <button type="submit" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="nextBtnClicked()">
+        Next
+      </button>
+      <button type="button" (click)="closeModal($event)" class="btn btn-sm btn-outline-dark closebutton mb-2">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

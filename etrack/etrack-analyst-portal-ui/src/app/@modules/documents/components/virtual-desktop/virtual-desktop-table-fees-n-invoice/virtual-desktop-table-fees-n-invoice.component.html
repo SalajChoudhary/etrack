@@ -1,0 +1,76 @@
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="header">
+      <h3 class="header-1b mb-0"><a href={{systemParameters?.INVOICE_FEE_INFO}} target="_blank">Fees & Invoices</a></h3>
+      <div>
+       <!--  <a 
+        [routerLink]="['/project-invoice']"
+        [queryParams]="{page: 'virtual-workspace'}"
+        class="btn btn-sm btn-outline-dark nextbutton mb-2 upload">
+          Add New
+        </a> -->
+        <button (click)="onAddNew()" [disabled]="isReadOnly || isFromDisposed" *ngIf="canShowAddNewButton"
+        class="btn btn-sm btn-outline-dark nextbutton mb-2 upload">
+          Add New
+        </button>
+      </div>
+    </div>
+    <hr class="m-0">
+  </div>
+  <div class="col-12 ">
+    <div class="scrollable">
+    <table class="table table-borderless">
+      <tbody>
+        <tr *ngFor="let invoice of invoice">
+          <td>
+            <div class="d-flex justify-content-start align-items-center">
+              <div class="mr-2 fees_invoice_tableWidth" >
+                Status<strong class="mr5">:</strong>
+                <span *ngIf="!isFromDisposed">
+                <a class="invoiceNumberLink" (click)="openexistingNvoice(invoice?.invoiceId)">{{ invoice?.status }}</a>
+                </span>
+                <span *ngIf="isFromDisposed">
+                  {{ invoice?.status }}
+                </span>
+             
+              </div>
+              <div>Due<strong class="mr5">:</strong> ${{ invoice?.dueAmount }}</div>
+            </div>
+            <div class="d-flex justify-content-start align-items-center">
+              <div class="mr-2 fees_invoice_tableWidth">
+                Paid<strong class="mr5">:</strong> ${{ invoice?.paidAmount }}
+              </div>
+              <div>Date<strong class="mr5">:</strong> {{ invoice?.invoiceDate }}</div>
+            </div>
+          </td>
+          <td>
+            <div class="float-right">
+              <div>
+                Invoice #<strong class="mr5">:</strong>{{isFromDisposed ? invoice?.invoiceId : ''}}<a class="invoiceNumberLink" *ngIf="!isFromDisposed" (click)="openinvoiceDocument(invoice?.invoiceId)">{{ invoice?.invoiceId }} </a>
+              </div>
+              <div >
+                Pay Reference #<strong class="mr5">:</strong> {{ invoice?.payReference }}
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="float-right mr-2" *ngIf="showServerError">
+  <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+</div>
+</div>
+
+<app-custom-modal-popup 
+  #addNewModal
+  (modalClosed)="addNewModalClosed($event)"
+  [modalConfig]="searchConfig"
+>
+<app-project-invoice *ngIf="openNewModal | async" [invoiceId]="selectedInvoiceId" 
+[feesAndInvoiceOptions]="feesAndInvoiceOptions"
+[userFullName]="virtualDesktopData?.loggedInUserName"
+(onCancel)="onCancel($event)" [errorMsgObj]="errorMsgObj"></app-project-invoice>
+
+</app-custom-modal-popup>

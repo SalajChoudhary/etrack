@@ -1,0 +1,163 @@
+.text-right{
+  position: absolute;
+  right: 0;
+}
+
+.heading-cont{
+  text-align: center;
+  background: #233E2A;
+  color: #fff;
+  min-width: 800px;
+  position: relative;
+  margin-left:-16px;
+}
+.main-container{
+  width:800px;
+  margin-bottom: -8px;
+}
+
+.inquiry-container{
+  min-height: calc(100vh - 198px);
+}
+
+form{
+  // border: 1px solid #000;
+  padding-top: 15px;
+  margin: -18px -16px 0px -16px;
+}
+.footer-row{
+  //border: 1px solid #000;
+  // padding-top: 10px;
+  padding-bottom: 5px;
+  margin: 0px -16px -16px -16px;
+  border-top: 0;
+}
+
+.disabledaccord{
+  background: #eae1e1;
+  opacity: 0.3;
+}
+div.hr{
+  border-bottom: 1px solid #000;
+  width: 103%;
+  margin: -40px 0px 65px -18px;
+}
+.accord-container{
+  position: relative;
+  width: 100%;
+  // background:rgba(44, 82, 52, 0.37);
+  padding-top:10px;
+  // border-top: 1px solid #000;
+  padding:27px 0px 27px 0px;
+}
+p.sign-submit{
+  position: relative;
+  top: 10px;
+}
+div.step{
+  height:40px;
+  font-weight: 500;
+  font-size: 16px;
+  background:#233E2A;
+  color:#fff;
+  position:relative;
+  width:100px;
+  text-align:center;
+  line-height:40px;
+  left: -16px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  margin-top: 15px;
+  margin-left: 15px;
+}
+div.step:after{
+  content:"";
+  position:absolute;
+  height:0;
+  width:0;
+  left:100%;
+  top:0;
+  border:20px solid transparent;
+  border-left: 20px solid #233E2A;
+}
+.accord{
+  height: 75px;
+  //padding: 15px;
+  cursor: pointer;
+  border:1px solid #233E2A;
+  background: #fff;
+  margin-bottom: 25px;
+  border-radius: 30px;
+  width: 90%;
+  margin-left: 56px;
+}
+.accord.active{
+ // background: rgb(44 82 52 / 37%);
+}
+.text-cont{
+  margin-top: 15px;
+  margin-left:30px;
+  width:550px;
+}
+.text-cont p{
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.icon-holder{
+  position: relative;
+  top: 8px;
+  right:0;
+  height:43px;
+}
+// @media only screen and (min-width: 992px){
+//   .icon-holder{
+//     left:35%;
+//   }
+// }
+.validateMode{
+  border-top: 1px solid #000;
+  background-color: #FFE15F;
+}
+
+.okButton{
+  width: 61px;
+}
+
+.mt-50{
+  margin-top: 50%;
+}
+
+.float-left{
+  float: left;
+}
+
+.ml-23{
+  margin-left: 2.2rem;
+}
+.dartUploadButton{
+  background-color: #FFE15F;
+  // text-align: center !important;
+ // margin-left: 45%;
+}
+.text-decoration-none{
+  text-decoration: none;
+
+}
+.accord:hover{
+  text-decoration: none;
+
+  }
+.text-black{
+  color:black;
+}
+.light-green{
+  background-color: #cad1cc;
+}
+
+.mr-93{
+  margin-right: 97px;
+}
+.margin-left-56{
+  margin-left: 56px;
+}

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Facility" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d5d73960-5ace-43c9-8c4d-567df557ea2f">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PermitCoverSheetReport"/>
+	<queryString language="json">
+		<![CDATA[permit.facility]]>
+	</queryString>
+	<field name="facilityName" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="facilityName"/>
+		<fieldDescription><![CDATA[facilityName]]></fieldDescription>
+	</field>
+	<field name="streetAddress" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="streetAddress"/>
+		<fieldDescription><![CDATA[streetAddress]]></fieldDescription>
+	</field>
+	<field name="details" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="details"/>
+		<fieldDescription><![CDATA[details]]></fieldDescription>
+	</field>
+	<field name="taxmap" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="taxmap"/>
+		<fieldDescription><![CDATA[taxmap]]></fieldDescription>
+	</field>
+	<field name="direcions" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="direcions"/>
+		<fieldDescription><![CDATA[direcions]]></fieldDescription>
+	</field>
+	<field name="streamwaterbody" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="streamwaterbody"/>
+		<fieldDescription><![CDATA[streamwaterbody]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="94" splitType="Stretch">
+			<textField>
+				<reportElement x="65" y="-1" width="95" height="20" uuid="7ab35ffd-f6c2-4e2e-bd0e-a9c0f0326e9e"/>
+				<textFieldExpression><![CDATA[$F{facilityName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="66" y="22" width="92" height="20" uuid="b70cf1af-1552-41df-846b-88ecf12460c5"/>
+				<textFieldExpression><![CDATA[$F{streetAddress}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="381" y="27" width="129" height="21" uuid="d88f8fca-3f83-4657-9123-9f02bf340762"/>
+				<textFieldExpression><![CDATA[$F{direcions}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="381" y="53" width="129" height="25" uuid="b0bcb68a-ce52-42ed-9965-95cde1408d48"/>
+				<textFieldExpression><![CDATA[$F{streamwaterbody}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="60" height="20" uuid="45774858-aca5-4406-b77a-a4163174602c"/>
+				<text><![CDATA[Facility:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<textField>
+				<reportElement x="66" y="-48" width="92" height="20" uuid="d3515880-1f48-4c11-aaab-317f1bf66414"/>
+				<textFieldExpression><![CDATA[$F{details}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<textField>
+				<reportElement x="66" y="-58" width="92" height="20" uuid="581757cd-fe6b-450a-98d9-288eef993225"/>
+				<textFieldExpression><![CDATA[$F{taxmap}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-12">
+    <div class="header">
+      <!-- <h3 class="header-1b mb-0">Additional Application</h3> -->
+      <div>
+        <button *ngIf="!isFromDisposed" (click)="onAddNew()" class="btn btn-sm btn-outline-dark nextbutton mb-2 upload">
+          Add Additional Permit
+        </button>
+      </div>
+    </div>
+    <hr class="m-0">
+  </div>
+  <div class="row mb-3">
+    <div class="col-12">
+      <hr class="m-0">
+    </div>
+  </div>
+
+
+  <app-custom-modal-popup 
+  #addNewModal
+  (modalClosed)="addNewModalClosed($event)"
+  [modalConfig]="modalConfig"
+>
+<app-new-application-permit-modal *ngIf="openNewModal | async"
+(onCancel)="onCancel($event)" (onSuccess)="onSuccess($event)" [errorMsgObj]="errorMsgObj"></app-new-application-permit-modal>
+
+</app-custom-modal-popup>
+
+<app-success-popup #successPopup [successMsg]="successMsg" (onOkClick)="onSuccesPopupOkClicked()"></app-success-popup>

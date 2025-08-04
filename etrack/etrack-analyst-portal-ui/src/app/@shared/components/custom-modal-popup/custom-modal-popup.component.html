@@ -1,0 +1,33 @@
+<ng-template #modal>
+ 
+    <div class="custom-modal-header" *ngIf="modalConfig?.showHeader">
+        <!-- <nav class="navbar navbar-expand-lg navbar-light primary">
+            <span class="navbar-brand" href="#">{{modalConfig.title}}</span>
+            <button *ngIf="modalConfig?.showClose" type="button" class="close remove-left-margin" aria-label="Close" (click)="closeHandler()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </nav> -->
+         <button *ngIf="modalConfig?.showClose" type="button" class="close remove-left-margin" 
+         aria-label="Close" (click)="closeHandler()">
+                <!-- <span aria-hidden="true">&times;</span> -->
+                <span aria-hidden="false">X</span>
+            </button>
+    </div>
+    <div class="custom-modal-body">
+        <!-- this placeholder is to inject component body -->
+        <ng-content></ng-content>
+    </div>
+    <!-- <div class="modal-footer" *ngIf="modalConfig.showFooter">
+        <div class="row footer-row mt-20">
+            <div class="col-md-12">
+                <button  type="submit" class="btn btn-primari nextbutton mr-2" *ngIf="modalConfig.showButton1">
+                    {{modalConfig.button1Label}}
+                </button>
+                <button type="button" class="btn btn-outline-dark closebutton" *ngIf="modalConfig.showButton2">
+                    {{modalConfig.button2Label}}
+                </button>
+
+            </div>
+        </div>
+    </div> -->
+</ng-template>

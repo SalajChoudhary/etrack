@@ -1,0 +1,179 @@
+<div class="row">
+    <div class="col-12">
+        <div class="header">
+            <h3 class="header-1b mb-0"> Response to Submitted Geographical Inquiry</h3>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="has-border">
+            <div class="row mt-1 ml-53">
+                <div class ="col-4 d-flex">
+                    <div class="header-1b">
+                        GI ID:
+                    </div>
+                    <div class="ml-2">
+                        {{formatInquiryId(inquiryId)}}
+                    </div>                   
+                </div>
+                <div class="col-6 d-flex ml-33">
+                    <div class = "header-1b">
+                        Received Date:
+                    </div> 
+                    <div class="ml-2">
+                        {{virtualDesktopData?.receivedDate}}
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3 ml-1">
+                <div class="col-5 d-flex">
+                    <div class="header-1b w-32">
+                        Inquiry Type:
+                    </div>
+                    <div style="padding-left: 2px !important">
+                        {{inquiryType}}
+                    </div>
+                </div>
+                <div class="col-3 d-flex">
+                    <div class="header-1b">
+                        Region:
+                    </div>
+                    <div class="ml-2">
+                        {{virtualDesktopData?.region}}
+                    </div>
+                </div>
+                <div class="col-4 d-flex">
+                    <div class="header-1b w-40">
+                        Municipality:
+                    </div>
+                    <div class="ml-1 w-60" style="overflow-wrap: break-word">
+                        {{virtualDesktopData?.municipality}}
+                    </div>
+                </div>
+            </div>
+            <div class="ml-2 mr-2">
+                <hr>
+            </div>   
+            <form
+                [formGroup]="giFormGroup"
+                (ngSubmit)="onFormSubmit()"
+            >
+                <div class="row mt-1">
+                    <div class="col-12">
+                        <label class="form-check-label ml-3 mr-1">Send Response?*:</label>
+                        <div class="form-check form-check-inline mr-1">
+                            <input type="radio" class="ml-1 mr-1" value="Y"
+                                formControlName="sendResponseInd" id="sendResponseRadioYes"
+                                (change)="onSendResponseChange()">
+                            <label class="form-check-label typo-2" for="sendResponseRadioYes">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline mr-4">                           
+                            <input type="radio" class="ml-1 mr-1" value="N"
+                                formControlName="sendResponseInd" id="sendResponseRadioNo"
+                                (change)="onSendResponseChange()">
+                            <label class="form-check-label typo-2" for="sendResponseRadioNo">
+                                No
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline mr-4 ml-50">                           
+                            <input type="checkbox" class="mr-1" formControlName="completeInd"
+                                (change)="onCompleteChange()">
+                            <label class="header-1b form-check-label">
+                                Complete
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline ml-50">
+                            <label>
+                                {{giFormGroup?.controls?.sendResponseInd.value === 'Y' ? 
+                                'Date*:' : 'Date:'}}
+                            </label>
+                            <input type="date" class="ml-1 w-date" formControlName="responseDate"
+                                (change)="onDateChange()">
+                        </div>
+                        <div class="ml-446" *ngIf="submitted && giFormGroup?.controls?.responseDate?.errors?.required">
+                            <span
+                                        class="addr-error-msg"                          
+                                        >{{ errorMsgObj?.NOTE_ACTION_DATE_REQD }}</span>
+                        </div>
+                        <div class="ml-446" *ngIf="submitted && giFormGroup?.controls?.responseDate?.errors?.lessThanRecvdDate">
+                            <span
+                                        class="addr-error-msg"                          
+                                        >Error: Date must be greater than or equal to the Received Date.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label class="ml-3">{{
+                            giFormGroup?.controls?.sendResponseInd.value === 'Y' ?
+                            'Response*:' : 'Response:'}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 ml-2">
+                        <app-textarea-child
+                            [formGroup]="giFormGroup"
+                            fieldWidth="98%"
+                            controlName="response"
+                            [maxLength]="maxNote"
+                            noOfRows="6"
+                            (onInputChange)="checkDisableInputs()">
+                        </app-textarea-child>
+                        <div class="mt-2 ml-1" *ngIf="submitted && giFormGroup?.controls?.response?.errors?.required">
+                            <span
+                                    class="addr-error-msg"                          
+                                    >Error: Response text is Required.</span>
+                        </div>
+                    </div>                  
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12 text-blue text-center" style="font-style: italic !important;">
+                        Note: The response to this Inquiry is entered here for reference purposes.
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mt-3 footer-btn">
+                            <button [disabled]="disableSubmit" type="submit" class="btn btn-sm btn-outline-dark nextbutton mb-2 mr-2 upload">
+                                Submit
+                            </button>
+                    </div>
+                </div>              
+            </form>           
+        </div>
+    </div>
+</div>
+
+<app-custom-modal-popup #reviewNotCompletePopup >
+    <ng-container>
+      <div>
+      <p class="text-center mt-2">All Program Area Reviews must be marked Complete before the Response is Completed.</p>
+      <div class="text-center mb-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="confirmReviewOkClicked()"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+    </ng-container>
+  </app-custom-modal-popup>
+
+<app-custom-modal-popup #confirmationPopup >
+    <ng-container>
+      <div>
+      <p class="text-center mt-2">Submit was successful</p>
+      <div class="text-center mb-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="confirmOkClicked()"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+    </ng-container>
+  </app-custom-modal-popup>

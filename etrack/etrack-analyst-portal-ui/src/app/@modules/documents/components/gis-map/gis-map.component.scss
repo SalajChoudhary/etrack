@@ -1,0 +1,104 @@
+/* import the required JSAPI css*/
+@import "@arcgis/core/assets/esri/themes/light/main.css";
+
+.esri-view {
+  height: 100%;
+}
+
+#text {
+  color: white;
+  padding: 3%;
+}
+#instructions {
+  width: 300px;
+  background: #fff;
+  padding: 20px;
+}
+
+.parent {
+  position: relative;
+  height: 65vh;
+  //height: 700px;
+  margin-right: -15px;
+}
+#mainWindow {
+  padding: .5em;
+  background-color: #fff;
+}
+#mainWindow p, #uploadForm {
+    display: block;
+    padding: .1em;
+}
+#layerToggle {
+  padding-top: 0.5rem;
+  padding-right: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 2rem;
+  background-color: #fff;
+}
+#dynamicLayers{
+  width: 400px;
+  background: #fff;
+  padding: 10px;
+  height: 45vh;
+  overflow: scroll;
+}
+
+#layerToggle div {
+    display: block;
+    padding: .1em;
+    width: 180px;
+}
+
+#toolbarDiv {
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.sublayers {
+  list-style-type: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.sublayer_label{
+  padding-left: 10px!important;
+}
+
+.sublayers-item {
+  margin-right: 4rem;
+  word-break: break-word;
+}
+
+.esri-widget--button.active,
+.esri-widget--button.active:hover,
+.esri-widget--button.active:focus {
+  cursor: default;
+  background-color: #999696;
+}
+.esri-widget--button.active path,
+.esri-widget--button.active:hover path,
+.esri-widget--button.active:focus path {
+  fill: #E4E4E4;
+}
+
+#topNav {  display: block; position: absolute;  z-index: 99; background: rgb(0, 23, 153);left: 15px;  top: 130px; }
+
+.loading {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+}
+
+.loading-hide {
+ display: none!important;
+}
+
+::ng-deep .esri-legend__layer-caption {
+  display: none;
+}
+

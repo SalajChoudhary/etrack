@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GISAddressRetrieveController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.controller</a> &gt; <span class="el_source">GISAddressRetrieveController.java</span></div><h1>GISAddressRetrieveController.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.controller;
+
+import java.util.Map;
+import java.util.UUID;
+import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import dec.ny.gov.etrack.gis.service.GISAddressRetrieveService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@RestController
+<span class="nc" id="L21">public class GISAddressRetrieveController {</span>
+  
+  @Autowired
+  private GISAddressRetrieveService gisAddressRetrieveService;
+<span class="nc" id="L25">  private static final Logger LOGGER = LoggerFactory.getLogger(GISAddressRetrieveController.class.getName());</span>
+  
+  /**
+   * Retrieve the Facility address details for the input address line 1.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param address - Input Search Address.
+   * 
+   * @return - Facility Address details.
+   */
+  @GetMapping(&quot;/ITSAddress&quot;)
+  @ApiOperation(value = &quot;Retrieve the matching address from ITS-GIS Service.&quot;)
+  public String getITSAddresses(HttpServletResponse response,
+      @RequestParam(name = &quot;SingleLine&quot;) @ApiParam(example = &quot;625 Broadway&quot;, value=&quot;Search address&quot;) final String address) {
+
+<span class="nc" id="L40">    String contextId = UUID.randomUUID().toString();</span>
+
+<span class="nc" id="L42">    LOGGER.info(&quot;Entering into getITSAddresses {}, Contxt Id {}&quot;, address, contextId);</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">    if (!StringUtils.hasLength(address)) {</span>
+<span class="nc" id="L44">      LOGGER.error(&quot;Input value address is empty . Context Id {} &quot;, contextId);</span>
+<span class="nc" id="L45">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L46">      return null;</span>
+    }
+<span class="nc" id="L48">    return gisAddressRetrieveService.getITSAddresses(address, contextId);</span>
+  }
+
+  /**
+   * Retrieve the ESRI Address for the input search parameters.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param address - Address line 1.
+   * @param postal - Postal Code.
+   * @param city - City.
+   * 
+   * @return - Matched address details.
+   */
+  @GetMapping(&quot;/EsriAddresses&quot;)
+  @ApiOperation(value = &quot;Retrieve the matched address for the input postal code and city from ESRI service.&quot;)
+  public String getEsriAddresses(HttpServletResponse response, @RequestParam final String address,
+      @RequestParam @ApiParam(example = &quot;12115&quot;, value=&quot;Postal/Zip Code&quot;) final String postal, 
+      @RequestParam @ApiParam(example = &quot;Albany&quot;, value=&quot;City name&quot;) final String city) {
+
+<span class="nc" id="L67">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L68">    LOGGER.info(&quot;Entering into getEsriAddresses address {} Postal {} City {}, Context Id {}&quot;,</span>
+        address, postal, city, contextId);
+
+<span class="nc bnc" id="L71" title="All 4 branches missed.">    if (!StringUtils.hasLength(address) || !StringUtils.hasLength(city)) {</span>
+<span class="nc" id="L72">      LOGGER.error(</span>
+          &quot;One of the mandatory parameter is missing to &quot;
+              + &quot;identify the ESRI addresses for the input search parameters.&quot;
+              + &quot; address {} city {}, postal code {}. Context Id {} &quot;,
+          address, city, postal, contextId);
+<span class="nc" id="L77">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L78">      return &quot;One of the mandatory parameter(Address/City) is missing for the lookup &quot;;</span>
+    }
+<span class="nc" id="L80">    return gisAddressRetrieveService.getEsriAddresses(address, postal, city, contextId);</span>
+  }
+
+  /**
+   * Retrieve the County details from GIS Service.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * 
+   * @return - Counties.
+   */
+  @GetMapping(&quot;/counties&quot;)
+  @ApiOperation(value = &quot;Retrieve all the Counties in the New York by calling GIS External service. &quot;
+      + &quot;This detail will be retrieved by calling GIS ITS.&quot;)
+  public Object getCounties(HttpServletResponse response) {
+    
+<span class="nc" id="L95">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L96">    LOGGER.info(&quot;Entering into getCounties to retrieve Counties. Context Id {}&quot;, contextId);</span>
+<span class="nc" id="L97">    return gisAddressRetrieveService.getCounties(contextId);</span>
+  }
+
+  /**
+   * Retrieve the Tax Parcel details for the input search parameters.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param taxParcelID - Tax Parcel Id.
+   * @param countyName - County Name.
+   * @param municipalName - Municipality Name.
+   * 
+   * @return - Tax Parcel details.
+   */
+  @GetMapping(&quot;/taxParcel&quot;)
+  @ApiOperation(value=&quot;Retrieve the Tax Parcel details for the input Tax Parcel I d, County Name and Municipality by calling GIS External service.&quot;)
+  public Object getTaxParcel(HttpServletResponse response,
+      @RequestParam(&quot;taxParcelID&quot;) @ApiParam(example = &quot;156.17-2-41&quot;, value=&quot;Facility Polygon Tax Parcel ID&quot;) final String taxParcelID,
+      @RequestParam(&quot;countyName&quot;) @ApiParam(example = &quot;Albany&quot;, value=&quot;County Name&quot;) final String countyName,
+      @RequestParam(name = &quot;municipalName&quot;, required = false) @ApiParam(example = &quot;Albany&quot;, value=&quot;Municipality Name&quot;) final String municipalName) {
+
+<span class="nc" id="L117">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L118">    LOGGER.info(&quot;Entering into getTaxParcel {} {} {}. Context Id {}&quot;, taxParcelID, countyName,</span>
+        municipalName, contextId);
+    
+<span class="nc bnc" id="L121" title="All 4 branches missed.">    if (!(StringUtils.hasLength(taxParcelID) &amp;&amp; StringUtils.hasLength(countyName))) {</span>
+<span class="nc" id="L122">      LOGGER.info(&quot;Mandatory value is missing {} {} {}&quot;, taxParcelID, countyName, municipalName);</span>
+<span class="nc" id="L123">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L124">      return null;</span>
+    }
+<span class="nc" id="L126">    return gisAddressRetrieveService.getTaxParcel(taxParcelID, countyName, municipalName, contextId);</span>
+  }
+
+  /**
+   * Retrieve the Municipalities from GIS Service for the input County.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param countyName - County name.
+   * 
+   * @return - Municipality details.
+   */
+  @GetMapping(&quot;/municipalities&quot;)
+  @ApiOperation(value = &quot;Retrieve all the Municipalities for the input county. This detail will be pulled by calling ITS GIS service.&quot;)
+  public String getMunicipalities(HttpServletResponse response,
+      @RequestParam(&quot;countyName&quot;) @ApiParam(example = &quot;Albany&quot;, value=&quot;County Name&quot;) final String countyName) {
+
+<span class="nc" id="L142">    String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L143">    LOGGER.info(&quot;Entering into getMunicipalities {}, Context Id {}&quot;, countyName, contextId);</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">    if (!StringUtils.hasLength(countyName)) {</span>
+<span class="nc" id="L145">      LOGGER.error(&quot;Mandatory value is missing {}&quot;, countyName);</span>
+<span class="nc" id="L146">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L147">      return null;</span>
+    }
+<span class="nc" id="L149">    return gisAddressRetrieveService.getMuncipalities(countyName, contextId);</span>
+  }
+
+  /**
+   * Retrieve the complete Address details.
+   * 
+   * @param response - {@link HttpServletResponse}
+   * @param addressParam - Address Parameter.
+   * @param userId - User who initiates this request.
+   * 
+   * @return - Matched address details.
+   */
+  @PostMapping(value = &quot;/address&quot;, produces = &quot;application/json&quot;)
+  @ApiOperation(value=&quot;Retrieve teh address details for the request details. Street Address 1 and Zip Code.&quot;)
+  public Object getAddressDetails(HttpServletResponse response,
+      @RequestBody Map&lt;String, String&gt; addressParam, 
+      @RequestHeader @ApiParam(example = &quot;shortname&quot;, value=&quot;User id of the logged in user&quot;) final String userId) {
+
+<span class="nc" id="L167">    final String contextId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L168">    LOGGER.info(&quot;Entering into getAddressDetails Context Id: {}&quot;, contextId);</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">    if (!StringUtils.hasLength(addressParam.get(&quot;streetAddress1&quot;))</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        || !StringUtils.hasLength(addressParam.get(&quot;zipCode&quot;))) {</span>
+<span class="nc" id="L171">      LOGGER.error(&quot;One of the mandatory parameter is missing to identify the address {}&quot;,</span>
+          addressParam);
+<span class="nc" id="L173">      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);</span>
+<span class="nc" id="L174">      return null;</span>
+    }
+<span class="nc" id="L176">    return gisAddressRetrieveService.getAddressDetails(userId, contextId, addressParam);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,1142 @@
+<!-- <mat-horizontal-stepper linear #stepper>
+    <mat-step [stepControl]="firstFormGroup" [editable]="isEditable"> -->
+
+<!-- <app-analyst-sub-header [showAddress]="false" [isPopUp]="true" ></app-analyst-sub-header> -->
+
+<form [formGroup]="firstFormGroup" (ngSubmit)="onFormSubmit()">
+  <!-- <ng-template matStepLabel>Location Search</ng-template> -->
+  <!-- something here -->
+  <div class="form-container outer-container">
+    <div class="row pt-3 app-search-width">
+      <div class="col-12">
+        <div class="d-flex justify-content-center align-items-center p-2">
+          <div class="top-headings header-3b">
+            {{ headerText ? headerText?.toUpperCase() : "" }} SEARCH
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 offset-3 hr-2">
+      <div class="form-group d-flex mt-4">
+        <h3 class="single-line header-1n">{{ headerText }} Type*:</h3>
+        <select
+          (change)="onTypeChange($event)"
+          name="applicantType"
+          formControlName="applicantType"
+          class="form-control ml-2 applicant_type"
+        >
+          <option value="" disabled selected>--SELECT--</option>
+          <option
+            *ngFor="let type of configObject?.publicTypes"
+            value="{{ type?.publicTypeCode }}"
+          >
+            {{ type?.publicTypeDesc }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <ng-container
+      *ngIf="
+        firstFormGroup.controls.applicantType.value == 'P' ||
+        firstFormGroup.controls.applicantType.value == 'I'
+      "
+    >
+      <div class="shadow-div"></div>
+      <div class="search-container">
+        <div class="col-2 search-height">
+          <h3 class="w-200 header-1n">Search By:</h3>
+        </div>
+        <div class="col-8">
+          <div class="input-container">
+            <div>
+              <div class="form-check form-check-inline form-check-section">
+                <label
+                  class="form-check-label typo-2 min-width-label"
+                  for="inlineCheckbox1"
+                  >First Name:</label
+                >
+                <select
+                  formControlName="ftype"
+                  name="applicantType"
+                  class="form-control mr-2 ml-2 ddl-options"
+                >
+                  <option value="S">Starts with</option>
+                  <option value="E">Exact</option>
+                  <option value="C">Contains</option>
+                </select>
+                <input
+                  maxlength="30"
+                  class="form-control input-name"
+                  type="text"
+                  formControlName="firstName"
+                  (keyup)="onValueChange($event)"
+                  id="inlineCheckbox1"
+                  
+                />
+              </div>
+            </div>
+            <div
+              class="addr-error-msg-placeholder"
+              *ngIf="
+                !firstFormGroup?.controls?.firstName?.errors || !isSubmitted
+              "
+            ></div>
+            <!-- <span
+              class="addr-error-msg"
+              *ngIf="
+                firstFormGroup?.controls?.firstName?.errors?.required &&
+                isSubmitted
+              "
+              >{{ errorMsgObj.FNAME_SEARCH_REQD }}
+            </span>
+            <span
+              class="addr-error-msg1"
+              *ngIf="
+                firstFormGroup?.controls?.firstName?.errors?.atleastTwoChar &&
+                isSubmitted
+              "
+              >{{ errorMsgObj.FNAME_MIN_CHAR_REQD }}
+            </span> -->
+          </div>
+          <!-- <br> -->
+          <div class="input-container mt-2">
+            <div>
+              <div class="form-check form-check-inline form-check-section">
+                <label
+                  class="form-check-label typo-2 min-width-label"
+                  for="inlineCheckbox1"
+                  >Last Name*:</label
+                >
+                <select
+                  formControlName="ltype"
+                  name="applicantType"
+                  class="form-control ml-2 mr-2 ddl-options"
+                  (change)="onLtypeChange($event)"
+                >
+                  <option value="S">Starts with</option>
+                  <option value="E">Exact</option>
+                  <option value="C">Contains</option>
+                </select>
+                <input
+                  required
+                  maxlength="30"
+                  class="form-control input-name"
+                  type="text"
+                  formControlName="lastName"
+                  (keyup)="onValueChange($event)"
+                  id="inlineCheckbox1"
+                />
+              </div>
+            </div>
+            <span
+              class="addr-error-msg"
+              *ngIf="
+                firstFormGroup?.controls?.lastName?.errors?.required &&
+                isSubmitted
+              "
+              >{{ errorMsgObj.LNAME_SEARCH_REQD }}</span
+            >
+            <span
+              class="addr-error-msg1"
+              *ngIf="
+                firstFormGroup?.controls?.lastName?.errors?.atleastTwoChar &&
+                isSubmitted
+              "
+              >{{ errorMsgObj.LNAME_MIN_CHAR_REQD }}
+            </span>
+          </div>
+        </div>
+        <div class="col-2 button-container">
+          <button
+            type="submit"
+            class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          >
+            Search
+          </button>
+          <button
+            (click)="clearFirstSearch()"
+            type="button"
+            class="btn btn-sm btn-outline-dark closebutton mb-2"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+      <div class="shadow-div" *ngIf="searched || applicantsError?.error">
+        <br />
+      </div>
+      <div class="row">
+        <div class="col-8 offset-2 mt-20">
+          <div class="exceptionerror-cls" *ngIf="applicantsError?.error">
+            {{ errorMsgObj.TOO_MANY_RESULTS_MSG }}
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="searched && applicantsList?.length > 0">
+        <div class="col-8 offset-2 mt-20">
+          <p>
+            Your search - {{ searchContent }} - matched the following records:
+          </p>
+          <p>Please select the correct match below or try:</p>
+          <div class="ml-60">
+            <p>- Different search criteria: starts with, contains, exact</p>
+            <p>- A nickname, abbreviation, or formally known as</p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+        *ngIf="
+          searched && !applicantsError?.error && applicantsList?.length == 0
+        "
+      >
+        <div class="col-8 offset-2 mt-20">
+          <p>
+            Your search - <em>{{ searchContent }}</em> - did not match any of our
+            records
+          </p>
+          <!-- No search message -->
+          <p>Please clear search and try:</p>
+          <div class="ml-60">
+            <p>- Different search criteria: starts with, contains, exact</p>
+            <p>- A nickname, abbreviation, or formally known as</p>
+            <p>
+              - or select
+              <strong
+                ><em>Add {{ headerText }}</em></strong
+              >
+              button.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="searched && applicantsList?.length > 0">
+        <div
+          class="col-8 offset-2"
+          role="Individual Table "
+          aria-label="Search Table Results"
+          aria-describedby="List of Applicants"
+        >
+          <p-table
+            styleClass="p-datatable-lg no-header-scoll"
+            [scrollable]="true"
+            scrollHeight="65vh"
+            [value]="applicantsList"
+            [rows]="10"
+            [rowsPerPageOptions]="[5, 10, 15, 20]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [totalRecords]="applicantsList?.length ? applicantsList?.length : 0"
+          >
+            <caption>
+              Search Result
+            </caption>
+            <ng-template pTemplate="header">
+              <tr role="rowgroup">
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-label="select Applicants"
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '10%' }"
+                ></th>
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-label="Name of Individual Applicants"
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '60%', position: 'relative' }"
+                >
+                  Name
+                </th>
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-label="'Affiliated Facilities Search Table Name Header "
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '30%', position: 'relative' }"
+                >
+                  Affiliated Facilities
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-i="rowIndex">
+              <tr role="rowgroup" aria-label="Row Values">
+                <td
+                  scope="col"
+                  role="cell"
+                  aria-label="Individual Applicants Name List Check box"
+                  class="table-check-box table-body"
+                >
+                  <!-- <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox> -->
+                  <input
+                    type="radio"
+                    name="scene1"
+                    id="radio{{ i }}"
+                    aria-label="Applicant name Radio"
+                    [value]="item?.applicantId"
+                    (click)="selectRow(g.checked, item)"
+                    #g
+                  />
+                </td>
+                <td
+                  scope="col"
+                  role="cell"
+                  aria-label="Individual Applicants Name List "
+                  class="table-body"
+                  [ngStyle]="{
+                    'text-align': 'left',
+                    'word-wrap': 'break-word',
+                    width: '60%',
+                    position: 'relative'
+                  }"
+                >
+                  <label *ngIf="innerWidth > 1024">{{
+                    item.displayName
+                  }}</label>
+                  <span *ngIf="innerWidth <= 1024">{{ item.displayName }}</span>
+                  <!-- <label
+                    *ngIf="innerWidth > 1024"
+                    triggers="mouseenter:mouseleave"
+                    #pop="ngbPopover"
+                    for="radio{{i}}"
+                    (mouseenter)="onHover($event, item, pop)"
+                    container="body"
+                    [ngbPopover]="
+                      item?.facilities?.length > 0 ? htmlContent : ''
+                    "
+                    [popoverTitle]="
+                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                    "
+                    placement="right"
+                    >{{ item.displayName }}</label
+                  >
+
+                  <span
+                    *ngIf="innerWidth <= 1024"
+                    #pop="ngbPopover"
+                    (click)="onHover($event, item, pop)"
+                    container="body"
+                    [ngbPopover]="
+                      item?.facilities?.length > 0 ? htmlContent : ''
+                    "
+                    [popoverTitle]="
+                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                    "
+                    placement="auto"
+                    >{{ item.displayName }}</span
+                  > -->
+                </td>
+                <td
+                  class="table-body col-notes 334"
+                  [ngStyle]="{
+                    'text-align': 'left',
+                    'word-wrap': 'break-word',
+                    width: '30%',
+                    position: 'relative'
+                  }"
+                >
+                  <button
+                    type="button"
+                    *ngIf="innerWidth > 1024"
+                    #pop = "ngbPopover"
+                    triggers="manual"
+                    [autoClose]="'outside'"
+                    (hidden)="onPopoverHidden()"
+                    popoverClass="affiliated-facilities-popover"
+                    class="affiliated-facilities-button click-link"
+                    (click)="onHover($event, item, pop)"
+                    container="body"
+                    [ngbPopover]="
+                      item?.facilities?.length > 0 ? htmlContent : ''
+                    "
+                    [popoverTitle]="
+                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                    "
+                    placement="right"
+                    >{{
+                      item?.facilitieNames?.length > 20
+                        ? item?.facilitieNames?.slice(0, 20) + "..."
+                        : item?.facilitieNames
+                    }}</button>
+                  <span
+                    *ngIf="innerWidth <= 1024"
+                    #pop="ngbPopover"
+                    triggers="manual"
+                    [autoClose]="'outside'"
+                    (hidden)="onPopoverHidden()"
+                    container="body"
+                    (click)="onHover($event, item, pop)"
+                    class="click-link"
+                    [ngbPopover]="
+                      item?.facilities?.length > 0 ? htmlContent : ''
+                    "
+                    [popoverTitle]="
+                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                    "
+                    placement="auto"
+                    >{{
+                      item?.facilitieNames?.length > 20
+                        ? item?.facilitieNames?.slice(0, 20) + "..."
+                        : item?.facilitieNames
+                    }}</span
+                  >
+                </td>
+                <!--mouseenter:mouseleave   [autoClose]="false"  triggers="manual" #t="ngbTooltip" (click)="t.open()" -->
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </ng-container>
+    <!-- SEARCH SCREEN -->
+
+    <!-- BUSINESS SEARCH SCREEN -->
+    <ng-container
+      *ngIf="
+        firstFormGroup.controls.applicantType.value == 'X' ||
+        firstFormGroup.controls.applicantType.value == 'T' ||
+        firstFormGroup.controls.applicantType.value == 'C'
+      "
+    >
+      <div class="shadow-div"></div>
+      <div class="search-container">
+        <div class="form-row form-name section-wrapper">
+          <div class="col-12 search-height">
+            <h3 class="w-200 header-1n">Search By:</h3>
+          </div>
+          <div class="col-12 search-space">
+            <div class="form-group d-flex business-search-form">
+              <div class="form-check form-check-inline">
+                <label
+                  style="text-align: right"
+                  class="form-check-label label-inline typo-2"
+                  for="inlineCheckbox1"
+                  >Business/Organization Name*:</label
+                >
+                <select
+                  formControlName="btype"
+                  name="applicantType"
+                  class="form-control mr-2 ml-2"
+                >
+                  <option value="S">Starts with</option>
+                  <option value="E">Exact</option>
+                  <option value="C">Contains</option>
+                </select>
+                <input
+                  class="form-control"
+                  maxlength="100"
+                  type="text"
+                  formControlName="businessName"
+                  (keyup)="onValueChange($event)"
+                  id="inlineCheckbox1"
+                />
+
+                <button
+                  type="submit"
+                  class="btn btn-sm btn-primari nextbutton ml-2 upload"
+                >
+                  Search
+                </button>
+                <button
+                  (click)="clearSecondSearch()"
+                  type="button"
+                  class="btn btn-sm btn-outline-dark closebutton ml-2"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <span
+                class="addr-error-msg"
+                *ngIf="
+                  firstFormGroup?.controls?.businessName?.errors?.required &&
+                  isSubmitted
+                "
+                >{{ errorMsgObj.BUS_ORG_SEARCH_REQD }}</span
+              >
+              <span
+                class="addr-error-msg1"
+                *ngIf="
+                  firstFormGroup?.controls?.businessName?.errors
+                    ?.atleastTwoChar && isSubmitted
+                "
+                >{{ errorMsgObj.BUS_ORG_MIN_CHAR_REQD }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="shadow-div" *ngIf="searched || applicantsError?.error"></div>
+
+      <div class="row" *ngIf="applicantsError?.error">
+        <div class="col-8 offset-2 mt-20">
+          <div class="exceptionerror-cls">
+            {{ errorMsgObj.TOO_MANY_RESULTS_MSG }}
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="row"
+        *ngIf="
+          searched && !applicantsError?.error && applicantsList?.length == 0
+        "
+      >
+        <div class="col-8 offset-2 mt-20">
+          <p>
+            Your search - <em>{{ searchContent }}</em> - did not match any of our
+            records
+          </p>
+          <!-- No search message -->
+          <p>Please clear search and try:</p>
+          <div class="ml-60">
+            <p>- Different search criteria: starts with, contains, exact</p>
+            <p>- A nickname, abbreviation, or formally known as</p>
+            <p>
+              - or select
+              <strong
+                ><em>Add {{ headerText }}</em></strong
+              >
+              button.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="searched && applicantsList?.length > 0">
+        <div class="offset-2 col-8 mt-20">
+          <p>
+            Your search - {{ searchContent }} - matched the following records:
+          </p>
+          <p>Please select the correct match below or try:</p>
+          <div class="ml-60">
+            <p>- Different search criteria: starts with, contains, exact</p>
+            <p>- A nickname, abbreviation, or formally known as</p>
+          </div>
+        </div>
+
+        <div
+          class="col-8 offset-2"
+          role="Businessor Org Table "
+          aria-label="Search Table Results"
+          aria-describedby="List of Applicants"
+        >
+          <p-table
+            styleClass="p-datatable-lg no-header-scoll"
+            [scrollable]="true"
+            scrollHeight="65vh"
+            [value]="applicantsList"
+            [rows]="10"
+            [rowsPerPageOptions]="[5, 10, 15, 20]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [totalRecords]="applicantsList?.length ? applicantsList?.length : 0"
+          >
+            <caption>
+              Business or Organization Search Results
+            </caption>
+            <ng-template pTemplate="header">
+              <tr role="rowgroup">
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-label="Business Organization Search Table check Box Header "
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '10%' }"
+                ></th>
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-label="Business Organization Search Table Name Header "
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '60%', position: 'relative' }"
+                >
+                  Business/Organization Name
+                </th>
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-label="'Affiliated Facilities Search Table Name Header "
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '30%', position: 'relative' }"
+                >
+                  Affiliated Facilities
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-i="rowIndex">
+              <tr role="" rowgroup>
+                <td
+                  scope="col"
+                  role="cell"
+                  aria-label="Business Organization Search Table Check box cell "
+                  class="table-check-box table-body"
+                >
+                  <!-- <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox> -->
+                  <input
+                    type="radio"
+                    name="scene1"
+                    id="radio2{{ i }}"
+                    aria-label="Business Organization"
+                    [value]="item?.applicantId"
+                    (click)="selectRow(g.checked, item)"
+                    #g
+                  />
+                </td>
+                <td
+                  scope="col"
+                  role="cell"
+                  aria-label="Business Organization Search Table Name cell "
+                  class="table-body"
+                  [ngStyle]="{
+                    'text-align': 'left',
+                    'word-wrap': 'break-word',
+                    width: '60%',
+                    position: 'relative'
+                  }"
+                >
+                  <label *ngIf="innerWidth > 1024">{{
+                    item.displayName
+                  }}</label>
+                  <span *ngIf="innerWidth <= 1024">{{ item.displayName }}</span>
+                  <!-- <label *ngIf="innerWidth > 1024" triggers="mouseenter:mouseleave" 
+                    container="body" for="radio2{{ i }}" [ngbPopover]="
+                                      item?.facilities?.length > 0 ? htmlContent : ''
+                                    " [popoverTitle]="
+                                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                                    " placement="right">{{ item.displayName }}</label>
+                
+                  <span *ngIf="innerWidth <= 1024" #pop="ngbPopover"  container="body" [ngbPopover]="
+                                      item?.facilities?.length > 0 ? htmlContent : ''
+                                    " [popoverTitle]="
+                                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                                    " placement="auto">{{ item.displayName }}</span> -->
+                </td>
+                <td
+                  class="table-body col-notes 614"
+                  [ngStyle]="{
+                    'text-align': 'left',
+                    'word-wrap': 'break-word',
+                    width: '30%',
+                    position: 'relative'
+                  }"
+                >
+                  <button
+                    *ngIf="innerWidth > 1024"
+                    type="button"
+                    #pop = "ngbPopover"
+                    triggers="manual"
+                    popoverClass="affiliated-facilities-popover"
+                    class="affiliated-facilities-button click-link"
+                    [autoClose]="'outside'"
+                    (hidden)="onPopoverHidden()"
+                    (click)="onHover($event, item, pop)"
+                    container="body"
+                    [ngbPopover]="
+                      item?.facilities?.length > 0 ? htmlContent : ''
+                    "
+                    [popoverTitle]="
+                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                    "
+                    placement="right"
+                    >{{
+                      item?.facilitieNames?.length > 20
+                        ? item?.facilitieNames?.slice(0, 20) + "..."
+                        : item?.facilitieNames
+                    }}</button>
+                  <span
+                    *ngIf="innerWidth <= 1024"
+                    #pop="ngbPopover"
+                    triggers="manual"
+                    [autoClose]="'outside'"
+                    (hidden)="onPopoverHidden()"
+                    class="click-link"
+                    container="body"
+                    (click)="onHover($event, item, pop)"
+                    [ngbPopover]="
+                      item?.facilities?.length > 0 ? htmlContent : ''
+                    "
+                    [popoverTitle]="
+                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                    "
+                    placement="auto"
+                    >{{
+                      item?.facilitieNames?.length > 20
+                        ? item?.facilitieNames?.slice(0, 20) + "..."
+                        : item?.facilitieNames
+                    }}</span
+                  >
+                </td>
+
+                <!-- [autoClose]="false"  triggers="manual" #t="ngbTooltip" (click)="t.open()" -->
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </ng-container>
+    <!-- BUSINESS SEARCH SCREEN -->
+
+    <!-- GOVT AGENCY SEARCH SCREEN -->
+    <ng-container
+      *ngIf="
+        firstFormGroup.controls.applicantType.value == 'F' ||
+        firstFormGroup.controls.applicantType.value == 'S' ||
+        firstFormGroup.controls.applicantType.value == 'M'
+      "
+    >
+      <div class="shadow-div"></div>
+      <div class="search-container">
+        <div class="form-row form-name section-wrapper">
+          <div class="col-12 search-height">
+            <h3 class="w-200 header-1n">Search By:</h3>
+          </div>
+          <div class="col-12 search-space">
+            <div class="form-group d-flex business-search-form">
+              <div class="form-check form-check-inline">
+                <label
+                  style="text-align: right"
+                  class="form-check-label label-inline typo-2"
+                  for="inlineCheckbox1"
+                  >Government Agency Name*:</label
+                >
+                <select
+                  formControlName="btype"
+                  name="applicantType"
+                  class="form-control mr-2 ml-2"
+                >
+                  <option value="S">Starts with</option>
+                  <option value="E">Exact</option>
+                  <option value="C">Contains</option>
+                </select>
+                <input
+                  class="form-control"
+                  maxlength="100"
+                  type="text"
+                  formControlName="businessName"
+                  (keyup)="onValueChange($event)"
+                  id="inlineCheckbox1"
+                />
+                <button
+                  type="submit"
+                  class="btn btn-sm btn-primari nextbutton ml-2 upload"
+                >
+                  Search
+                </button>
+                <button
+                  (click)="clearSecondSearch()"
+                  type="button"
+                  class="btn btn-sm btn-outline-dark closebutton ml-2"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <span
+                class="addr-error-msg"
+                *ngIf="
+                  firstFormGroup?.controls?.businessName?.errors?.required &&
+                  isSubmitted
+                "
+                >{{ errorMsgObj.GOVT_AGY_SEARCH_REQD }}</span
+              >
+              <span
+                class="addr-error-msg1"
+                *ngIf="
+                  firstFormGroup?.controls?.businessName?.errors
+                    ?.atleastTwoChar && isSubmitted
+                "
+                >{{ errorMsgObj.GOVT_AGY_MIN_CHAR_REQD }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="shadow-div" *ngIf="searched || applicantsError?.error"></div>
+      <div class="row" *ngIf="applicantsError?.error">
+        <div class="col-8 offset-2 mt-20">
+          <div class="exceptionerror-cls">
+            {{ errorMsgObj.TOO_MANY_RESULTS_MSG }}
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+        *ngIf="
+          searched && !applicantsError?.error && applicantsList?.length == 0
+        "
+      >
+        <div class="col-8 offset-2 mt-20">
+          <p>
+            Your search - <em>{{ searchContent }}</em> - did not match any of our
+            records
+          </p>
+          <!-- No search message -->
+          <p>Please clear search and try:</p>
+          <div class="ml-60">
+            <p>- Different search criteria: starts with, contains, exact</p>
+            <p>- A nickname, abbreviation, or formally known as</p>
+            <p>
+              - or select
+              <strong
+                ><em>Add {{ headerText }}</em></strong
+              >
+              button.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="searched && applicantsList?.length > 0">
+        <div class="offset-2 col-8 mt-20">
+          <p>
+            Your search - {{ searchContent }} - matched the following records:
+          </p>
+          <p>Please select the correct match below or try:</p>
+          <div class="ml-60">
+            <p>- Different search criteria: starts with, contains, exact</p>
+            <p>- A nickname, abbreviation, or formally known as</p>
+          </div>
+        </div>
+
+        <!-- Businessor Org -->
+        <!-- Search Table Results -->
+        <div
+          class="col-8 offset-2"
+          role="table"
+          aria-label="Semantic Elements"
+          aria-describedby="List of Applicants"
+        >
+          <p-table
+            styleClass="p-datatable-lg no-header-scoll"
+            [scrollable]="true"
+            scrollHeight="65vh"
+            [value]="applicantsList"
+            [rows]="10"
+            [rowsPerPageOptions]="[5, 10, 15, 20]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [totalRecords]="applicantsList?.length ? applicantsList?.length : 0"
+          >
+            <ng-template pTemplate="header">
+              <tr role="rowgroup">
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-labelledby="Government Agency Search Results"
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '10%' }"
+                ></th>
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-labelledby="Government Agency Table Header"
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '60%', position: 'relative' }"
+                >
+                  Government Agency Name
+                </th>
+                <th
+                  scope="col"
+                  role="columnheader"
+                  aria-label="'Affiliated Facilities Search Table Name Header "
+                  class="table-header-primary"
+                  [pSortableColumn]="'name'"
+                  [ngStyle]="{ width: '30%', position: 'relative' }"
+                >
+                  Affiliated Facilities
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-i="rowIndex">
+              <tr role="rowgroup">
+                <td
+                  scope="col"
+                  role="cell"
+                  aria-labelledby="item"
+                  class="table-check-box table-body"
+                >
+                  <!-- <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox> -->
+                  <input
+                    type="radio"
+                    name="scene1"
+                    id="radio3{{ i }}"
+                    aria-label="Government agency radio"
+                    [value]="item?.applicantId"
+                    (click)="selectRow(g.checked, item)"
+                    #g
+                  />
+                </td>
+                <td
+                  scope="col"
+                  role="cell"
+                  aria-labelledby="Government Agency cell"
+                  class="table-body"
+                  [ngStyle]="{
+                    'text-align': 'left',
+                    'word-wrap': 'break-word',
+                    width: '60%',
+                    position: 'relative'
+                  }"
+                >
+                  <label *ngIf="innerWidth > 1024">{{
+                    item.displayName
+                  }}</label>
+                  <span *ngIf="innerWidth <= 1024">{{ item.displayName }}</span>
+                  <!-- <label
+                    *ngIf="innerWidth > 1024"
+                    triggers="mouseenter:mouseleave"
+                    (mouseenter)="onHover($event, item)"
+                    container="body"
+                    for="radio3{{i}}"
+                    [popoverTitle]="item?.facilities?.length > 0 ? popUpHeaderText : ''"
+                    [ngbPopover]="item?.facilities?.length > 0 ? htmlContent : ''"
+                    placement="right"
+                    >{{ item.displayName }}</label
+                  >
+                  <span
+                    *ngIf="innerWidth <= 1024"
+                    #pop="ngbPopover"
+                    (click)="onHover($event, item, pop)"
+                    container="body"
+                    [ngbPopover]="item?.facilities?.length > 0 ? htmlContent : ''"
+                    [popoverTitle]="item?.facilities?.length > 0 ? popUpHeaderText : ''"
+                    placement="auto"
+                    >{{ item.displayName }}</span
+                  > -->
+                </td>
+                <td
+                  class="table-body col-notes"
+                  [ngStyle]="{
+                    'text-align': 'left',
+                    'word-wrap': 'break-word',
+                    width: '30%',
+                    position: 'relative'
+                  }"
+                >
+                  <button
+                    *ngIf="innerWidth > 1024"
+                    type="button"
+                    #pop="ngbPopover"
+                    triggers="manual"
+                    [autoClose]="'outside'"
+                    (hidden)="onPopoverHidden()"
+                    popoverClass="affiliated-facilities-popover"
+                    class="affiliated-facilities-button click-link"
+                    (click)="onHover($event, item, pop)"
+                    container="body"
+                    [ngbPopover]="
+                      item?.facilities?.length > 0 ? htmlContent : ''
+                    "
+                    [popoverTitle]="
+                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                    "
+                    placement="right"
+                    >{{
+                      item?.facilitieNames?.length > 20
+                        ? item?.facilitieNames?.slice(0, 20) + "..."
+                        : item?.facilitieNames
+                    }}</button>
+                  <span
+                    *ngIf="innerWidth <= 1024"
+                    #pop="ngbPopover"
+                    triggers="manual"
+                    [autoClose]="'outside'"
+                    (hidden)="onPopoverHidden()"
+                    class="click-link"
+                    container="body"
+                    (click)="onHover($event, item, pop)"
+                    [ngbPopover]="
+                      item?.facilities?.length > 0 ? htmlContent : ''
+                    "
+                    [popoverTitle]="
+                      item?.facilities?.length > 0 ? popUpHeaderText : ''
+                    "
+                    placement="auto"
+                    >{{
+                      item?.facilitieNames?.length > 20
+                        ? item?.facilitieNames?.slice(0, 20) + "..."
+                        : item?.facilitieNames
+                    }}</span
+                  >
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <!-- Code updadate -->
+        <!-- <p-table
+            styleClass="p-datatable-lg no-header-scoll"
+            [scrollable]="true"
+            scrollHeight="65vh"
+            [value]="applicantsList"
+            [rows]="10"
+            [rowsPerPageOptions]="[5, 10, 15, 20]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [totalRecords]="applicantsList?.length ? applicantsList?.length : 0">
+            <caption>Government Agency Search Results</caption>
+            <ng-template pTemplate="header">
+                <tr role="rowgroup">
+                  <th
+                    scope="col"
+                    role="columnheader"
+                    class="table-header-primary"
+                    [pSortableColumn]="'name'"
+                    [ngStyle]="{ width: '10%' }"
+                  ></th>
+                  <th
+                    scope="col"
+                    role="columnheader"
+                    class="table-header-primary"
+                    [pSortableColumn]="'name'"
+                    [ngStyle]="{ width: '90%', position: 'relative' }"
+                  >
+                    Government Agency Name
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item let-i="rowIndex">
+                <tr role="rowgroup">
+                  <td 
+                  scope="col" 
+                  role="cell" 
+                  class="table-check-box table-body">
+                    <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox>
+                    <input
+                      type="radio"
+                      name="scene1"
+                      id="radio{{ i }}"
+                      [value]="item?.applicantId"
+                      (click)="selectRow(g.checked, item)"
+                      #g
+                    />
+                  </td>
+                  <td
+                    scope="col"
+                    role="cell"
+                    class="table-body"
+                    [ngStyle]="{
+                      'text-align': 'left',
+                      'word-wrap': 'break-word',
+                      width: '90%',
+                      position: 'relative'
+                    }"
+                  >
+                    <span
+                      *ngIf="innerWidth > 1024"
+                      triggers="mouseenter:mouseleave"
+                      (mouseenter)="onHover($event, item)"
+                      container="body"
+                      [popoverTitle]="
+                        item?.facilities?.length > 0 ? popUpHeaderText : ''
+                      "
+                      [ngbPopover]="
+                        item?.facilities?.length > 0 ? htmlContent : ''
+                      "
+                      placement="right"
+                      >{{ item.displayName }}</span
+                    >
+                    <span
+                      *ngIf="innerWidth <= 1024"
+                      #pop="ngbPopover"
+                      (click)="onHover($event, item, pop)"
+                      container="body"
+                      [ngbPopover]="
+                        item?.facilities?.length > 0 ? htmlContent : ''
+                      "
+                      [popoverTitle]="
+                        item?.facilities?.length > 0 ? popUpHeaderText : ''
+                      "
+                      placement="auto"
+                      >{{ item.displayName }}</span
+                    >
+                  </td>
+  
+                  [autoClose]="false"  triggers="manual" #t="ngbTooltip" (click)="t.open()"
+                </tr>
+              </ng-template>
+        </p-table> -->
+        <!-- code update end -->
+      </div>
+    </ng-container>
+    <!-- GOVT AGENCY SEARCH SCREEN -->
+  </div>
+  <!-- class="shadow-div" -->
+  <div *ngIf="searched && !applicantsError?.error"></div>
+
+  <div class="row footer-row mt-20" *ngIf="searched && !applicantsError?.error">
+    <div class="col-md-12">
+      <div class="float-right">
+        <button
+          type="submit"
+          *ngIf="!(searched && applicantsList?.length == 0)"
+          [disabled]="selectedRows.length == 0"
+          (click)="onSubmit()"
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+        >
+          OK
+        </button>
+        <button
+          *ngIf="searched && applicantsList?.length == 0"
+          type="submit"
+          (click)="onSubmit()"
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+        >
+          Add {{ headerText }}
+        </button>
+        <button
+          type="button"
+          (click)="closePopUp()"
+          class="btn btn-sm btn-outline-dark closebutton mb-2"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+<!-- </mat-step> -->
+
+<!-- <mat-step>
+        <ng-template matStepLabel>Location Detail</ng-template>
+        <p>You are now done.</p>
+        <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button routerLink="/apply-for-permit-details">Save</button>
+            <button mat-button (click)="stepper.reset()">Reset</button>
+        </div>
+    </mat-step>
+</mat-horizontal-stepper> -->
+<app-custom-modal-popup #applicantInfoModal [modalConfig]="modalConfig">
+  <ng-container *ngIf="isOpenPopupSearch | async">
+    <app-applicant-informations
+      [isFromScreen]="isFromSearch"
+      [searchedApplicantData]="searchedApplicantData"
+      [applicantSearchParam]="searchParams"
+      [selectedSearchApplicantType]="selectedApplicantType"
+      [currentTab]="currentTab"
+      (closeClicked)="closeInfoModal($event)"
+    ></app-applicant-informations>
+  </ng-container>
+</app-custom-modal-popup>
+<ng-template #htmlContent>
+  <ul style="color: black !important; font-size: 12px">
+    <li class="typo-2" *ngFor="let facility of facilityArray">
+      <span
+        >{{ facility?.facilityName }}, {{ facility?.formattedAddress }}</span
+      >
+    </li>
+    <li class="typo-2" *ngIf="facilityArray?.length == 0">
+      No Facility Available
+    </li>
+  </ul>
+</ng-template>

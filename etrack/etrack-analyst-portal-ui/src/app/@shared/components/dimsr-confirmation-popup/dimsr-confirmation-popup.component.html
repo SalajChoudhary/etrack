@@ -1,0 +1,31 @@
+<!-- <div>
+    <div class="modal-header-confirmation ">       
+    </div>
+    <div class="modal-body-confirmation">
+        <span class="delete-cnf-message typo-2"> 
+            <p style="text-align: center;"> Upload to DART has completed successfully.</p></span>
+
+    </div>
+    <div class="modal-footer-confirmation model-footer-reduced ">
+        <button type="button" class="btn btn-sm btn-primari mb-2 mr-2 okButton"
+            (click)="navigateToVirtualDesktop()">
+            OK
+        </button>
+    </div>
+</div>
+ -->
+<ng-template #warningModal let-modal>
+    <div class="modal-header-confirmation ">
+    </div>
+    <div class="modal-body-confirmation" style="text-align: center;">
+        <span class="delete-cnf-message typo-2">
+            <p style="text-align: center;"> Upload to DART has completed successfully</p>
+        </span>
+
+    </div>
+    <div class="modal-footer-confirmation model-footer-reduced ">
+        <button type="button" class="btn btn-sm btn-primari mb-2 mr-2 okButton" (click)="navigateToVirtualDesktop()">
+            OK
+        </button>
+    </div>
+</ng-template>

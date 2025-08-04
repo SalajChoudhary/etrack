@@ -1,0 +1,242 @@
+
+
+.form-check-label {
+  width: 220px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.w-170{
+  width: 170px;
+}
+
+.margin-top-20{
+  margin-top: -20px !important;
+}
+
+.state-label {
+  width: 50px;
+}
+// .zip-align {
+//   text-align: center;
+//   padding-left: 30px;
+// }
+.font-lg {
+  font-size: 18px !important;
+}
+.country-box {
+  margin-left: -90px !important;
+  max-width: 120px;
+}
+.address1Input{
+  width: 286px;
+  margin-left:-1px;
+}
+
+.pl-40{
+  padding-left: 40px;
+}
+.pl-five{
+  padding-left: 5px;
+}
+
+.w-112{
+  width: 112px;
+}
+
+
+
+.zipInput{
+  margin-left: -4px;
+}
+
+label.address-type {
+  width: 95px;
+  font-size: 16px;
+  font-weight: 400;
+  padding-top: 7px;
+  text-align: right;
+  margin-right: 15px;
+}
+.zip-cont label {
+  width: 113px;
+}
+.zip-cont input {
+  width: 100px;
+}
+.font-weight {
+  font-weight: 500 !important;
+}
+.postal-align {
+  padding-left: 23px;
+  width: 161px;
+}
+
+.mr-10{
+  margin-right: 10px;
+}
+
+.w-148{
+  width: 148px;
+}
+.city-align {
+  text-align: right;
+ // padding-right: 23px;
+}
+.country-align {
+  width: 190px;
+  padding-left: 36px;
+}
+
+.postalInput{
+  margin-left: -3px;
+}
+
+.cityInput{
+  margin-left: 5px;
+}
+
+.input-align{
+  text-align: left;
+}
+
+.state-align {
+  width: 43%;
+  /* padding-left: 60px; */
+}
+.m-left {
+  margin-left: -95px;
+}
+.d-block {
+  display: block;
+}
+
+.corpHeader{
+  // background-color: yellow;
+  max-height: 25px;
+  max-width: 310px;
+  font-style: italic;
+  //font-weight: bold;
+  margin-top: -15px;
+
+}
+
+.state-province{
+  margin-left: -12px;
+}
+
+#nonUsCityError{
+  margin-left: -20px;
+  margin-top: -200px;
+}
+
+#nonUsCountryError{
+  margin-top: -20px;
+  margin-left: 10px;
+}
+
+#nonUsStateError{
+  margin-left: 86px;
+}
+
+
+#postalErrorSpan{
+  margin-left: 31px !important;
+}
+
+#cityErrorCol{
+  margin-top: -15px;
+}
+#cityErrorSpan{
+  margin-left: 95px;
+}
+#stateErrorCol{
+  margin-top: -22px;
+
+}
+#stateErrorSpan{
+  margin-left: 10px;
+}
+
+.ml-110{
+ margin-left: 110px;
+}
+
+.ml-315{
+  margin-left: 315px;
+}
+
+.zipPostalError{
+  margin-left: 142px !important;
+}
+
+
+.history-data {
+  // color: red;
+  // background-color: yellow;
+}
+
+.icon-holder{
+  position: relative;
+  top: 5px;
+  right:0;
+}
+.icon-holder-1{
+  position: relative;
+  top: 0px;
+  right:0;
+}
+.icon-holder-2{
+  position: relative;
+  top: 0px;
+  right:0;
+  margin-left: -38px;
+}
+
+.icon-holder-3{
+  position: relative;
+  top: 0px;
+  right:0;
+}
+.icon-holder-4{
+  position: relative;
+  top: 0px;
+  right:0;
+}
+
+@media only screen and (min-width: 992px){
+  .icon-holder{
+    left:-27px;
+  }
+  .icon-holder-1{
+    left:-27px;
+  }
+  .icon-holder-3{
+    left:-53px;
+  }
+}
+
+.input-box-wrap {
+  display: flex;
+}
+
+.hide-icon {
+  display: none;
+}
+
+.tooltip-inner {
+  background-color: white !important;
+  width: 300px !important;
+  max-width: unset !important;
+  border: 1px solid black !important;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+.ml-96{
+  margin-left: 96px;
+}
+
+.ml-173{
+  margin-left: 173px;
+}

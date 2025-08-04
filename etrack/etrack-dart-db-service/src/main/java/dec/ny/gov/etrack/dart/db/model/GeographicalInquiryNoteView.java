@@ -1,0 +1,22 @@
+package dec.ny.gov.etrack.dart.db.model;
+
+import java.io.Serializable;
+import lombok.Data;
+
+public @Data class GeographicalInquiryNoteView implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+  private Long inquiryNoteId;
+  private Long inquiryId;
+  private Integer actionTypeCode;
+  private String actionTypeDesc;
+  private String actionDate;
+  private String actionNote;
+  private String comments;
+  private String systemGenerated;
+  private String updatedDate;
+  private String createDate;
+  private String updatedBy;
+}

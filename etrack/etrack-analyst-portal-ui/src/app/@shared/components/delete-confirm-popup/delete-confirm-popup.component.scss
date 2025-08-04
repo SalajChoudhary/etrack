@@ -1,0 +1,50 @@
+.m-auto{
+  margin:auto
+}
+
+.modal-footer {
+  padding: 0.25rem;
+}
+
+.model-footer-reduced {
+  justify-content: center !important;
+  border-top: none !important;
+}
+
+.ml-14{
+  margin-left: 14%;
+}
+.bold{
+  font-weight: bold;
+}
+
+::ng-deep {
+  .modal-dialog .modal-content {
+    -webkit-border-radius: 25px !important;
+    -moz-border-radius: 25px !important;
+    border-radius: 25px !important;
+    border: 1px solid #919ea2;
+  }
+  .modal-20vh {
+    max-width: 500px !important;
+    min-width: 430px !important ;
+  }
+}
+.ml-100{
+  margin-left: 100px;
+}
+
+.ml-65{
+  margin-left: 65px;
+}
+
+.description {
+  border: 1px solid #c0c0c0;
+}
+.counter-brief {
+  display: block;
+  text-align: right;
+  margin-right: 7%;
+  margin-top: -28px;
+  position: inherit;
+}

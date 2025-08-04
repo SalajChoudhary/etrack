@@ -1,0 +1,39 @@
+<ng-container [formGroup]="form">
+  
+  <div class="header-1b">Litigation Hold</div>
+
+  <div class="row">
+    <div class="col-6  no-padding-left">
+      <div>
+        <label class="header-1n">Start Date:&nbsp;</label>
+        <input type="date" class="w-90" formControlName="startDate"
+         (change)="onLitigationChange.emit($event)"
+         />
+      </div>
+      <!-- <div *ngIf="userIsProgramReviewer"> 
+        <span>{{ getFormattedDate(form.get("startDate")?.value) }}</span>
+      </div>-->
+    </div>
+    <div class="col-6 p-0">
+      <div>
+        <label class="header-1n">End Date:&nbsp;</label>
+        <input type="date" class="w-90" formControlName="endDate" (change)="onLitigationChange.emit($event)"
+       />
+      </div>
+      <!-- <div *ngIf="userIsProgramReviewer">
+        <span>{{ getFormattedDate(form.get("endDate")?.value) }}</span>
+      </div> -->
+    </div>
+    <div class="col-12">
+      <p class="addr-error-msg" *ngIf="litigationError && saveClicked">
+        {{ litigationError }}
+      </p>
+    </div>
+    <!-- <div class="col-12">
+        <button class="btn btn-sm btn-primari float-right"  *ngIf="!userIsProgramReviewer" [disabled]="form.invalid" (click)="onSave($event)">Save</button>
+    </div> -->
+  </div>
+</ng-container>
+
+  <app-litigation-hold-table *ngIf="virtualDesktopData?.litigationRequestHistory?.length" [virtualDesktopData]="virtualDesktopData"></app-litigation-hold-table>
+

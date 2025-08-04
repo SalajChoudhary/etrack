@@ -1,0 +1,420 @@
+<app-analyst-sub-header [showAddress]="false"></app-analyst-sub-header>
+<app-stepper-buttons [selectedIndex]="selectedIndex" [lastIndex]="2" [startNumber]="2" [endNumber]="3"
+  [startName]="'Applicant Information'" [endName]="'Project Information'" mainNavigation="/apply-for-permit-details"
+  [backwardName]="'Location'" [forwardName]="'Project Information'" [backward]="'/project-location'"
+  [forward]="'/project-informations'"></app-stepper-buttons>
+
+<mat-horizontal-stepper class="child-stepper customStepper  has-step-icon-bg--white custom-step-height"
+  [selectedIndex]="selectedIndex" (selectionChange)="onStepChange($event)" linear #stepper>
+  <ng-template matStepperIcon="done">
+    <img src="assets/icons/check2-square.svg" alt="A square checkbox" />
+  </ng-template>
+  <ng-template matStepperIcon="edit">
+    <img src="assets/icons/edit_square-white.svg" alt="An edit square box" />
+  </ng-template>
+
+  <mat-step [state]="selectedIndex === 0 ? 'edit' : ''" [completed]="applicantsCollection?.applicants?.length">
+    <ng-template matStepLabel>
+      <span class="child-label">Applicants</span>
+    </ng-template>
+    <!-- <br /> -->
+
+    <div class="form-container">
+
+      <!-- GOVT AGENCY SEARCH SCREEN -->
+      <ng-container>
+        <div class="content-wrapper mt-3">
+          <!-- <app-validate-banner *ngIf="mode == 'validate'" [validated]="applicantsValidated"></app-validate-banner> -->
+          <div class="note-text header-1n">
+            Note: An Applicant is defined as a Legally Responsible Party
+          </div>
+
+          <div class="row mb-2" *ngIf="
+              applicantsCollection?.applicants?.length;
+              else emptyContainer
+            ">
+            <div class="col-6 offset-3 mt-20">
+              <div class="box-shadow border-radius-25">
+                <div class="container-header-title header-1b border-radius-25 mb-3">
+                  Below are the applicants you have chosen for this new project
+                </div>
+              </div>
+              <div >
+                <div class="wrapper-container  ">
+                  <div class="inner-container  yield-container" *ngFor="
+                      let item of applicantsCollection?.applicants;
+                      let last = last">
+                    <div class="project-name typo-2" [ngClass]="{'validated':item?.validatedInd == 1}">
+                      {{ item.displayName }}
+                    </div>
+
+                    <button class="action-edit btn-no-border-transparent" (click)="editApplicants(item)" id="editBtn"
+                      aria-label="A button that allows you to edit an applicants information">
+                      <img style="width: 1.5em" src="assets/icons/editicon.svg" alt="An edit icon" />
+                    </button>
+                    <button class="action-delete  btn-no-border-transparent" (click)="confirmDelete(item)"
+                      [disabled]="(applicantsValidated || isReadonly)"
+                      aria-label="A button that will delete an applicant" id="deleteBtn">
+                      X
+                    </button>
+                    <div class="icon-yield">
+                      <img *ngIf="item?.modified === 'Y' && !(applicantsValidated || isReadonly)"
+                        src="/assets/icons/yieldsign.png" alt="A yellow yield sign">
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="note-text-more header-1n mb-5">
+              <button class="click-link  btn-no-border-transparent increase-contrast header-1n" (click)="openSelection()"
+                aria-label="A button that allows you to add another applicant"
+                [disabled]="(applicantsValidated || isReadonly)">
+                Add another Applicant
+              </button>
+              <div class="note-after-link">for this project</div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="float-right mr-2" *ngIf="showServerError">
+      <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+    <div class="footer-row mt-20">
+      <div class="col-md-12 bottom-button-container">
+        <!-- category="aplct" activityId="7" -->
+        <app-validate-checkbox [isDisabled]="!applicantsValidated" *ngIf="mode == 'validate'"
+          [(validatedModel)]="applicantsValidated"></app-validate-checkbox>
+        <button [disabled]="!applicantsCollection?.applicants?.length"
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent($event, 1)"
+          aria-label="A next button" id="applicantSubmitBtn">
+          Next
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="navigateAccountInfo()"
+          aria-label="A close button" id="applicantCloseButton">
+          Close
+        </button>
+      </div>
+    </div>
+  </mat-step>
+  <!--  -->
+  <mat-step [state]="selectedIndex === 0 ? '' : selectedIndex === 1 ? 'edit' : ''"
+    [completed]="propertyOwnerCollection?.applicants?.length">
+
+
+    <ng-template matStepLabel><span class="child-label">Property Owners</span></ng-template>
+    <!-- something here -->
+    <div class="form-container">
+
+
+      <!-- Property Owner -->
+      <ng-container>
+        <div class="content-wrapper mt-3">
+          <!-- <app-validate-banner *ngIf="mode == 'validate'" [validated]="propertyOwnersValidated"></app-validate-banner> -->
+          <div class="note-text-no-text header-1n"></div>
+          <!-- <div class="note-text header-1n">{{mode+'mode'}}{{propertyOwnersValidated+'propertyOwnersValidated'}}</div> -->
+          <div class="row mb-2" *ngIf="
+              propertyOwnerCollection?.applicants?.length;
+              else emptyContainer
+            ">
+            <div class="col-6 offset-3 mt-20">
+              <div class="box-shadow border-radius-25">
+                <div class="container-header-title header-1b border-radius-25 mb-3" >
+                  Below are the owners of the property associated with this new
+                  project
+                </div>
+              </div>
+              <div class="">
+                <div class="wrapper-container ">
+                  <div class="inner-container yield-container" [ngClass]="{ 'edges-curved bottom': last }"
+                    *ngFor="
+                      let item of propertyOwnerCollection?.applicants;
+                      let last = last
+                    ">
+                    <div class="project-name typo-2" [ngClass]="{'validated':item?.validatedInd == 1}">
+                      {{ item.displayName }}
+                      <!-- {{item.firstName}} {{item.middleName}} {{item.lastName}} -->
+                    </div>
+                    <button class="action-edit btn-no-border-transparent" (click)="editApplicants(item)" id="editBtn">
+                      <img class="image-edit" src="assets/icons/editicon.svg" alt="An edit icon" />
+                    </button>
+                    <button class="action-delete btn-no-border-transparent" (click)="confirmDelete(item,true)"
+                      [disabled]="(propertyOwnersValidated || isReadonly)"
+                      aria-label="A button that will delete an applicant" id="deleteBtn">
+                      X
+                    </button>
+                    <div class="icon-yield">
+                      <img *ngIf="item?.modified === 'Y' && !(propertyOwnersValidated || isReadonly)"
+                        src="/assets/icons/yieldsign.png" alt="A yellow yield sign">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="note-text-more header-1n mb-5">
+              <button class="click-link btn-no-border-transparent header-1n" (click)="openSelection()"
+                [disabled]="(propertyOwnersValidated || isReadonly)"
+                aria-label="A button that allows you to add another property owner">
+                Add another Property Owner
+              </button>
+              <div class="note-after-link">for this project</div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <div class="float-right mr-2" *ngIf="showServerError">
+      <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+    <div class="footer-row mt-20">
+      <div class="col-md-12 bottom-button-container">
+        <!-- <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent('Associated Applicants')"  matStepperPrevious>Back</button> -->
+        <!-- category="aplct" activityId="8" -->
+        <app-validate-checkbox [isDisabled]="!propertyOwnersValidated" *ngIf="mode == 'validate'"
+          [(validatedModel)]="propertyOwnersValidated"></app-validate-checkbox>
+        <!-- <div class="float-right mr-2" *ngIf="showServerError">
+          <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+        </div> -->
+        <button [disabled]="!propertyOwnerCollection?.applicants?.length"
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent($event, 2)"
+          aria-label="A next button" id="ownerSubmitBtn">
+          Next
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="navigateAccountInfo()"
+          aria-label="A close button" id="ownerCloseBtn">
+          Close
+        </button>
+      </div>
+    </div>
+  </mat-step>
+
+  <mat-step [state]="(selectedIndex === 0 || selectedIndex === 1) ? '' : selectedIndex === 2 ? 'edit' : ''">
+    <ng-template matStepLabel><span class="child-label">Contacts/Agents</span></ng-template>
+
+    <div class="form-container">
+
+
+      <!-- GOVT AGENCY SEARCH SCREEN -->
+      <ng-container>
+        <div class="content-wrapper mt-3">
+          <!-- <app-validate-banner *ngIf="mode == 'validate' " [validated]="contactsAgentsValidated"></app-validate-banner> -->
+
+          <div class="note-text-no-text header-1n"></div>
+
+          <div class="row mb-2" *ngIf="
+              applicantContacts?.applicants?.length;
+              else emptyContactContainer
+            ">
+            <div class="col-6 offset-3 mt-20">
+              <div class="box-shadow border-radius-25">
+                <div class="container-header-title header-1b border-radius-25 mb-3" >
+                  Below are the contact/agents you have chosen for applications
+                  for this new project
+                </div>
+              </div>
+              <div class="">
+                <div class="wrapper-container">
+                  <div class="inner-container yield-container" [ngClass]="{ 'edges-curved bottom': last }"
+                    *ngFor="
+                      let item of applicantContacts?.applicants;
+                      let last = last
+                    ">
+                    <div class="project-name typo-2" [ngClass]="{'validated':item?.validatedInd == 1}">
+                      {{ item.displayName }}
+                      <!-- {{item.firstName}} {{item.middleName}} {{item.lastName}} -->
+                    </div>
+                    <button class="action-edit  btn-no-border-transparent" (click)="editApplicants(item)" id="editBtn"
+                      aria-label="A button that allows you to edit a contact or agent's information">
+                      <img src="assets/icons/editicon.svg" alt="An edit icon" />
+                    </button>
+                    <button class="action-delete  btn-no-border-transparent" (click)="confirmDelete(item)"
+                      [disabled]="(contactsAgentsValidated || isReadonly)"
+                      aria-label="A button that allows you to delete a contact agent" id="deleteBtn">
+                      X
+                    </button>
+                    <div class="icon-yield">
+                      <img *ngIf="item?.modified === 'Y' && !(contactsAgentsValidated || isReadonly)"
+                        src="/assets/icons/yieldsign.png" alt="A yellow yield sign">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="note-text-more header-1n mb-5">
+              <button class="click-link  btn-no-border-transparent header-1n" (click)="openSelection()"
+                [disabled]="(contactsAgentsValidated || isReadonly)"
+                aria-label="A button that allows you to add another contact or agent.">
+                Add another Contact/Agent
+              </button>
+              <div class="note-after-link">for this project</div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <div class="float-right mr-2" *ngIf="showServerError">
+      <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+    <div class="footer-row mt-20">
+      <div class="col-md-12 bottom-button-container">
+        <!-- <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent('Property Owners')"  matStepperPrevious>Back</button> -->
+        <!-- category="aplct" activityId="9" -->
+        <app-validate-checkbox [isDisabled]="!contactsAgentsValidated" *ngIf="mode == 'validate'"
+          [(validatedModel)]="contactsAgentsValidated"></app-validate-checkbox>
+        <!-- **Validate Mode Next button** && mode != 'validate' -->
+        <button [disabled]="!applicantContacts?.applicants?.length "
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent($event, 3)"
+          aria-label="A next button" id="agentSubmitButton">
+          Next
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" (click)="navigateAccountInfo()"
+          aria-label="A close button" id="agentCloseButton">
+          Close
+        </button>
+      </div>
+    </div>
+  </mat-step>
+</mat-horizontal-stepper>
+
+<ng-template #emptyContainer>
+  <div class="mb-2 mt-20 empty-container">
+    <div class="empty-inner-container typo-2 bg-white">
+      <div>
+        <div>
+          {{ emptyMessageData.title }} needs to be added for this new project.
+          <div>
+            We will search our system to see if a record already exists.
+          </div>
+        </div>
+      </div>
+      <div class="popup-button-container">
+        <button class="btn btn-sm btn-primari mb-2 mr-2" (click)="openSelection()" aria-label="An OK button">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #emptyContactContainer>
+  <div class="mb-2 mt-20 empty-container">
+    <div class="empty-inner-container typo-2 bg-white">
+      <div>
+        Would you like to add a contact or agent
+        <div>for the permit applications?</div>
+      </div>
+      <div class="popup-button-container">
+        <button [disabled]="isReadonly" class="btn btn-sm btn-outline-dark closebutton mb-2 mr-2"
+          (click)="openSelection()" aria-label="A yes button">
+          Yes
+        </button>
+        &nbsp;
+        <button [disabled]="isReadonly" class="btn btn-sm btn-outline-dark closebutton mb-2 mr-2"
+          (click)="commonService.navigateToMainPage()" aria-label="A no button">
+          No
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<app-custom-modal-popup #modal [modalConfig]="selectionConfig" (modalClosed)="closeModal($event)">
+  <ng-container *ngIf="isOpenPopupApplicants | async">
+    <app-applicant-selection [currentTab]="selectedIndex" [popupData]="popupData"
+      (closeBtnClicked)="closeModal($event)"></app-applicant-selection>
+  </ng-container>
+</app-custom-modal-popup>
+
+<app-custom-modal-popup #confirmationModal [modalConfig]="confirmationModalConfig">
+  <ng-container *ngIf="isOpenPopupApplicantsCnf | async">
+    <div>
+      <div class="col-md-12 popup-close-container">
+        <!-- <div class="action-close" (click)="navigateEvent('yes')">
+                X
+            </div> -->
+      </div>
+      <div class="modal-body empty-inner-container typo-2">
+        <div *ngIf="
+          getApplicantList &&
+            propertyOwnerCollection?.applicants?.length &&
+            noClickCount != 1
+          ">
+          {{ getApplicantList }} has been added as the Property Owner.
+        </div>
+
+        <div *ngFor="let data of confirmationMessage">
+          {{ data }}
+        </div>
+        <div class="col-md-12 popup-button-container">
+          <button class="btn btn-sm btn-outline-dark closebutton mb-2"
+            (click)="$event.stopPropagation(); navigateEvent($event, 'yes');" aria-label="A yes button">
+            Yes
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2"
+            (click)="$event.stopPropagation(); navigateEvent($event, 'no')" aria-label="A no button">
+            No
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>
+<app-custom-modal-popup #applicantInfoModal [modalConfig]="modalConfig" (modalClosed)="closeInfoModal($event)">
+  <ng-container *ngIf="isOpenPopupApplicantsInfo | async">
+    <app-applicant-informations [applicantId]="applicantId" [currentTab]="selectedIndex"
+      (closeClicked)="closeInfoModal($event)" [isFromScreen]="isFromAssociate"></app-applicant-informations>
+  </ng-container>
+</app-custom-modal-popup>
+
+<app-delete-confirm-popup [isAlsoApplicant]="isAlsoApplicant" [openModal]="deleteIsClicked" [deletedDocName]="deleteItem"
+  [deleteApplicant]="deleteApplicant" [bodyText]="deletePopupText"></app-delete-confirm-popup>
+
+
+<!-- <ng-template #deleteAgentModal let-modal>
+ <div class="modal-header border-bottom-0">
+          <div class=" text-center ">
+
+    </div> 
+  <div class="modal-body">
+    <div class="confirm-custom-header">
+      <div>
+       intentionally left blank to center confirm text 
+      </div>
+      <h2 class="modal-title" id="modal-basic-title">Confirm</h2>
+      <button
+        type="button"
+        class="close"
+        aria-label="Close"
+        (click)="modal.dismiss('Cross click')"
+      >
+        <span aria-hidden="true">X</span>
+      </button>
+    </div>
+    <p style="text-align: center; font-size: 15px">
+      Are you sure you want to permanently delete the selected item?
+    </p>
+  </div>
+  <div class="modal-footer model-footer-reduced">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-dark closebutton mb-2"
+      (click)="deleteApplicants(); modal.dismiss('deleted')"
+    >
+      Delete
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-dark closebutton mb-2"
+      (click)="modal.dismiss('Cross click')"
+    >
+      Cancel
+    </button>
+  </div>
+</ng-template> -->
+<app-custom-modal-popup #searchModal (modalClosed)="closeSearchModal($event)" [modalConfig]="searchConfig">
+  <ng-container *ngIf="isOpenPopUpSearch | async">
+    <app-applicant-informations-search [currentTab]="selectedIndex" (closeClicked)="closeSearchModal($event)">
+    </app-applicant-informations-search>
+  </ng-container>
+</app-custom-modal-popup>

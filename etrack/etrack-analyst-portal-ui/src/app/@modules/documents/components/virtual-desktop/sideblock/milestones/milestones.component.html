@@ -1,0 +1,40 @@
+<ng-container *ngFor="let batchDetail of batchDetails">
+    <div class="bg-gray py-3 pl-4">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <div class=" header-1b">Batch {{batchDetail?.batchNumber}}</div>
+            
+        </div>
+       
+    
+        <mat-accordion class="sideblock-accordion mat-expansion--has-toggle-icon-left" multi
+        *ngIf="batchDetail.milestones && batchDetail.milestones.length">
+        <mat-expansion-panel class="mat-elevation-z">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+        <div class="d-flex justify-content-between align-items-center w-100">
+
+                    <div class=" header-1b">Milestones</div>
+                    <div>
+                        <img class="export-icon" (click)="exportMilestones($event, batchDetail.milestones)" alt="export" src="assets/icons/export.png">
+                    </div>
+                </div>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+                <div class="px-3 py-1">
+                    <table aria-labelledby="EA Table" class="table table-borderless table-batch mb-0">
+                        <tr *ngFor="let milestone of batchDetail.milestones">
+                            <td class="typo-2">{{milestone?.milestoneStatus}}</td>
+                            <td class="typo-2">{{milestone?.milestoneDate}}</td>
+                        </tr>
+                    </table>
+                </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <div class="typo-2"><span *ngIf="batchDetail?.gpPermitTypeCode == 1">GP # {{batchDetail?.gpPermitTypeCode}}</span></div>
+    <div *ngIf="batchDetail?.eaInd"><span class="typo-2">Emergency Authorization</span></div>
+    <div *ngFor="let permitTransTypeApplId of splitByComma(batchDetail?.permitTransTypeApplId)">
+        <span class="typo-2">{{permitTransTypeApplId}}</span>
+    </div>
+    </div>
+    
+</ng-container>

@@ -1,0 +1,18 @@
+export const Headers = [
+  { exportToExcel: true, columnTitle: 'Type' },
+  { exportToExcel: true, columnTitle: 'Sub-Type' },
+  { exportToExcel: true, columnTitle: 'Document Name' },
+  { exportToExcel: true, columnTitle: 'Description' },
+  { exportToExcel: true, columnTitle: '# Files' },
+  { exportToExcel: true, columnTitle: 'Upload Date | Time' },
+  { exportToExcel: true, columnTitle: 'Project ID' },
+  { exportToExcel: true, columnTitle: 'APP ID' },
+  { exportToExcel: true, columnTitle: 'DEP Rel Det' },
+  // { exportToExcel: true, columnTitle: 'createdBy' },
+  // { exportToExcel: true, columnTitle: 'uploadDateTime' },
+  // { exportToExcel: true, columnTitle: 'files' },
+  // { exportToExcel: true, columnTitle: 'doctypeLabel' },
+  // { exportToExcel: true, columnTitle: 'docSubTypeLabel' },
+  // { exportToExcel: true, columnTitle: 'fileCounts' },
+  // { exportToExcel: true, columnTitle: 'uploadDate' },
+];

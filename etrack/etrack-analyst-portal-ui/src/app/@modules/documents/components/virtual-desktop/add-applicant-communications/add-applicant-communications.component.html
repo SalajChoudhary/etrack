@@ -1,0 +1,198 @@
+<form [formGroup]="form" (ngSubmit)="onFormSubmit()">
+    <div class="bg-white modal_popup">
+    <div class="top-header header-align">
+        <div class="top-headings header-2b mb-3">Analyst Correspondence</div>
+    </div>
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                    <div class="form-group row">
+                        <div class="col-10">
+                            <label for="subj" class="col-form-label form-check-label header-3n">Subject*:</label>
+                            <input formControlName="subject" class="form-check-input subject" value="" maxlength="100" id="subj"/>
+                            <div>  
+                                <span class="addr-error-msg ml-80" *ngIf="form?.controls?.subject?.errors?.required && submitted">
+                                    {{errorMsgObj?.SUBJECT_REQD}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row type-radio">
+                        <div class="col-12 form-group d-flex form-check form-check-inline" style="justify-content:center">
+                            <input formControlName="correspondenceType" [value]="requestType"
+                                type="radio" class="correspondence-type-radio" (change)="onCorrespondenceTypeChange($event)">
+                            <label class="form-check-label header-3n">Request Documents</label>
+                            <input formControlName="correspondenceType" [value]="correspondenceType"
+                                type="radio" class="correspondence-type-radio" (change)="onCorrespondenceTypeChange($event)">
+                            <label class="form-check-label header-3n">No Requested Documents</label>
+                        </div>
+                    </div>
+                    <div class="row add-btn">
+                        <button type="button" *ngIf="showRequestDocsSection"
+                                    class="form-check form-check-inline btn btn-sm btn-outline-dark closebutton"
+                                    (click)="addDocument()">
+                                    Add
+                                </button>
+                    </div>
+                    <div class="row col-12 table-center p-2" *ngIf="showRequestDocsSection">
+                        <p-table [value]="requestedDocs" [scrollable]="true" scrollHeight="25vh">
+                            <ng-template pTemplate="header">
+                                <tr #header class="header-height">
+                                    <th class="table-header-primary" [class.selected] = "columnWithBorder === 'name'" 
+                                    (click)="sortColumn('name')"
+                                    [ngStyle]="{width: '30%', cursor: 'pointer'}">
+                                    Document Name
+                                    </th>
+                                    <th class="table-header-primary" [class.selected] = "columnWithBorder === 'typeDesc'"
+                                    (click)="sortColumn('typeDesc')"
+                                    [ngStyle]="{width: '30%', cursor: 'pointer'}">
+                                    Type
+                                    </th>
+                                    <th class="table-header-primary" [class.selected] = "columnWithBorder === 'subTypeDesc'"
+                                    (click)="sortColumn('subTypeDesc')" 
+                                    [ngStyle]="{width: '30%', cursor: 'pointer'}">
+                                    Sub-Type
+                                    </th>
+                                    <th class="table-header-primary" (click)="columnWithBorder=''" [ngStyle]="{width: '10%'}">
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-row let-i="rowIndex">
+                                <tr>
+                                    <td class="table-body" scope="col" 
+                                    [ngStyle]="{'word-wrap': 'break-word', width: '30%'}">
+                                    <div class="pl-2">{{row?.name}}</div>
+                                    </td>
+                                    <td class="table-body" scope="col" role="cell" 
+                                    [ngStyle]="{'word-wrap': 'break-word', width: '30%'}">
+                                        <div class="col-type">{{row?.typeDesc}}</div>
+                                    </td>
+                                    <td class="table-body" scope="col" role="cell" 
+                                    [ngStyle]="{'word-wrap': 'break-word', width: '30%'}">
+                                        <div class="col-sub-type">{{row?.subTypeDesc}}</div>
+                                    </td>
+                                    <td class="table-body" scope="col" role="cell" [ngStyle]="{width: '10%'}">
+                                        <button type="button" aria-label="Delete Application" (click)="onDeleteClicked(i)"
+                                        onclick="this.blur()" class="btn pl-1" placement="left" [ngbTooltip]="'Delete document'">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash"
+                                            viewBox="0 0 16 16" alt="Delete icon">
+                                            <path
+                                            d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                            <path fill-rule="evenodd"
+                                            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                    <div *ngIf="addButtonClicked && showRequestDocsSection">
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <div class="form-check mt-4 t-center" id="top-elem">
+                                    <label class="header-1b form-check-label">
+                                        <span>
+                                            Please provide the Document Type and Sub-Type
+                                            below. </span><br />
+                                            <span class="mt-3">
+                                                If none apply, please choose <span class="font-italic">'Other'</span> and provide a
+                                                description.<!--container--></span> </label><br />
+                                </div>
+                                <div class="t-center">
+                                    <div class="form-check form-check-inline mt-3">
+                                        <label class="typo-2 form-check-label doc-name">Document Name*:</label>
+                                        <input formControlName="documentName" (input)="checkInputs()"
+                                            class="form-check-input heade-text input-doc" value="" maxlength="100" id="docName"/>
+                                    </div>
+                                </div>
+                                <div class="t-center" *ngIf="showAddDocError && (form.controls.documentName.errors?.required || showDuplicateDocNameError)">
+                                    <div class="mt-3">
+                                        <span *ngIf="showDuplicateDocNameError && !form.controls.documentName.errors?.required" 
+                                        class="addr-error-msg">{{ errorMsgObj?.DOC_NAME_DUPLICATE }}</span>
+                                        <span *ngIf="form.controls.documentName.errors?.required" 
+                                        class="addr-error-msg">{{ errorMsgObj?.DOC_NAME_REQ }}</span>
+                                    </div>
+                                </div>
+                                <div class="t-center">
+                                    <div class="form-check form-check-inline mt-3">
+                                        <label class="typo-2 form-check-label">Type*:</label>
+                                        <select (change)="onDocTypeChange()" formControlName="docCategory" class="form-check-input heade-text" value="" id="docTypeSelect">
+                                            <option disabled value="">-- SELECT --</option>
+                                            <option *ngFor="let item of documentTypes" [ngValue]="item.docTypeId">
+                                                {{ item.docTypeDesc }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="t-center" *ngIf="showAddDocError && form.controls.docCategory.errors?.required">
+                                    <div class="mt-3">
+                                        <span 
+                                        class="addr-error-msg">{{ errorMsgObj?.DOC_TYPE_REQ }}</span>
+                                    </div>
+                                </div>
+                                <div class="form-check mt-4 t-center">
+                                    <label class="typo-2 form-check-label">
+                                        <span class="font-italic" *ngIf="!showOtherDirections">
+                                            Select a sub-type or leave blank if none apply.
+                                            <!-- <span class="note-italic">*conditional if does not equal 'Other'</span>  -->
+                                        </span>
+                                        <span class="font-italic" *ngIf="showOtherDirections">
+                                            Please provide a description: </span> 
+                                            <!-- <span class="note-italic">*conditional for 'Other'</span> -->
+                                    </label><br />
+                                </div>
+                                <div class="form-check form-check-inline t-center mt-3">
+                                    <label class="typo-2 form-check-label">Sub-Type:</label>
+                                    <select formControlName="docSubCategory" class="form-check-input heade-text" value="" id="subTypeSelect">
+                                        <option *ngIf="documentSubTypes.length" value="0">
+                                            -- SELECT --
+                                        </option>
+                                        <option *ngFor="let item of documentSubTypes" [ngValue]="item.subTypeId">
+                                            {{ item.subTypeDesc }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-check form-check-inline t-center mt-3">
+                                    <label class="typo-2 form-check-label input-doc">Other{{showOtherDirections ? '*' : ''}}:</label>
+                                    <input formControlName="otherDocSubCategory" maxlength="50" class="form-check-input heade-text input-doc"
+                                    value="" id="otherInput" (input)="checkInputs()"/>
+                                </div>
+                                <div class="t-center" *ngIf="showAddDocError && form.controls.otherDocSubCategory.errors?.required" >
+                                    <div class="mt-3">
+                                        <span
+                                        class="addr-error-msg">{{ errorMsgObj?.OTH_SUB_TYPE_REQ }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="float-right mr-2" *ngIf="showServerError">
+        <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+    <div class="t-center">
+            <span *ngIf="showDocRequiredError && submitted"
+            class="addr-error-msg">Error: Complete the document entries and Add to the list.</span>
+    </div>
+    <div class="t-center">
+        <span *ngIf="form?.controls?.correspondenceType?.errors?.required && submitted"
+        class="addr-error-msg">Error: Select a correspondence type.</span>
+    </div>
+    <div class="t-center modal-footer">
+        <button type="submit" style="width: 60px" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload">
+            OK
+        </button>
+        <button type="button" style="width: 60px" class="btn btn-sm btn-outline-dark closebutton mb-2"
+          (click)="closeModal()">
+            Cancel
+        </button>
+    </div>
+</form>
+
+<app-delete-confirm-popup [openModal]="deleteIsClicked" (onDeleteConfirmed)="deleteDocument()"
+    [bodyText]='confirmDeleteBodyText'></app-delete-confirm-popup>
+<app-pending-changes-popup #pendingPopup (onOkClick)="goBack()"></app-pending-changes-popup>

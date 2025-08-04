@@ -1,0 +1,415 @@
+<app-analyst-sub-header [isPending]="submitted" [showButton]="true"></app-analyst-sub-header>
+<div class="shadow p-3 bg-white rounded roww">
+  <div class="row">
+    <form [formGroup]="searchForm" class="form-inline search-form" name="document-form">
+      <div class="col-12 pl-0 pr-0 d-flex">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12 pl-0 pr-0">
+              <div class="dec-form pl-0 mt-2">
+                <div style="text-align: center; 
+                  padding: 5px 0px 30px 0px;">
+                  <strong class="header-3b">
+                    Department-Initiated Changes to Existing Authorizations
+                  </strong>
+                </div>
+                <div class="row">
+                  <div class="form-check  ml-4">
+                    <label class=" mr-2 header-1b" for="inlineRadio1">DEC ID*:</label>
+                  </div>
+                  <div class="form-group mb-2 mr-2 search-input-cont">
+                    <input type="text" class="form-control search-input" (keyup)="searchTextChange($event)" id="decID"
+                      [maxlength]=" 12" formControlName="searchItemText" [placeholder]="'9-9999-99999'"
+                      [mask]="'0-0000-00000'" [dropSpecialCharacters]="false" (keyup.enter)="onSearch()"
+                      [readonly]="disablepropety" />
+                  </div>
+                  <div class="btn-conts">
+                    <button (click)="onSearch()" type="submit" class="btn btn-sm btn-primari mb-2 mr-2 upload"
+                      [disabled]="disablepropety">
+                      Search
+                    </button>
+                    <button type="button" (click)="clearSearchForm()"
+                      class="btn btn-sm btn-outline-dark closebutton mb-2" [disabled]="disablepropety">
+                      Clear
+                    </button>
+                  </div>
+                  <div *ngIf="showSerchResult" style="margin-left: 4rem;
+                  margin-top: 1rem;">
+                    <span><strong class="mr-2 header-1b">Facility:</strong></span>
+                    <span class="typo-2">{{facilityname}}</span>
+
+                  </div>
+                  <div *ngIf="showSerchResult" style="margin-left:35.75rem ;width: 100% ;">
+                    <span><strong class="mr-2 header-1b">All Active LRP's:</strong></span>
+
+                    <span *ngFor="let LRP of response.facility?.activeLRPs;let i = index">
+                      <span *ngIf="!i" class="typo-2">{{LRP}} <br> </span>
+
+                      <span *ngIf="i" class="typo-2" style="margin-left: 7.40rem ">{{LRP}} <br> </span>
+
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="search-input-errors">
+          <div class="errors">
+            <span *ngIf="
+                submitted &&
+                (searchForm.controls.searchItemText.errors?.required ||
+                  !searchForm.controls.searchItemText.value.trim().length)
+              " class="errors ml_5">{{errorMessages?.DEC_ID_REQ}}</span>
+            <span *ngIf="
+                submitted &&
+                (searchForm.controls.searchItemText.value.length != 12) &&
+                searchForm.controls.searchItemText.value.length
+              " class="errors ml_5">{{ errorMessages?.DEC_ID_LENGTH }}</span>
+            <span *ngIf="
+                submitted  &&
+                searchForm.controls.searchItemText.errors?.invalidDecSearchLength
+              " class="errors ml_5">{{ errorMessages?.DEC_ID_LENGTH }}</span>
+            <!-- <span *ngIf="(showSerchResult && !showFacilityExists)|| (submitted  && reponsenNullshow)"
+              class="errors ml_5">{{errorMessages?.NO_ACTIVE_PERMITS}}</span> -->
+            <!-- <span *ngIf="submitted  && reponsenNullshow" class="errors ml_5"> {{reponsenullMessage}} </span> -->
+            <div class="float-right" *ngIf="showServerError">
+              <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div style="width:100%;" class="mat-expansion--has-toggle-icon-left" *ngIf="showSerchResult && showFacilityExists">
+      <div class="shadow-div"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-12" *ngIf="!isOnlyPendingPermits">
+            <table class="table table-borderless table-existing-permits mb-0"
+              aria-labelledby="A table showing pending applications">
+              <tbody *ngFor="let existPermit of existingPermits | keyvalue;let last=last">
+
+                <tr *ngFor="let permit of existPermit.value;let i = index">
+                  <td class="permit-td-color" style="width:440px">
+                    <ng-container *ngIf="!i">
+                      <form [formGroup]="transTypeForm">
+
+                        <label class="mr_3 ">
+                          <input type="radio" class="mr-2" value="DIM" id="{{permit.batchId}}"
+                            formControlName="transType" (click)="DisableProperty(existPermit,permit,'DIM')">DIM
+                        </label>
+                        <label class="mr_3 ">
+                          <input type="radio" class="mr-2" value="DTN" id="{{permit.batchId}}"
+                            formControlName="transType" (click)="DisableProperty(existPermit,permit,'DTN')">DTN
+                        </label>
+                        <label class="mr_3 ">
+                          <input type="radio" class="mr-2" value="DIR" id="{{permit.batchId}}"
+                            formControlName="transType" (click)="DisableProperty(existPermit,permit,'DIR')">DIR
+                        </label>
+                        <label class="mr_3">
+                          <input type="radio" class="mr-2" value="DIS" id="{{permit.batchId}}"
+                            formControlName="transType" (click)="DisableProperty(existPermit,permit,'DIS')">DIS
+                        </label>
+
+                      </form>
+                    </ng-container>
+
+                    <div class="search-input-errors" *ngIf="!i">
+                      <div class="errors">
+                        <span *ngIf="dimcrsubmitted &&  (transTypeForm.controls.transType.errors?.required)"
+                          class="errors">
+                          {{errorMessages?.ATLEAST_ONE_SEL_REQD}}
+                        </span>
+                        <span *ngIf="showexistingDIMSRerror" class="errors">
+                          {{errorMessages?.DIMSR_PENDING_APPL_EXIST}}
+                        </span>
+                      </div>
+                    </div>
+
+                  </td>
+                  <td class="permit-td-color">
+                    <div class="text-bold " style="color: black ;">{{permit?.permitTypeDesc}}</div>
+                    <div>{{permit?.programIdFormatted}} </div>
+                  </td>
+
+                  <td class="permit-td-color" *ngIf="i===0">
+                    <div>{{permit?.effectiveEndDate}} </div>
+                    <div class="max-height-40" placement="top" triggers="mouseenter:mouseleave"
+                      [ngbPopover]="permit?.projectDesc">{{permit?.projectDesc}}</div>
+                  </td>
+
+                </tr>
+
+                <tr>
+                  <td colspan="3">
+                    <div class="shadow-div"></div>
+                  </td>
+                </tr>
+
+              </tbody>
+              <tbody *ngFor="let pendingPermit of pendingPermits | keyvalue;let last=last">
+
+                <tr *ngFor="let permit of pendingPermit.value;let i = index">
+                  <td class="permit-td-color" style="width:440px">
+                    <ng-container *ngIf="!i">
+                      <span style="font-style:italic ;"> Pending </span>
+                    </ng-container>
+                  </td>
+                  <td class="permit-td-color">
+                    <div class="text-bold " style="color:black">{{permit?.permitTypeDesc}}</div>
+                    <div>{{permit?.programIdFormatted}}</div>
+                  </td>
+
+                  <td class="permit-td-color" *ngIf="i===0">
+                    <div>Recv'd Date: {{permit?.receivedDate}}</div>
+                    <!-- <div>DART Status: {{permit?.transType}} </div> -->
+                    <div style="width: fit-content;" class="max-height-40" placement="top"
+                      triggers="mouseenter:mouseleave" [ngbPopover]="permit?.projectDesc">{{permit?.projectDesc}}</div>
+                  </td>
+                </tr>
+
+
+                <tr>
+                  <td colspan="3">
+                    <div class="shadow-div"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+        </div>
+      </div>
+      <div class="shadow-div border-background"></div>
+      <div style="width:97% ;">
+        <form [formGroup]="dimcrForm">
+          <div class="row">
+            <div class="col-12">
+              <div class="form-row ml-4" style="display:block;">
+                <div class="mt_1" *ngIf="!isOnlyPendingPermits">
+                  <div class="form-group js-center lh" style="margin-bottom: 0 !important;">
+                    <label><strong class="header-1b">Project Manager*:</strong></label>
+                    <app-searchable-dropdown formControlName="ProjectManager" [listItems]="projectManagers">
+                    </app-searchable-dropdown>
+                    <!-- <div class="form-check dropdown">
+                      <input aria-label="Project Manager" id="ProjectManager" (click)="isInputClicked=!isInputClicked"
+                        (input)="onDrpdownChange()" formControlName="ProjectManager" [ngStyle]="{'width': '20rem'}">
+                      <div #dropdown
+                        [ngClass]="isInputClicked && projectManagers?.length? 'dropdown-menu-visible':'dropdown-menu-hidden'">
+                        <li class="dropdown-option" (click)="onDropdownSelect(manager,$event)"
+                          *ngFor="let manager of projectManagers" [value]="manager.userId" [ngStyle]="{'width': '20rem'}">
+                          {{manager?.managerName}}</li>
+                      </div>
+                    </div> -->
+                  </div>
+                </div>
+                <div class="col-12" *ngIf="!isOnlyPendingPermits">
+                  <div class="search-input-errors">
+                    <div class="errors" style="margin-left:7.5rem">
+                      <span *ngIf="dimcrsubmitted && (dimcrForm.controls.ProjectManager.errors?.required)" class="errors">
+                        {{errorMessages?.PROJ_MGR_REQD}}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt_1" *ngIf="!isOnlyPendingPermits">
+                  <label><strong class="pr-125 header-1b">Notice of Intent Mailing Date*:</strong></label>
+                  <input type="date" formControlName="MailingDate" name="MailingDate" (change)="SetEffective()">
+                </div>
+                <div class="col-12" *ngIf="!isOnlyPendingPermits">
+                  <div class="search-input-errors">
+                    <div class="errors" style="margin-left:12.5rem">
+                      <span *ngIf="dimcrsubmitted && (dimcrForm.controls.MailingDate.errors?.required)" class="errors">
+                        Error: Notice of Intent Mailing Date is Required.
+                      </span>
+                      <span *ngIf=" !MailingDateValid " class="errors">
+                        {{errorMessages?.INTENT_MAILG_DT_FUT}}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt_1" *ngIf="!isOnlyPendingPermits">
+                  <label><strong class="pr-125 header-1b">Proposed Effective Date*:</strong></label>
+                  <input type="date" formControlName="EffectiveDate" name="EffectiveDate">
+                </div>
+                <div class="col-12" *ngIf="!isOnlyPendingPermits">
+                  <div class="search-input-errors">
+                    <div class="errors" style="margin-left:11rem">
+                      <span *ngIf="dimcrsubmitted && (dimcrForm.controls.EffectiveDate.errors?.required)" class="errors">
+                        Error: Proposed Effective Date is Required.
+                      </span>
+                      <span *ngIf=" !EffectiveDateValid " class="errors">
+                        Error: Proposed Effective Date must be greater than or equal to {{effecDate}} (Received Date + 15
+                        calender days).
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt_1 mb_1 form-cont" *ngIf="!isOnlyPendingPermits">
+                  <label><strong class="header-1b">Description*:</strong></label>
+                  <span style="padding-left:1rem; width: 95%;">
+                    <app-textarea-child [formGroup]="dimcrForm" fieldWidth="95%" (onInputChange)="onInputChange($event)"
+                      controlName="Notes" [maxLength]="300" noOfRows="3"></app-textarea-child>
+                  </span>
+                </div>
+                <div class="col-12" *ngIf="!isOnlyPendingPermits">
+                  <div class="search-input-errors">
+                    <div class="errors">
+                      <span *ngIf="dimcrsubmitted && (dimcrForm.controls.Notes.errors?.required)" class="errors"
+                        style="margin-left:5rem">
+                        Error: Description Required.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="space_between">
+                  <p *ngIf="!isOnlyPendingPermits" class="pt-2 pb-2 header-1n"
+                    style="font-style: italic ;">
+                    <strong style="float:right ;">After Submit, upload project-related documents from the Virtual
+                      Workspace.</strong>
+                  </p>
+                  <div class="errors typo-2" *ngIf="isOnlyPendingPermits || !showFacilityExists">
+                    {{errorMessages.NO_ACTIVE_PERMITS}}
+                  </div>
+                  <div class="float-right mt-3">
+                    <button *ngIf="!isOnlyPendingPermits" type="submit" (click)="onFormSubmit()"
+                      class="btn btn-sm btn-primari mb-2 mr-2 upload">
+                      Submit
+                    </button>
+                    <button (click)="close()" type="submit" class="btn btn-sm btn-outline-dark closebutton mb-2">
+                      Close
+                    </button>
+                  </div>
+    
+                </div>
+    
+              </div>
+            </div>
+          </div>
+          
+
+        </form>
+      </div>
+    </div>
+    <div *ngIf="(showSerchResult && !showFacilityExists)|| (submitted  && reponsenNullshow)" style="width:100%;"
+      class="mat-expansion--has-toggle-icon-left">
+      <div class="shadow-div border-background"></div>
+      <div style="width: 97%;">
+        <div style="text-align: left;">
+          <div class="errors typo-2 ml-5">
+            {{errorMessages?.NO_ACTIVE_PERMITS}}
+          </div>
+
+
+        </div>
+      </div>
+      <div class="footer-close-btn">
+
+        <button (click)="close()" type="submit" class="btn btn-sm btn-outline-dark closebutton mb-2">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  <app-pending-changes-popup #pendingPopup (onOkClick)="goBack()"></app-pending-changes-popup>
+  <!-- <app-warning-pop-up #warningPopup [PopUpMessage]="PopUpMessage" (onOkClick)="goBack1()"></app-warning-pop-up> -->
+  <app-dimsr-confirmation-popup #dimsrconfirmationpopup></app-dimsr-confirmation-popup>
+
+  <ng-template #warningPopup let-modal>
+    <div class="col-12" *ngIf="pendingPermitWarning">
+      <div class="modal-header-confirmation ">
+        <img src="assets/icons/yieldsign.svg" width="25px" height="25px" alt="Yield Icon">
+        <div class="header-1n" style="margin-left: 30%;">
+          APPLICATION ADD WARNING(S)
+        </div>
+
+
+      </div>
+      <div class="modal-body-confirmation" style="text-align: center;">
+        <table class="pop-table table table-borderless table-existing-permits mb-0"
+          aria-labelledby="A table showing pending applications">
+          <tbody *ngFor="let existPermit of existingPermits | keyvalue;let last=last"
+           >
+           <!-- code commented for pending permit only [hidden]="!isShowWarning(existPermit.key)" -->
+
+            <tr *ngFor="let permit of existPermit.value;let i = index">
+              <td class="pop-td" style="width:35%">
+                <ng-container *ngIf="!i">
+                    <label class="mr-2 ">
+                      <input type="radio" class="mr-2" value="DIM" id="{{permit.batchId}}" [checked] ="permit.transType === 'DIM'"
+                      disabled>DIM
+                    </label>
+                    <label class="mr-2 ">
+                      <input type="radio" class="mr-2" value="DTN"  id="{{permit.batchId}}"  [checked] ="permit.transType === 'DTN'"
+                      disabled >DTN
+                    </label>
+                    <label class="mr-2 ">
+                      <input type="radio" class="mr-2" value="DIR"  id="{{permit.batchId}}"  [checked] ="permit.transType === 'DIR'"
+                       disabled >DIR
+                    </label>
+                    <label class="mr-2">
+                      <input type="radio" class="mr-2" value="DIS" id="{{permit.batchId}}"  [checked] ="permit.transType === 'DIS'"
+                        disabled>DIS
+                    </label>
+                </ng-container>
+                <div class="search-input-errors" *ngIf="!i">
+                  <div class="errors">
+                    <span *ngIf="dimcrsubmitted &&  (transTypeForm.controls.transType.errors?.required)" class="errors">
+                      {{errorMessages?.ATLEAST_ONE_SEL_REQD}}
+                    </span>
+                    <!-- <span *ngIf="pendingPermitWarning" class="errors">
+                      {{errorMessages?.DIMSR_PENDING_APPL_EXIST}}
+                    </span> -->
+                  </div>
+                </div>
+              </td>
+              <td class="pop-td" style="width:30%">
+                <div class="text-bold " style="color: black ;">{{permit?.permitTypeDesc}}</div>
+                <div>{{permit?.programIdFormatted}} </div>
+              </td>
+
+              <td class="pop-td" style="width:35%" *ngIf="i===0">
+                <div>{{permit?.effectiveEndDate}} </div>
+                <div class="max-height-40" placement="top" triggers="mouseenter:mouseleave"
+                  [ngbPopover]="permit?.projectDesc">{{permit?.projectDesc}}</div>
+              </td>
+
+            </tr>
+            <tr class="header-1b " style="text-align: center;" *ngIf="isShowWarning(existPermit.key)">
+              <td colspan="3" class="pb-0 warning-pop">
+                {{isShowWarning(existPermit.key)}}
+
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" class="p-0">
+                <div class="shadow-div"></div>
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+      </div>
+      <div class="typo-2 accept-msg" style="text-align: center;">
+        To accept these warnings and continue processing, click <strong>OK</strong>.<br>
+        Click <strong>Cancel</strong> to return to the screen and make changes before submitting.
+      </div>
+      <div class="modal-footer-confirmation model-footer-reduced ">
+
+        <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 okButton"
+          (click)="goBack1();modal.dismiss('Cross click')">
+          OK
+        </button>
+
+        <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2"
+          (click)="modal.dismiss('Cross click')">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </ng-template>

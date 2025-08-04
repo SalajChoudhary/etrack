@@ -1,0 +1,133 @@
+
+.text-center{
+font-weight: bold;
+}
+  // ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  //   border-right: solid black 2px !important;
+  // }
+   
+  // ::ng-deep .p-datatable table tr:nth-child(even) {
+  //   background-color: #dddddd;
+  // }
+
+//   ::ng-deep .p-datatable table {
+//     border-bottom: solid black 2px !important;
+//     border-left: solid black 2px !important;
+// }
+.modal_popup {
+  padding: 30px 10px;
+  border-radius: 3rem;
+  font-weight: 500;
+}
+.in-text-center{
+    padding-left: 46%;
+    font-weight: bold;
+}
+.counter-brief {
+  display: block;
+  text-align: right;
+  margin-right: 4%;
+  margin-top: -44px;
+  position: inherit;
+  font-weight: 400;
+}
+.bottom-text-center{
+  padding-left: 46%;
+  font-weight: bold;
+}
+
+.invoice-table{
+  margin-left: 400px;
+  // remeber to remove display
+  display: none;
+}
+.margin{
+  margin-left: 50px;
+}
+.fees-invoice {
+  font-size: 1rem;
+  font-weight: 600;
+  div {
+    label.fees_invoice_label {
+      width: 242px;
+    }
+  }
+}
+select.form-control{
+  height: 36px !important;
+}
+.generate_invoice {
+  display: flex;
+    justify-content: end;
+    align-items: center;
+    padding: 0 83px;
+    div {
+      button:first-child {
+        text-transform: uppercase;
+      }
+    }
+}
+.notes{
+  margin-left: 20px !important;
+  
+}
+
+.w-90{
+  width: 90px;
+}
+
+.w-81{
+  width: 81px
+}
+.ml-33{
+  margin-left: 33px;
+}
+
+.w-80{
+  width: 80px;
+}
+.mt-15{
+  margin-top: 15px;
+}
+.amount_paid{
+  font-size: 1rem;
+  font-weight: 600;
+}
+.balance {
+  padding: 10px 83px;
+  font-size: 1rem;
+  font-weight: 600;
+  .payment_details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+  }
+}
+.cancellation-form{
+  padding: 10px 83px;
+  .form-label{
+    font-weight: 600;
+  }
+}
+
+.lh-25{
+  line-height: 2.5;
+}
+.datepicker:focus-visible  {
+  outline: 0;
+    border: 2px solid black;
+}
+.inv-error-msg {
+  font-size: 12px;
+  font-weight: 400;
+  color: red;
+}
+.placeholderFont{
+  font-size:  0.9rem !important;
+  font-family: Arial, Roboto, "Helvetica Neue", sans-serif !important;}
+.toLowerCase{
+  text-transform: none !important;
+}
+.custom{
+  margin-left: 31px !important;
+}

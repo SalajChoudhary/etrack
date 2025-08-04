@@ -1,0 +1,102 @@
+<ng-container>
+    <div>
+        <p class="text-center mt-2 header-font">Is there a material change to the originally authorized project that involves, but is not limited to, any of the following:</p>
+        <p class="ml-6 sub-header-font">
+            - new activities not previously authorized; <br>
+            - existing activities ocurring in locations times, or amounts not previously authorized; <br>
+            - an increase in the amount of land disturbance or physical construction; <br>
+            - emissions or discharges of pollutants not previously authorized; <br>
+            - increases of existing pollutant emissions or discharges?
+        </p>
+    </div>
+    <hr class="gray">
+    <table class="table table-borderless mb-0" aria-label="A table which shows the permits you have applied for"
+        aria-describedby="A table which shows the permits you have applied for">
+        <tbody role="rowgroup">
+            <ng-container *ngFor="let batch of permitGroupKeys; let last = last">
+                <ng-container *ngFor="let permit of groupedPermits[batch]; let i = index;">
+                    <tr scope="col" role="cell">
+                        <td class="permit-desc sub-header-font permit-td-color pt-0" >
+                            {{ permit?.permitTypeDesc}}
+                        </td>
+                        <td class="permit-desc sub-header-font permit-td-color pt-0 p-0" [ngStyle]="{'width': '161px'}">
+                            {{ permit?.programIdFormatted }}
+                        </td>
+                        <td class="permit-desc sub-header-font permit-td-color pt-0">
+                            <span *ngIf="!i">
+
+                                {{ permit?.effectiveEndDate }}
+                            </span>
+                        </td>
+                        <td scope="col" role="cell" class="permit-action pt-0">
+                            <div class="d-flex goUp">
+                                <div class="form-check permit-text-align header-1n" *ngIf="!i">
+                                    <label class="form-check-label mr-4"
+                                        [ngStyle]="{'font-size': '12px', 'color' : 'black'}"><input
+                                            class="form-check-input" type="radio" #yes
+                                            (change)="extendYesNoClicked($event, yes, '1', groupedPermits[batch],true,permit)"
+                                            id="{{batch}}" name="{{batch}}" value="Y" 
+                                            [checked]="getDefaultYes(batch)" >YES</label>
+                                    <label class="form-check-label mr-4"
+                                        [ngStyle]="{'font-size': '12px', 'color' : 'black'}"><input
+                                            class="form-check-input" type="radio" #no
+                                            (change)="extendYesNoClicked($event, no, '1', groupedPermits[batch],false,permit)"
+                                            id="{{batch}}" name="{{batch}}" value="N" 
+                                            [checked]="getDefaultNo(batch)" >NO</label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr scope="col" role="cell" *ngIf="permit?.permitTypeCode==='HW' && permit?.isYesChecked==false">
+                        <td colspan="5" style="width: 100;" class="sub-header-font">
+                            Do the proposed changes qualify as minor modifications under minor 6 NYCRR 373-12(c)?
+                        </td>
+                    </tr>
+                    <tr scope="col" role="cell" *ngIf="permit?.permitTypeCode==='ATV' && permit?.isYesChecked==false">
+                        <td colspan="5" class="sub-header-font" style="width: 100;">
+                            Do the proposed changes qualify as administrative amendments or minor modifications under
+                            minor 6 NYCRR
+                            201-6.6(b) or (c)?
+                        </td>
+                    </tr>
+                    <tr scope="col" role="cell" *ngIf="permit?.permitTypeCode==='ASF' && permit?.isYesChecked==false">
+                        <td colspan="5" class="sub-header-font" style="width: 100;">
+                            Do the proposed changes qualify as administrative amendments or minor modifications under
+                            minor 6 NYCRR
+                            201-5.4(c)?
+                        </td>
+                    </tr>
+                    <tr scope="col" role="cell" *ngIf="permit?.permitTypeCode==='SPDES' && permit?.isYesChecked==false">
+                        <td colspan="5" class="sub-header-font" style="width: 100;">
+                            Do the proposed changes qualify as minor modifications under minor modifications under 40
+                            CFR 122 63?
+                        </td>
+                    </tr>
+                </ng-container>
+                <tr>
+                    <td colspan="4">
+                        <div *ngIf="!last" class="shadow-div"></div>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+
+
+    <!-- <span class="ml-little addr-error-msg"
+        *ngIf="showYesNoRequiredError && isSubmitted">{{errorMsgObj?.YES_NO_SEL_REQD}}</span> -->
+    <div class="text-center">
+        <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload text-center btn-597" (click)="okIsClicked()">
+            OK
+        </button>
+
+
+        <button class="btn btn-sm btn-outline-dark closebutton mb-2 text-center" (click)="closeIsClicked()">
+            Cancel
+        </button>
+    </div>
+
+    <div class="float-right mr-2" *ngIf="showServerError">
+        <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+      </div>
+</ng-container>

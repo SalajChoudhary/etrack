@@ -1,0 +1,170 @@
+.form-inline .form-group {
+  margin-left:15px;
+  margin-bottom: 15px;
+}
+
+.form-container {
+  text-align: center;
+  min-height: calc(100vh - 260px);
+}
+.dec-font{
+  font-family: Arial, sans-serif !important;
+  font-size: 0.9rem !important;
+}
+
+.errors{
+      position: relative;
+      padding-left: 2.8rem;
+      padding-bottom: 10px;
+      color:red;
+      display: grid;
+      font-family: Arial, sans-serif ;
+  }
+
+// these can move to global style
+.bottom-button-container {
+  display: flex;
+  justify-content: end;
+  padding: 0.5rem 1rem 0;
+}
+.footer-row {
+  .step-names.step-names{
+    letter-spacing: normal;
+    margin: 0 0 16px;
+    margin-bottom: 15px !important;
+  }
+  // position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 2px
+}
+
+.dec-select {
+width: 150px;
+border-radius: 10px !important;
+}
+.description {
+width: 90%;
+}
+
+.counter-brief {
+display: block;
+text-align: right;
+margin-left: -3.5rem;
+margin-top: 4rem;
+position: inherit;
+}
+.counter-brief-1 {
+  display: block;
+  text-align: right;
+  margin-left: -2.5rem;
+  margin-top: 2rem;
+  position: inherit;
+}
+
+.instruction-font{
+ font-size: 15px !important;
+}
+
+.font-weight {
+  font-weight: 500 !important;
+}
+.form-check-label {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.top-border {
+width: 100%;
+display: flex;
+justify-content: center;
+font-style: italic;
+border-top: solid 1px black;
+font-size: medium;
+}
+
+
+.icon-holder{
+  position: relative;
+  top: 5px;
+  right:0;
+}
+.icon-holder-1{
+  position: relative;
+  top: 0px;
+  right:0;
+}
+@media only screen and (min-width: 992px){
+  .icon-holder{
+    left:-27px;
+  }
+  .icon-holder-1{
+    left:-27px;
+  }
+}
+
+.input-box-wrap {
+  display: flex;
+}
+
+.hide-icon {
+  display: none;
+}
+
+.custom-step-height{
+  margin-top: -58px;
+}
+
+::ng-deep .mat-horizontal-content-container {
+  padding: 0px !important;
+}
+::ng-deep {
+  .mat-horizontal-stepper-header-container {
+      border-top: none !important;
+      border-bottom: none !important;
+  }
+  .child-stepper .mat-horizontal-stepper-header-container {
+    // border-top: solid 2px black !important;
+    // border-bottom: solid 2px black !important;
+    width: 65%;
+    margin-left: 25%;
+    @media (max-width: 1024px) {
+      width: 60%;
+    margin-left: 29%;
+  }
+  }
+  .mat-step-header .mat-step-label-selected .child-label {
+    // background-color: red;
+    font-size: large;
+    font-weight: bold;
+    color:#233E2A;
+
+  }
+  .mat-step-header .mat-step-icon-selected {
+    // background-color: red;
+    width: 30px;
+    height: 30px;
+  }
+
+}
+::ng-deep .modal-25vw {
+  min-width: 40vw !important;
+  max-width: 40vW !important;
+}
+
+::ng-deep .customStepper {
+  .mat-horizontal-stepper-header-container {
+    margin-bottom: 8px;
+    .mat-step-header {
+      height: 40px;
+    }
+  }
+}
+
+.font-label-bold {
+  font-weight: bold !important;
+  font-size: 14px !important;
+}
+
+
+

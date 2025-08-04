@@ -1,0 +1,121 @@
+<div class="component">
+  <div class="component-body">
+    <p-table class="xyx" styleClass="p-datatable-lg" [value]="rows" scrollHeight="260px" aria-describedby="A table which allows the user to select and validate a project"
+      [scrollable]="rows?.length > 6 ? true : false" >
+      <caption> Dashboard Validate</caption>
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="table-header-primary" [ngStyle]="{ width: '90px', color: '#65666B' }"></th>
+          <th class="table-header-primary" [pSortableColumn]="'projectId'" [ngStyle]="{ width: '120px' }">
+            Project ID
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'applicant'" [ngStyle]="{ width: '13%' }">
+            LRP Name
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'facilityName'" [ngStyle]="{ width: '16%' }">
+            Fac Name
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'locationDirections'" [ngStyle]="{ width: '16%' }">
+            Fac Address
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'municipality'"
+            [ngStyle]="{ width: '13%', 'word-wrap': 'break-word' }">
+            Municipality
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'permitType'" [ngStyle]="{ width: '13%' }">
+            Permit Type
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'dartStatus'" [ngStyle]="{ width: '13%' }">
+            App Type
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'responseDate'" [ngStyle]="{ width: '12%' }">
+            Recv'd Date
+          </th>
+          <th class="table-header-primary" [pSortableColumn]="'lastModified'" [ngStyle]="{ width: '10%' }">
+            <!-- <img width="20px" height="20px" alt="filter" src="assets/icons/funnel-cross.jpg"> -->
+            &nbsp;
+            <img class="export-icon" alt="export" src="assets/icons/export.png" style="cursor: 'pointer';" />
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row let-i="rowIndex">
+        <tr>
+          <td class="table-body btn-colum"  [ngStyle]="{ width: '90px', color: '#65666B' }">
+            <button (click)="navigate(row?.projectId)" class="btn btn-sm btn-primari nextbutton upload">
+              Validate
+            </button>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              width: '120px'
+            }">
+            <a href="javascript:void(0)" (click)="navigateToVirtualDesktop(row)">{{ row?.projectId }}</a>
+          </td>
+          
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '13%'
+            }">
+            {{ row?.applicant }}
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '16%'
+            }">
+            {{ row?.facilityName }}
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '16%'
+            }">
+            {{ row?.locationDirections }}
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '13%'
+            }">
+            {{ row?.municipality }}
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '13%'
+            }">
+            {{ row?.permitType }}
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '13%'
+            }">
+            {{ row?.dartStatus }}
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '12%'
+            }">
+            <span [ngClass]="{
+                'text-danger': row?.isReponseDateLessThanCurrentDate
+              }">
+              {{ row?.responseDate }}
+            </span>
+          </td>
+          <td class="table-body" [ngStyle]="{
+              'text-align': 'left',
+              'word-wrap': 'break-word',
+              width: '8%'
+            }"></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <div class="component-footer">
+    <!-- <p *ngIf="rows?.length > 0" class="pl-3 pt-2 pb-2">
+      <strong> # Records:</strong>&nbsp;{{ totalRecords }}
+    </p> -->
+  </div>
+</div>

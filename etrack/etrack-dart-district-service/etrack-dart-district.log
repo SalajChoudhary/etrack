@@ -1,0 +1,5 @@
+[ERROR : 04 Mar 2025 11:25:51 AM ] in: (org.jboss.stdio.AbstractLoggingWriter:71) - Handler java.util.logging.ConsoleHandler is not defined
+[ INFO : 04 Mar 2025 11:25:51 AM ] in: (org.springframework.boot.StartupInfoLogger:55) - Starting EtrackDartDistrictServiceApplication on N5CD41297ZV with PID 12260 (started by SxChoudh in C:\Users\sxchoudh\EAP-7.1.0\bin)
+[ INFO : 04 Mar 2025 11:25:51 AM ] in: (org.springframework.boot.SpringApplication:651) - No active profile set, falling back to default profiles: default
+[ERROR : 04 Mar 2025 11:43:23 AM ] in: (org.springframework.boot.SpringApplication:837) - Application run failed
+java.lang.OutOfMemoryError: Metaspace

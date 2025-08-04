@@ -1,0 +1,130 @@
+<div class="content-wrapper mt-3">
+  <!-- <app-validate-banner class="DEMO" *ngIf="isValidate" [validated]="applicationContactsValidated"
+    [showBottomBorder]="false"></app-validate-banner> -->
+</div>
+<div class="form-container">
+
+  <fieldset [disabled]="isReadOnly" class="mb-5">
+    <div class="col-8 container-header-title offset-2 header-1b py-3 mt-3 box-shadow border-radius-5">
+
+      <div class=" note-text">
+        This project requires the following application forms to be submitted.
+      </div>
+      <ng-container>
+        <div class=" note-text" *ngIf="jafForm?.contacts?.length>1" >
+          Return to the <span class="italic">Permit Selection and/or Contact/Agent</span> screen to make any corrections needed.
+        </div>
+        <div class=" note-text" *ngIf="jafForm?.contacts?.length<=1">
+          Return to the <span class="italic">Permit Selection</span> screen to make any corrections needed.
+        </div>
+      </ng-container>
+      <!-- <ng-container>
+        <div class=" note-text header-1n">
+          Please enter the request type details listed below by clicking on the Modification and/or Extension Details
+          link(s). Return to the Permit Selection and/or Contact/Agent screen to make any corrections needed.
+        </div>
+      </ng-container>
+      <ng-container>
+        <div class="note-text header-1n">
+          Please assign the available contact agent for each permit. Return to the Permit Selection screen to make any
+          corrections needed.
+        </div>
+      </ng-container>
+      <ng-container>
+        <div class="note-text header-1n">
+          Please enter the request type details listed below by clicking on the Modification and/or Extension Details
+          link(s), and if applicable, assign the available contact/agent. Return to the Permit Selection and/or
+          Contact/Agent screen to make any corrections needed.
+        </div>
+      </ng-container> -->
+
+    </div>
+    <!-- Modify Extenstion form -->
+    <div class="col-10 offset-1">
+      <div class="field-row" *ngFor="let nonJafList of nonJafContacts; let i = index">
+        <h4 class="input-header typo-1">{{nonJafList.formName}} </h4>
+        <select (change)="makeFormDirt($event)" [(ngModel)]="nonJafList.selected" 
+        *ngIf="nonJafList.contacts.length > 1" class="w-210">
+          <option ngValue="">— Assign Contact/Agent —</option>
+          <option ngValue="{{con.roleId}}" *ngFor="let con of nonJafList.contacts;">{{con.displayName}}</option>
+        </select>
+        <span class="w-210 typo-2" *ngIf="nonJafList.contacts.length == 1" >{{nonJafList.contacts[0].displayName}}</span>
+      </div>
+    </div>
+    <form [formGroup]="applicationContactsForm" class="formHeight">
+      <div class="col-10 offset-1">
+        <div class="field-row" *ngIf="jafForm?.jafForms?.length>0">
+          <h4 class="input-header typo-1">Joint Application Form </h4>
+          <select *ngIf="jafForm?.contacts?.length>1" class="w-210"
+            aria-label="jaf field" formControlName="jafRoleIds">
+            <option ngValue="">
+              — Assign Contact/Agent —
+            </option>
+            <option [ngValue]="contact?.roleId" *ngFor="let contact of jafForm?.contacts">
+              {{contact?.displayName}}
+            </option>
+          </select>
+          <span *ngIf="jafForm?.contacts?.length===1" class="w-210 typo-2">{{jafForm?.contacts[0]?.displayName}}</span>
+        </div>
+        <div class="permit-options">
+          <p>
+            <span *ngFor="let permitCode of jafForm?.jafForms">- {{permitCode}}<br></span>
+          </p>
+        </div>
+      </div>
+    </form>
+  </fieldset>
+
+
+  <div class="footer-row">
+    <div class="col-md-12 bottom-button-container">
+      <!-- <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent('Property Owners')"  matStepperPrevious>Back</button> -->
+      <app-validate-checkbox *ngIf="isValidate" category="PROJ-INFO" activityId="12"
+        [(validatedModel)]="applicationContactsValidated"></app-validate-checkbox>
+      <button type="button" (click)="openWarningModal()" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload">
+        Next
+      </button>
+      <button type="button" (click)="close()" class="btn btn-sm btn-outline-dark closebutton mb-2">
+        Close
+      </button>
+    </div>
+    <div class="col-md-12 bottom-button-container">
+      <div class="float-right mr-2" *ngIf="showServerError">
+        <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #warningModal let-modal>
+  <div class="modal-header-confirmation pl-2 text-center modal-header-dec-reduced">
+  </div>
+  <div class="modal-body-confirmation " style="text-align: center;">
+    <p class="delete-cnf-message typo-2 ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red"
+        class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+
+        <path
+          d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+
+        <path
+          d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+
+      </svg>&nbsp; &nbsp;<span class="typo-2">Contact/Agents have not been associated to any application.</span>
+    </p>
+    
+    <div class="ml-35 typo-2" *ngFor="let contact of leftOutContacts">{{contact.displayName}}</div>
+    <br>
+    <p class="ml-35 typo-2">Are you sure you want to remove this contact/agent from this project?</p>
+  </div>
+  <div class="modal-footer-confirmation model-footer-reduced">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2" (click)="onRemove()">
+      Remove
+    </button>
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2  okButton"
+      (click)="modal.dismiss('Cross click')">
+      Cancel
+    </button>
+  </div>
+
+</ng-template>
+<app-pending-changes-popup #pendingPopup (onOkClick)="okClicked()"></app-pending-changes-popup>

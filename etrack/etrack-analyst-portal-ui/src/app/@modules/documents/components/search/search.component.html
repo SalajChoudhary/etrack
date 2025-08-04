@@ -1,0 +1,871 @@
+<app-analyst-sub-header
+  [showButton]="true"
+  [isPending]="searchForm.dirty"
+></app-analyst-sub-header>
+
+<div class="container-fluid" style="min-height: calc(100vh - 198px)">
+  <ng-container #dashboard *ngIf="!isCreatingQuery">
+    <div class="row">
+      <div class="col-9 offset-1 mb-3 text-center">
+        <span class="header-2n">Available Searches</span>
+      </div>
+      <div class="col-1 text-center">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 upload"
+          (click)="
+            navigateToQueryPage('new'); runQuery = false; isSubmitted = false
+          "
+        >
+          Add New
+        </button>
+      </div>
+      <div class="float-right mr-2" *ngIf="showServerError">
+        <app-server-error-message
+          [serverErrorMessage]="serverErrorMessage"
+        ></app-server-error-message>
+      </div>
+    </div>
+    <div class="row">
+      <div
+        class="grid-margin mb-5 offset-1 col-10"
+        role="Projects Table"
+        aria-label="A table showing recent search queries"
+        aria-describedby="Application Search table"
+      >
+        <p-table
+          styleClass="p-datatable-lg"
+          [value]="existingSearches"
+          class="w"
+          [scrollable]="existingSearches?.length > 7 ? true : false"
+          scrollHeight="300px"
+          [totalRecords]="existingSearches.length"
+          aria-describedby="A table showing recent search queries"
+        >
+          <caption class="typo-1">
+            Recent Search queries table
+          </caption>
+          <ng-template pTemplate="header">
+            <tr role="rowgroup" class="no-filter">
+              <th
+                scope="col"
+                aria-label="Search Codes Header"
+                role="columnheader"
+                aria-sort="ascending"
+                class="table-header-primary"
+                [pSortableColumn]="'queryName'"
+                [ngStyle]="{ width: '20%', color: '#65666B' }"
+              >
+                Name
+              </th>
+              <th
+                scope="col"
+                role="columnheader"
+                aria-label="Search Codes Header"
+                class="table-header-primary"
+                aria-sort="ascending"
+                [pSortableColumn]="'queryOwner'"
+                [ngStyle]="{ width: '15%' }"
+              >
+                User
+              </th>
+              <th
+                scope="col"
+                role="columnheader"
+                aria-label="Search Codes Header"
+                aria-sort="ascending"
+                class="table-header-primary"
+                pSortableColumn="resultDetails"
+                [ngStyle]="{ width: '10%' }"
+              >
+                Result Details
+              </th>
+              <th
+                scope="col"
+                role="columnheader"
+                aria-label="Search Code Header"
+                aria-sort="ascending"
+                class="table-header-primary"
+                pSortableColumn="modifiedDate"
+                [ngStyle]="{ width: '10%' }"
+              >
+                Last Updated
+              </th>
+              <th
+                scope="col"
+                role="columnheader"
+                aria-label="Search Code Header"
+                aria-sort="ascending"
+                class="table-header-primary"
+                pSortableColumn="comments"
+                [ngStyle]="{ width: '20%' }"
+              >
+                Comments
+              </th>
+              <th
+                scope="col"
+                role="columnheader"
+                aria-label="Search Code Header"
+                aria-sort="ascending"
+                class="table-header-primary"
+                [pSortableColumn]="'lastModified'"
+                [ngStyle]="{ width: '5%' }"
+              ></th>
+              <th
+                scope="col"
+                role="columnheader"
+                aria-label="Search Code Header"
+                aria-sort="ascending"
+                class="table-header-primary"
+                [pSortableColumn]="'lastModified'"
+                [ngStyle]="{ width: '5%' }"
+              ></th>
+              <th
+                scope="col"
+                role="columnheader"
+                aria-label="Search Code Header"
+                aria-sort="ascending"
+                class="table-header-primary"
+                [pSortableColumn]="'lastModified'"
+                [ngStyle]="{ width: '7%' }"
+              ></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-i="rowIndex">
+            <tr role="rowgroup">
+              <td
+                scope="col"
+                role="cell"
+                aria-label="SIC Codes Cell"
+                aria-sort="ascending"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'left',
+                  'word-wrap': 'break-word',
+                  width: '20%'
+                }"
+              >
+                {{ item.queryName }}
+              </td>
+              <td
+                scope="col"
+                role="columnheader"
+                aria-label="User cell"
+                aria-sort="ascending"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'left',
+                  'word-wrap': 'break-word',
+                  width: '15%'
+                }"
+              >
+                {{ item.queryOwner }}
+              </td>
+              <td
+                scope="col"
+                role="columnheader"
+                aria-label="Project or Documents cell"
+                aria-sort="ascending"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'left',
+                  'word-wrap': 'break-word',
+                  width: '10%'
+                }"
+              >
+                {{ item.resultDetails == "P" ? "Projects" : "Documents" }}
+              </td>
+              <td
+                scope="col"
+                role="columnheader"
+                aria-label="Last updated cell"
+                aria-sort="ascending"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'left',
+                  'word-wrap': 'break-word',
+                  width: '10%'
+                }"
+              >
+                {{ item.modifiedDate }}
+              </td>
+              <td
+                scope="col"
+                role="columnheader"
+                aria-label="Comments cell"
+                aria-sort="ascending"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'left',
+                  'word-wrap': 'break-word',
+                  width: '20%'
+                }"
+              >
+                {{ item.comments }}
+              </td>
+              <td
+                scope="col"
+                role="columnheader"
+                aria-label="Comments cell"
+                aria-sort="ascending"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'left',
+                  'word-wrap': 'break-word',
+                  width: '5%'
+                }"
+              >
+               <span > <button
+                *ngIf="
+                (userRoles.includes(UserRole.System_Admin)) ||(item.queryOwner != 'GLOBAL' &&
+                  !userRoles.includes(UserRole.System_Admin))
+              "
+                (click)="
+                    isSubmitted = false;
+                    navigateToQueryPage('edit');
+                    getActiveSearchDetails(item.queryId,false);
+                    setLastRunDate(item);
+                    runQuery = false;
+                    showRun = false;
+                    
+                  "
+                  class="btn btn-link"
+                >
+                  Edit
+                </button></span>
+                <span > <button
+                  *ngIf="(item.queryOwner == 'GLOBAL'  &&
+                    !userRoles.includes(UserRole.System_Admin))
+                "
+                  (click)="
+                      isSubmitted = false;
+                      navigateToQueryPage('edit');
+                      getActiveSearchDetails(item.queryId,true);
+                      setLastRunDate(item);
+                      runQuery = false;
+                      showRun = false;
+                      
+                    "
+                    class="btn btn-link"
+                  >
+                    View
+                  </button></span>
+              </td>
+              <td
+                scope="col"
+                role="columnheader"
+                aria-label="Comments cell"
+                aria-sort="ascending"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'left',
+                  'word-wrap': 'break-word',
+                  width: '5%'
+                }"
+              >
+                <button class="btn btn-link" (click)="selectedRun(item)">
+                  Run
+                </button>
+              </td>
+              <td
+                scope="col"
+                role="columnheader"
+                aria-label="Bridge Cell Cell"
+                aria-sort="ascending"
+                class="table-body"
+                [ngStyle]="{
+                  'text-align': 'center',
+                  'word-wrap': 'break-word',
+                  width: '5%'
+                }"
+              >
+                <span style="cursor: pointer; margin-left: -2px">
+                  <button
+                    class="btn btn-link"
+                    [disabled]="
+                      (item.queryOwner == 'GLOBAL' &&
+                        !userRoles.includes(UserRole.System_Admin)) ||
+                      (item.globalInd == 'Y' &&
+                        !userRoles.includes(UserRole.System_Admin))
+                    "
+                    (click)="onDeleteQueryClicked(item)"
+                  >
+                    Delete
+                  </button>
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td style="text-align: center" colspan="8">
+                No Records Available.
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+    <ng-container *ngIf="runQuery">
+      <div class="row">
+        <div class="col-12 mr-5 mb-3 text-center">
+          <span class="header-2n"
+            >Results Listing by
+            {{
+              activeRunQueryItem.resultDetails == "P"
+                ? "Projects"
+                : "Documents"
+            }}({{ activeData?.length }})</span
+          >
+        </div>
+      </div>
+
+      <div class="row">
+        <div
+          class="grid-margin mb-5 col-12 mr-5"
+          role="Projects Table"
+          aria-label="A table showing recent search queries"
+          aria-describedby="Application Search table"
+        >
+          <p-table
+            styleClass="p-datatable-lg"
+            [value]="activeData"
+            class="w"
+            [scrollable]="activeData?.length > 7 ? true : false"
+            scrollHeight="400px"
+            [totalRecords]="activeData.length"
+            aria-describedby="A table showing recent search queries"
+          >
+            <caption class="typo-1">
+              Recent Search queries table
+            </caption>
+            <ng-template pTemplate="header">
+              <tr role="rowgroup" class="no-filter">
+                <th
+                  *ngFor="let header of activeHeaders"
+                  let i=index;
+                  scope="col"
+                  aria-label="Results Table Header"
+                  role="columnheader"
+                  aria-sort="ascending"
+                  class="table-header-primary"
+                  [pSortableColumn]="header.columnTitle"
+                  [ngStyle]="{ width: header.headerWidth, color: '#65666B' }"
+                  
+                >
+                  {{ header.columnLabel }}
+                  <span *ngIf="header?.isExportIcon && activeData.length > 0">
+                    &nbsp;
+                    <img
+                      class="export-icon"
+                      alt="export"
+                      ngbTooltip="Export to Excel"
+                      placement="right"
+                      src="assets/icons/export.png"
+                      (click)="exportToExcel()"
+                      style="cursor: 'pointer'"
+                  /></span>
+                  
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-i="rowIndex">
+              <tr role="rowgroup">
+                <td
+                  *ngFor="let header of activeHeaders"
+                  scope="col"
+                  role="cell"
+                  aria-label="Results Table Data"
+                  aria-sort="none"
+                  class="table-body"
+                  [ngStyle]="{
+                    'text-align': 'left',
+                    'word-wrap': 'break-word',
+                    width: header.bodyWidth
+                  }"
+                >
+                  <a
+                    routerLink="./"
+                    (click)="navigate(item, header, header.columnTitle)"
+                    *ngIf="header.isLink"
+                    >{{ item[header.columnTitle] }}</a
+                  >
+                  <ng-container *ngIf="!header.isLink">{{
+                    item[header.columnTitle]
+                  }}</ng-container>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td style="text-align: center" colspan="9">
+                  No Records Available.
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+      <div class="row float-right col-12">
+        <div class="mr-2" *ngIf="showResultTableServerError">
+          <app-server-error-message
+            [serverErrorMessage]="serverErrorMessage"
+          ></app-server-error-message>
+        </div>
+      </div>
+    </ng-container>
+   
+    <div class="col-1 text-center"></div>
+
+  </ng-container>
+
+  <ng-container #searchCriteria *ngIf="isCreatingQuery">
+    <form [formGroup]="searchForm">
+      <div class="row">
+        <div class="col-4 text-left">
+          <span class="header-3b">Search by</span>
+        </div>
+        <div class="col-8">
+          <div class="mb-4">
+            <div class="col-6 form-check form-check-inline">
+              <span class="header-3b form-check-label mr-2">Query Name*:</span>
+              <input
+                class="form-check-input w-50"
+                type="text"
+                formControlName="queryName"
+                maxlength="100"
+              />
+              <button
+              class="btn btn-sm btn-primari nextbutton ml-4 mr-2 upload"
+              (click)="onRunClicked()"
+              *ngIf="isFrom == 'edit'"
+              [disabled]="saveAsClicked"
+            >
+              Run
+            </button>
+            </div>
+            <div class="col-12 ml-33p">
+              <span
+                class="addr-error-msg typo-2"
+                *ngIf="formControls?.queryName?.errors?.required && isSubmitted"
+                >{{errorMsgObj?.QRY_NM_REQD}}</span
+              >
+              <span
+                class="addr-error-msg typo-2"
+                *ngIf="duplicateQueryName && isSubmitted"
+                >{{errorMsgObj?.SRG_QRY_NM_EXISTS}}</span
+              >
+              <span
+                class="addr-error-msg typo-2"
+                *ngIf="showDuplicateQueryNameError && isSubmitted"
+                >{{errorMsgObj?.SRG_QRY_NM_EXISTS}}</span
+              >
+              <span 
+              class="addr-error-msg typo-2"
+              *ngIf="
+              isSubmitted &&
+              formControls?.queryName?.errors?.documentNameInvalid" >
+              {{errorMsgObj?.QRY_CONTAN_INVALID_CHAR}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-3 text-left form-check form-check-inline ml-3">
+          <span class="mr-2 header-1b">Result Details*:</span>
+          <input
+            class="form-check-input"
+            type="radio"
+            name="resultDetails"
+            id="projectRadio"
+            value="P"
+            formControlName="resultDetails"
+          />
+          <label
+            class="typo-2 form-check-label mr-2 header-1b"
+            for="projectRadio"
+            >Projects</label
+          >
+          <input
+            class="form-check-input"
+            type="radio"
+            name="resultDetails"
+            id="documentRadio"
+            value="D"
+            formControlName="resultDetails"
+          />
+          <label class="typo-2 form-check-label header-1b" for="documentRadio"
+            >Documents</label
+          >
+        </div>
+        <div class="col-4 form-check form-check-inline" style="max-width: 27%;">
+          <span class="mr-2 header-1b">Search Type*:</span>
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="pendingCheck"
+            id="pendingCheck"
+            value="P"
+            formControlName="pending"
+          />
+          <label
+            class="typo-2 form-check-label mr-2 header-1b"
+            for="pendingCheck"
+            >Pending</label
+          >
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="historicCheck"
+            id="historicCheck"
+            value="H"
+            formControlName="historic"
+          />
+          <label
+            class="typo-2 form-check-label mr-5 header-1b"
+            for="historicCheck"
+            >Disposed</label
+          >
+        </div>
+        <div class="col-5 form-check form-check-inline">
+          <span class="mr-2 header-1b">Data Type*:</span>
+          <input
+            class="form-check-input"
+            type="radio"
+            name="persistenceDataType"
+            id="projectRadio"
+            value="0"
+            formControlName="persistenceDataType"
+          />
+          <label
+            class="typo-2 form-check-label mr-2 header-1b"
+            for="projectRadio"
+            >Live</label
+          >
+          <input
+          class="form-check-input"
+          type="radio"
+          name="persistenceDataType"
+          id="documentRadio"
+          value="1"
+          formControlName="persistenceDataType"
+        />
+        <label class="typo-2 form-check-label header-1b" for="documentRadio"
+          >Stored Data </label
+        >
+        <div *ngIf="lastLoadDate" class="ml-5">
+          <span class="header-1b">&nbsp;Last Load Date: </span> {{lastLoadDate}}
+        </div>
+          <button
+            class="btn btn-sm btn-outline-dark nextbutton upload ml-2"
+            (click)="onClearClicked()"
+            *ngIf="isFrom != 'edit'"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4 form-check form-check-inline">
+          <span
+            class="addr-error-msg typo-2"
+            *ngIf="formControls?.resultDetails?.errors?.required && isSubmitted"
+            >Error: Result Details is required.</span
+          >
+        </div>
+        <div class="col-4 form-check form-check-inline">
+          <span
+            class="addr-error-msg typo-2"
+            *ngIf="
+              !formControls?.historic?.value&&
+              !formControls?.pending?.value&&
+              isSubmitted
+            "
+            >{{errorMsgObj?.SRG_TYPE_REQD}}</span
+          >
+        </div>
+      </div>
+
+      <ng-container *ngFor="let app of uniqueApplications; let i = index">
+        <hr />
+        <div class="row" > 
+          <ng-container> 
+            <div class="col-1 mr-0 pr-0" *ngIf="i<1" ></div>
+            <div class="col-1 mr-0 pr-0" *ngIf="i > 0">
+              <span>
+                <ng-container >
+                  <select
+                    class="form-control w-40"
+                    name="entityAndOr"
+                    [(ngModel)]="app.selectedAndOr"
+                    [ngModelOptions]="{standalone: true}"
+                    style="width: 75%;"
+                  >
+                    <option
+                      *ngFor="let val of entityOperators"
+                      [value]="val" [selected]="!app.selectedAndOr"
+                    >
+                      {{ val | uppercase}}
+                    </option>
+                  </select>
+                </ng-container>
+              </span>
+            </div>
+          </ng-container>
+          
+          <div class="col-9 ml-0 pl-0" >
+            <span class=" col-2 header-3b" style="text-transform: uppercase">{{
+              app.searchEntityDesc
+            }}</span>
+          </div>
+          <div class="col-2" *ngIf="searchQueryControls(i).length == 0">
+            <span
+              style="cursor: pointer; margin-left: -2px"
+              (click)="createControl(i)"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                x="0px"
+                y="0px"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                class="ml-29"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z"
+                ></path>
+              </svg>
+            </span>
+          </div>
+        </div>
+        <div
+          class="row"
+          *ngFor="let query of searchQueryControls(i)?.controls; let j = index"
+        >
+          <div class="col-12">
+            <app-search-row-query
+              [searchForm]="query"
+              [firstSection]="trackingArray[0]"
+              [sectionFieldlist]="uniqueApplications[i].children"
+              [isSubmitted]="isSubmitted"
+              [trackingArray]="trackingArray"
+              [sectionOperators]="genericOperators"
+              [fieldName]="'PROJ ATTR'"
+              (onDeleteClicked)="deleteControl(i, j, 'PROJ ATTR')"
+              [rowIndex]="j"
+              [mainRowIndex]="i"
+              (onAddClicked)="createControl(i)"
+            ></app-search-row-query>
+          </div>
+        </div>
+        <hr *ngIf="i + 1 == uniqueApplications.length" />
+      </ng-container>
+      <div class="col-12 pl-0">
+        <span class="header-3b mb-5">COMMENTS*</span>
+        <div class="row">
+          <div class="col-11 ml-5 mb-3">
+            <app-textarea-child
+              [maxLength]="250"
+              fieldWidth="70%"
+              counterWidth="69%"
+              [noOfRows]="5"
+              (onInputChange)="onCommentsChange($event)"
+              [formGroup]="searchForm"
+              controlName="comments"
+            >
+            </app-textarea-child>
+          </div>
+        </div>
+        <div
+          class="row"
+          *ngIf="formControls?.comments?.errors?.required && isSubmitted"
+        >
+          <div class="col-11 ml-5 mb-3">
+            <span class="addr-error-msg typo-2"
+              >{{errorMsgObj?.COMMENTS_REQD}}</span
+            >
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="col-5 offset-6 text-right">
+            <button 
+              class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload mr-4"
+              [hidden]="disableSave() || isView()"
+              (click)="onSaveClicked()"
+            >
+              Save
+            </button>
+            <button
+              class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload mr-4"
+              (click)="onSaveAsClicked()"
+              *ngIf="isFrom == 'edit'"
+            >
+              Save As
+            </button>
+            <button
+              class="btn btn-sm btn-outline-dark closebutton mb-2"
+              (click)="onSearchCloseClicked(); runQuery = false"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="float-right mr-2" *ngIf="showServerError">
+        <app-server-error-message
+          [serverErrorMessage]="serverErrorMessage"
+        ></app-server-error-message>
+      </div>
+    </form>
+    <br />
+    <ng-container *ngIf="runQuery">
+      <div class="row">
+        <div class="col-12 mr-5 mb-3 text-center">
+          <span class="header-2n"
+            >Results Listing by
+            {{
+              activeRunQueryItem.resultDetails == "P" ? "Projects" : "Documents"
+            }}
+            ({{ activeData?.length }})
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div
+          class="grid-margin mb-5 mr-5 col-12"
+          role="Projects Table"
+          aria-label="A table showing recent search queries"
+          aria-describedby="Application Search table"
+        >
+          <p-table
+            styleClass="p-datatable-lg"
+            [value]="activeData"
+            class="w"
+            [scrollable]="activeData?.length > 7 ? true : false"
+            scrollHeight="400px"
+            [totalRecords]="activeData.length"
+            aria-describedby="A table showing recent search queries"
+          >
+            <caption class="typo-1">
+              Recent Search queries table
+            </caption>
+            <ng-template pTemplate="header">
+              <tr role="rowgroup" class="no-filter">
+                <th
+                  *ngFor="let header of activeHeaders"
+                  scope="col"
+                  aria-label="SIC Codes Header"
+                  role="columnheader"
+                  aria-sort="ascending"
+                  class="table-header-primary"
+                  [pSortableColumn]="header.columnTitle"
+                  [ngStyle]="{ width: header.headerWidth, color: '#65666B' }"
+                >
+                  {{ header.columnLabel }}
+                  <span *ngIf="header?.isExportIcon && activeData.length > 0">
+                    &nbsp;
+                    <img
+                      class="export-icon"
+                      alt="export"
+                      ngbTooltip="Export to Excel"
+                      placement="right"
+                      src="assets/icons/export.png"
+                      (click)="exportToExcel()"
+                      style="cursor: 'pointer'"
+                  /></span>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-i="rowIndex">
+              <tr role="rowgroup">
+                <td
+                  *ngFor="let header of activeHeaders"
+                  scope="col"
+                  role="cell"
+                  aria-label="SIC Codes Cell"
+                  aria-sort="none"
+                  class="table-body"
+                  [ngStyle]="{
+                    'text-align': 'left',
+                    'word-wrap': 'break-word',
+                    width: header.bodyWidth
+                  }"
+                >
+                  <a
+                    routerLink="./"
+                    (click)="navigate(item, header, header.columnTitle)"
+                    *ngIf="header.isLink"
+                    >{{ item[header.columnTitle] }}</a
+                  >
+                  <ng-container *ngIf="!header.isLink">{{
+                    item[header.columnTitle]
+                  }}</ng-container>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td style="text-align: center" colspan="9">
+                  No Records Available.
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-10 offset-1 text-right">
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
+
+<app-delete-confirm-popup
+  [openModal]="deleteIsClicked"
+  [deleteApplicant]="deleteQuery"
+  (onDeleteConfirmed)="deleteQueryId()"
+  [bodyText]="deletePopupBodyText"
+></app-delete-confirm-popup>
+
+<app-pending-changes-popup
+  #pendingPopup
+  (onOkClick)="goToDash()"
+></app-pending-changes-popup>
+
+<app-success-popup
+  #successPopup
+  [showRun]="showRun && isFrom != 'edit'"
+  (onOkClick)="onSuccessPopupOkClicked()"
+  (onRunClick)="onRunClick()"
+  [successMsg]="successPopupMessage"
+></app-success-popup>
+
+<app-view-document-popup
+  [openModal]="viewButtonIsClicked"
+  [fileNameWidth]="'90'"
+  (fileClicked)="onViewDocumentPopupFileClicked($event)"
+  [fullData]="fullData"
+  [fileDateWidth]="'10'"
+  [modalSize]="'md'"
+></app-view-document-popup>
+
+<app-custom-modal-popup #confirmApplicant [modalConfig]="confirmConfig">
+    <ng-container *ngIf="isOpenConfirmPopUp | async">
+      <div class="modal-body note-text" >
+        <p class="t-center">The Stored Data set is currently being updated with the latest live eTrack data.</p>
+        <p class="t-center">This process will take a short while to complete.</p>
+        <p class="t-center">Please try again later.</p>
+      </div>
+      <div class="modal-footer-confirmation model-footer-reduced" style="padding: 0 0 20px 0">
+        <button type="button" class="btn btn-sm btn-primari mb-2 mr-2 okButton" (click)="okClicked()"
+          id="warningOk">
+          OK
+        </button>
+      </div>
+    </ng-container>
+  </app-custom-modal-popup>

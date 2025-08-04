@@ -1,0 +1,878 @@
+<!-- <div class="hr hr-2">
+    &nbsp;
+</div> -->
+
+<!-- <div
+  class="title title-space d-flex justify-content-center align-items-center p-2"
+>
+</div> -->
+<div class="d-flex justify-content-between align-items-center p-2">
+  <div></div>
+  <h4 class="top-heading header-2n">PERMIT SELECTION</h4>
+
+  <button type="button" class="close remove-left-margin" aria-label="Close" (click)="closeHandler()">
+    <!-- <span aria-hidden="true">&times;</span> -->
+    <!-- <span aria-hidden="false">X</span> -->
+  </button>
+</div>
+<div class="container mb-15">
+  <div class="row">
+    <div class="col-6 col-md-6 col-xs-12 t-align-right">
+      <button (click)="open(1)" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload mt-15 b-box">
+        More about Environmental Permits
+      </button>
+    </div>
+    <div class="col-6 col-md-6 col-xs-12">
+      <button (click)="open(0)" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload mt-15 b-box">
+        Do You Qualify for a General Permit?
+      </button>
+    </div>
+  </div>
+
+  <div class="container mb-15">
+    <div class="permit-text-align header-1b">
+      Expand the permit categories below to add applications to this project.
+    </div>
+  </div>
+  <div class="container mb-15">
+    <div class="permit-text-align header-1n">
+      To view more information about environmental permits or to see if this
+      project qualifies
+    </div>
+    <div class="permit-text-align header-1n mb-4">
+      for a general permit, please use the buttons above to visit the NYSDEC
+      website.
+    </div>
+      <div class="permit-text-align header-1b">
+        Is this a request for an emergency authorization?
+        </div>
+       <div class="form-check permit-text-align header-1n">
+        <input class="form-check-input" type="radio" name="emergency" value="yes" (change)="onEmergencyAuthChanged($event)" [attr.disabled]="showEmergencyAuth === false ? true : null" [attr.checked] ="getEmergencyAuth ==='E' ? 'checked' : null">
+      <label class="form-check-label header-1n mr-4">YES</label>
+      <input class="form-check-input" type="radio" name="emergency" value="no" (change)="onEmergencyAuthChanged($event)" [attr.disabled]="showEmergencyAuth === false ? true : null" [attr.checked] ="getEmergencyAuth === '' ? 'checked' : null">
+      <label class="form-check-label header-1n mr-4">NO</label>
+    </div> 
+  </div>
+  </div>
+
+<!-- <div >&nbsp;</div> -->
+<!-- <div class="container">
+  <button  (click)="myaccordion.openAll()">Expand All</button>
+  <button  (click)="myaccordion.closeAll()">Collapse All</button>
+</div> -->
+<div class="form-container" *ngIf="fetchedPermitSummary">
+  <mat-accordion #myaccordion="matAccordion" class="permit-selection--accordion" multi>
+    
+    <!-- <mat-expansion-panel *ngIf="existingPermits?.length"> -->
+      <mat-expansion-panel *ngIf="canShowExistingPermits">
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b">Existing Permits to Modify, Extend, Renew or Transfer</mat-panel-title>
+      </mat-expansion-panel-header>
+      <!-- <div class="d-flex justify-content-center align-items-center"> -->
+        <div class="ml4pct">
+          <span >Select all that apply:</span>
+        </div>
+        <div class="ml5pct">
+          <ul>
+            <li class="header-1n">Choose <span class="header-1b"> Modify</span> if there are changes to the authorized activity and you also need more time for the project.
+            </li>
+            <li class="header-1n">Choose  <span class="header-1b">Extend</span>  if you are only requesting additional time without any changes to the previously authorized
+              activity.</li>
+                        
+          </ul>
+        </div> 
+        <div class="ml4pct" *ngIf="!noEndDate">
+          <span class="header-1n">If you need more time than the extension date below, please apply for a <span class="header-1b">new permit</span> from the categories
+              below.</span> 
+          </div>       
+      <!-- </div> -->
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            
+            <table class="table table-borderless table-existing-permits" aria-labelledby="A table showing existing permits">
+              
+              <tbody *ngFor="let existingPermit of existingPermits | keyvalue;let last=last">
+                <tr *ngFor="let permit of existingPermit.value;let i = index">
+                  <td class="permit-td-color" style="width:440px">
+                    <ng-container *ngIf="!i">
+                                         
+                      <label *ngFor="let types of permit.availableTransTypes; let t=index;" class="mr-2">
+                        <input type="checkbox" class="mr-2" id="{{types.code}}{{i}}" name="{{types.code}}{{i}}"
+                         [(ngModel)]="types.selected" (change)="onModifyClickedRevised(types, existingPermit.value)">{{types.type}}
+                      </label>                                        
+                    </ng-container>
+                  </td>
+                  <td class="permit-td-color">
+                    <div class="text-bold ">{{permit?.permitTypeDesc}} </div>
+                    <div>{{permit?.programIdFormatted}}</div>
+                  </td>
+                  <td class="permit-td-color" *ngIf="i===0">
+                    <div style="height:20px">{{permit?.effectiveEndDate}}
+                    </div>
+                    <div class="max-height-40" placement="top" triggers="mouseenter:mouseleave"
+                      [ngbPopover]="permit?.projectDesc">{{permit?.projectDesc}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3">
+                    <div *ngIf="!last" class="shadow-div"></div>
+                  </td>
+                </tr>                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngIf="canShowPendingPermits">
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b">Pending Applications</mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="ml4pct">
+
+        <ul><span class="ml4pct"></span>
+          <li class="header-1n">Call your regional office to request to transfer or withdraw these pending applications.
+            
+          </li>
+          <li class="header-1n">Please reference the Permit ID or Application ID in your request.</li>
+          
+        </ul>
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <table class="table table-borderless table-existing-permits mb-0"
+              aria-labelledby="A table showing pending applications">
+              <tbody *ngFor="let pendingPermit of pendingPermits | keyvalue;let last=last">
+                <tr *ngFor="let permit of pendingPermit.value;let i = index">
+                  <td class="permit-td-color" style="width:440px">
+                    <ng-container *ngIf="!i">
+                      
+                      <label class="mr-2 invisible">
+                        <input type="checkbox" class="mr-2" [(ngModel)]="permit.ngModelExtend">Extend
+                      </label>
+                      <label class="mr-2 invisible">
+                        <input type="checkbox" class="mr-2" [(ngModel)]="permit.ngModelModify">Modify
+                      </label>
+                      <label class="mr-2 invisible">
+                        <input type="checkbox" class="mr-2" [(ngModel)]="permit.ngModelTransfer" disabled>Transfer
+                      </label>
+                      <label class="mr-2 invisible">
+                        <input type="checkbox" class="mr-2" [(ngModel)]="permit.ngModelRenew">Renew
+                      </label>
+                    </ng-container>
+                  </td>
+                  <td class="permit-td-color">
+                    <div class="text-bold ">{{permit?.permitTypeDesc}}</div>
+                    <div>{{permit?.programIdFormatted}}</div>
+                  </td>
+                  
+                  <td class="permit-td-color" *ngIf="i===0">
+                    <div>Recv'd Date: {{permit?.receivedDate}} </div>
+                    <!-- <div>DART Status: {{permit?.transType}} </div> -->
+                    <div class="max-height-40" placement="top" triggers="mouseenter:mouseleave"
+                      [ngbPopover]="permit?.projectDesc">{{permit?.projectDesc}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3">
+                    <div *ngIf="!last" class="shadow-div"></div>
+                  </td>
+                </tr>                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngFor="let permitCategoryDesc of permitCategoriesList">
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b"> {{permitCategoryDesc}} </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+            <div *ngFor="let item of permitCategories[permitCategoryDesc]['non-general']; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes [attr.data-generalPermitInd]="item?.generalPermitInd" 
+              [attr.data-permitCategoryId]="item?.permitCategoryId"
+              (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="{{permitCategoryDesc}}ngCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label class="form-check-label margint-5 typo-2" for="{{permitCategoryDesc}}ngCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }} </label>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="getEmergencyAuth !== 'E'">
+            <div *ngFor="let item of permitCategories[permitCategoryDesc]['general']; let i= index" class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes [attr.data-generalPermitInd]="item?.generalPermitInd" 
+              [attr.data-permitCategoryId]="item?.permitCategoryId" (change)="onCheckBoxChange($event, item)" class="form-check-input"
+              [ngClass]="{'wetlandsBoxesCheckbox' : permitCategoryDesc === 'Waterways, Coastlines & Wetlands',
+              'wasteWaterSpdesCheckbox' : permitCategoryDesc === 'Wastewater (SPDES)'}"
+                type="checkbox" id="{{permitCategoryDesc}}Checkbox{{i}}" [value]="item?.permitTypeCode" />
+              <label [title]="item?.relatedRegularPermitTypeDescForGp" class="form-check-label margint-5 typo-2" for="{{permitCategoryDesc}}Checkbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <!-- <mat-expansion-panel>
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b"> Waterways, Coastlines & Wetlands </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+            <div *ngFor="let item of wetlandsBoxesng; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes [attr.data-generalPermitInd]="item?.generalPermitInd" 
+              [attr.data-permitCategoryId]="item?.permitCategoryId"
+              (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="wetlandsBoxesngCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label class="form-check-label margint-5 typo-2" for="wetlandsBoxesngCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }} </label>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="getEmergencyAuth !== 'E'">
+            <div *ngFor="let item of wetlandsBoxes; let i= index" class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes [attr.data-generalPermitInd]="item?.generalPermitInd" 
+              [attr.data-permitCategoryId]="item?.permitCategoryId" (change)="onCheckBoxChange($event, item)" class="form-check-input wetlandsBoxesCheckbox"
+                type="checkbox" id="wetlandsBoxesCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label [title]="item?.relatedRegularPermitTypeDescForGp" class="form-check-label margint-5 typo-2" for="wetlandsBoxesCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b"> Wastewater (SPDES) </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+            <div *ngFor="let item of wastewaterSPDESBoxesng; let i=index"
+              class="form-check col-12 form-check-expand m-bottom">              
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"              
+                type="checkbox" id="wastewaterSPDESBoxesngCheckbox{{i}}"
+                [attr.data-generalPermitInd]="item?.generalPermitInd"
+                [attr.data-permitCategoryId]="item?.permitCategoryId"
+                [value]="item?.permitTypeCode" />
+              <label class="form-check-label margint-5 typo-2" for="wastewaterSPDESBoxesngCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="getEmergencyAuth !== 'E'">
+            <div *ngFor="let item of wastewaterSPDESBoxes; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input wasteWaterSpdesCheckbox"
+                type="checkbox" id="wastewaterSPDESBoxes{{i}}"
+                [attr.data-generalPermitInd]="item?.generalPermitInd"
+                [attr.data-permitCategoryId]="item?.permitCategoryId"
+                [value]="item?.permitTypeCode" />
+              <label [title]="item?.relatedRegularPermitTypeDescForGp" class="form-check-label margint-5 typo-2" for="wastewaterSPDESBoxes{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b"> Water Withdrawal </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+            <div *ngFor="let item of waterWithdrawalBoxesng; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="waterWithdrawalBoxesngCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label class="form-check-label margint-5 typo-2" for="waterWithdrawalBoxesngCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="getEmergencyAuth !== 'E'">
+            <div *ngFor="let item of waterWithdrawalBoxes; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="waterWithdrawalBoxesCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label [title]="item?.relatedRegularPermitTypeDescForGp" class="form-check-label margint-5 typo-2" for="waterWithdrawalBoxesCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b"> Mining of Mineral Resources </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="container">
+        <div class="row ">
+          <div class="col-6">
+            <div *ngFor="let item of mineralResourceBoxesng; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="mineralResourceBoxesngCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label class="form-check-label margint-5 typo-2" for="mineralResourceBoxesngCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="getEmergencyAuth !== 'E'">
+            <div *ngFor="let item of mineralResourceBoxes; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="mineralResourceBoxesCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label [title]="item?.relatedRegularPermitTypeDescForGp" class="form-check-label margint-5 typo-2" for="mineralResourceBoxesCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b"> Air Facility</mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+            <div *ngFor="let item of airFacilityBoxesng; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="airFacilityBoxesngCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label class="form-check-label margint-5 typo-2" for="airFacilityBoxesngCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="getEmergencyAuth !== 'E'">
+            <div *ngFor="let item of airFacilityBoxes; let i=index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="airFacilityBoxesCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label [title]="item?.relatedRegularPermitTypeDescForGp" class="form-check-label margint-5 typo-2" for="airFacilityBoxesCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b"> Waste Management </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+            <div *ngFor="let item of wasteManagementBoxesng; let i = index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="wasteManagementBoxesngCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label class="form-check-label margint-5 typo-2" for="wasteManagementBoxesngCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="getEmergencyAuth !== 'E'">
+            <div *ngFor="let item of wasteManagementBoxes; let i=index"
+              class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="wasteManagementBoxesCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label [title]="item?.relatedRegularPermitTypeDescForGp" class="form-check-label margint-5 typo-2" for="wasteManagementBoxesCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header class="bg-heading">
+        <mat-panel-title class="header-1b"> Others </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+            <div *ngFor="let item of otherBoxesng; let i = index" class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="otherBoxesngCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label class="form-check-label margint-5 typo-2" for="otherBoxesngCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="getEmergencyAuth !== 'E'">
+            <div *ngFor="let item of otherBoxes; let i = index" class="form-check col-12 form-check-expand m-bottom">
+              <input #developmentCheckBoxes (change)="onCheckBoxChange($event, item)" class="form-check-input"
+                type="checkbox" id="otherBoxesCheckbox{{i}}" [value]="item?.permitTypeCode" />
+              <label [title]="item?.relatedRegularPermitTypeDescForGp" class="form-check-label margint-5 typo-2" for="otherBoxesCheckbox{{i}}">{{
+                item?.permitTypeDesc
+                }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel> -->
+  </mat-accordion>
+  <div class="ml-2">
+    <span class="addr-error-msg mt-1 typo-2"
+      *ngIf="isNewPermitsMatchesWithExistingPermitsSelected && isSubmitted">
+    {{ errorMsgObj?.NO_NEW_PERMIT_IF_EXIST || "Error Msg: You cannot apply for a New permit at the same time you are choosing an option in the Existing Auths/Pending Apps section."       }}
+    </span>
+    <span class="addr-error-msg mt-1 typo-2"
+      *ngIf="isNewPermitsMatchesWithPermitSummaryValues && isSubmitted">
+     {{ errorMsgObj?.NO_NEW_PERMIT_IF_EXIST || " Error Msg: You cannot apply for a New permit at the same time you are choosing an option in the Existing Auths/Pending Apps section."       }}
+    </span>
+    <span class="addr-error-msg mt-1 typo-2"
+    *ngIf="isModExtPermitsMatchesWithPermitSummaryValues && isSubmitted">
+    {{ errorMsgObj?.NO_NEW_PERMIT_IF_EXIST || "Error Msg: You cannot apply for a New permit at the same time you are choosing an option in the Existing Auths/Pending Apps section."       }}
+  </span>
+
+    
+    <span class="addr-error-msg mt-1 typo-2"
+      *ngIf="isSPDESExceeded && isSubmitted">{{errorMsgObj?.MULTI_SPDES_PERMIT_SELCTD}}</span>
+    <span class="addr-error-msg mt-1 typo-2"
+      *ngIf="showAtLeastOneRequiredError && isSubmitted">{{errorMsgObj?.PERMIT_TYPE_REQD}}</span>
+    <span class="addr-error-msg mt-1 typo-2"
+      *ngIf="showAquaticPesticideError && isSubmitted">{{errorMsgObj?.PERMIT_REQD_AQUATIC_PEST}}</span>
+    <span class="addr-error-msg mt-1 typo-2"
+      *ngIf="showSPDESGPError && isSubmitted">{{errorMsgObj?.ONLY_ONE_SPDES_ALLOWED}}</span>
+    <span class="addr-error-msg mt-1 typo-2"
+      *ngIf="showNaturalResourceGPError && isSubmitted">{{errorMsgObj?.ONLY_ONE_NR_GP_ALLOWED}}</span>
+    <span class="addr-error-msg mt-1 typo-2"
+      *ngIf="Showonly1NaturalResourceGPSPDESGPError && isSubmitted">{{errorMsgObj?.ONLY_ONE_NR_GP_SPDES_ALD}}</span>
+      
+    <span class="addr-error-msg mt-1 typo-2"
+    *ngIf="showWaterwayCoastalAndWetlandsGeneralCountError && isSubmitted">{{errorMsgObj?.ONLY_ONE_NR_GP_SPDES_ALD}}</span>
+  </div>
+
+  <div class="float-right mr-2" *ngIf="showServerError">
+    <span class="error-msg">{{serverErrorMessage}}</span>
+  </div>
+  <div class="footer-row mt-20">
+    <div class="col-md-12 bottom-button-container">
+      <!-- <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload" (click)="stepperClickEvent('Associated Applicants')"  matStepperPrevious>Back</button> -->
+      <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload btn-512"
+        (click)="onShowConstructionOperatingPopup()"
+        id="okBtn1">
+        OK
+      </button>
+      <button (click)="onClose()" type="button" class="btn btn-sm btn-outline-dark closebutton mb-2" id="cancelBtn1">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-custom-modal-popup #modal [modalConfig]="modalConfig">
+  <ng-container *ngIf="isOpenFbeModal">
+  </ng-container>
+</app-custom-modal-popup>
+
+
+<app-custom-modal-popup #validationPopup [modalConfig]="modalConfig">
+  <!-- scenario 1 construction modification -->
+  <ng-container *ngIf="showConModPopup">
+    <div>
+      <p class="text-center mt-2 header-font">Is there a material change to the originally authorized project that involves, but is not limited to, any of the following:</p>
+      <p class="ml-6 sub-header-font">
+        - new activities not previously authorized; <br>
+        - existing activities ocurring in locations times, or amounts not previously authorized; <br>
+        - an increase in the amount of land disturbance or physical construction; <br>
+        - emissions or discharges of pollutants not previously authorized; <br>
+        - increases of existing pollutant emissions or discharges?
+      </p>
+    </div>
+    <hr class="gray">
+    <table class="table table-borderless mb-0" aria-label="A table which shows the permits you have applied for"
+      aria-describedby="A table which shows the permits you have applied for">
+      <tbody role="rowgroup">
+        <ng-container *ngFor="let batch of permitGroupKeys; let last = last">
+          <ng-container *ngFor="let permit of groupedPermits[batch]; let i = index;">
+            <tr scope="col" role="cell">
+              <td class="permit-desc sub-header-font permit-td-color pt-0" [ngStyle]="{'width': '295px'}">
+                {{ permit?.permitTypeDesc}}
+              </td>
+              <td class="permit-desc sub-header-font permit-td-color pt-0 p-0" [ngStyle]="{'width': '161px'}">
+                {{ permit?.programIdFormatted }}
+              </td>
+              <td class="permit-desc sub-header-font permit-td-color pt-0" >
+               <span *ngIf="!i">
+                  <!--  {{ permit?.effectiveStartDate }}
+                  <span *ngIf="permit?.effectiveEndDate">-</span> -->
+                  {{ permit?.effectiveEndDate }}
+                </span>
+              </td>
+              <td scope="col" role="cell" class="permit-action pt-0">
+                <div class="d-flex goUp">
+                  <div class="form-check permit-text-align header-1n" *ngIf="!i">
+                    <label class="form-check-label mr-4" [ngStyle]="{'font-size': '12px', 'color' : 'black'}"><input
+                        class="form-check-input" type="radio" #yes
+                        (change)="extendYesNoClicked($event, yes, '1', groupedPermits[batch],true,permit)"
+                        id="{{batch}}" name="{{batch}}" value="Y">YES</label>
+                    <label class="form-check-label mr-4" [ngStyle]="{'font-size': '12px', 'color' : 'black'}"><input
+                        class="form-check-input" type="radio" #no
+                        (change)="extendYesNoClicked($event, no, '1', groupedPermits[batch],false,permit)"
+                        id="{{batch}}" name="{{batch}}" value="N">NO</label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <!-- <tr scope="col" role="cell" *ngIf="permit?.permitTypeCode==='HW' && permit?.isYesChecked==false">
+              <td colspan="5" style="width: 100;" class="sub-header-font">
+                Do the proposed changes qualify as minor modifications under minor 6 NYCRR 373-12(c)?
+              </td>
+            </tr>
+            <tr scope="col" role="cell" *ngIf="permit?.permitTypeCode==='ATV' && permit?.isYesChecked==false">
+              <td colspan="5"  class="sub-header-font" style="width: 100;">                
+                Do the proposed changes qualify as administrative amendments or minor modifications under minor 6 NYCRR
+                201-6.6(b) or (c)?
+              </td>
+            </tr>
+            <tr scope="col" role="cell" *ngIf="permit?.permitTypeCode==='ASF' && permit?.isYesChecked==false">
+              <td colspan="5"  class="sub-header-font" style="width: 100;">
+                Do the proposed changes qualify as administrative amendments or minor modifications under minor 6 NYCRR
+                201-5.4(c)?
+              </td>
+            </tr>
+            <tr scope="col" role="cell" *ngIf="permit?.permitTypeCode==='SPDES' && permit?.isYesChecked==false">
+              <td colspan="5"  class="sub-header-font" style="width: 100;">
+                Do the proposed changes qualify as minor modifications under minor modifications under 40 CFR 122 63?
+              </td>
+            </tr>  -->
+            <!-- <div class="form-check permit-text-align header-1n" >
+              <label class="form-check-label mr-4" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input
+                  class="form-check-input" type="radio" #yes1
+                  (change)="questionYesNoClicked(permit.permitTypeCode, true)"
+                  id="{{batch}}" name="{{batch}}" value="Y">YES</label>
+              <label class="form-check-label mr-4" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input
+                  class="form-check-input" type="radio" #no1
+                  (change)="questionYesNoClicked(permit.permitTypeCode, false)"
+                  id="{{batch}}" name="{{batch}}" value="N">NO</label>
+            </div> -->
+          </ng-container>
+          <!-- {{yes?.checked}} -->
+
+          <tr>
+            <td colspan="4">
+              <div *ngIf="!last" class="shadow-div"></div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <!--
+
+    <ng-container *ngIf="extendedPermitsActive?.length">
+      <div>
+        <p class="text-center mt-2 header-font">For each of the permit groupings listed below <br> <br> If you need more
+          time than the listed extension date, please choose to apply for a new permit.</p>
+        <p class="text-center sub-header-font">
+          Additionally, you cannot make any changes to the authorized activity. <br>
+          If that is needed for this project, please choose to modify the permit.
+        </p>
+        <hr class="gray">
+      </div>
+      <table class="table table-borderless mb-0" aria-label="A table which shows the permits you have applied for"
+        aria-describedby="A table which shows the permits you have applied for">
+        <tbody role="rowgroup">
+          <ng-container *ngFor="let permit of extendedPermitsActive; let i = index; let last = last">
+            <tr scope="col" role="cell" >
+              <td class="permit-desc permit-td-color pt-0" [ngStyle]="{'width': '295px'}">
+                {{ permit?.permitTypeDesc }}
+              </td>
+              <td class="permit-desc permit-td-color pt-0 p-0" [ngStyle]="{'width': '161px'}">
+                {{ permit?.programIdFormatted }}
+              </td>
+              <td scope="col" role="cell" class="permit-action pt-0 permit-td-color">
+                <div class="d-flex goUp">
+                  <div class="form-check permit-text-align header-1n pl-0" *ngIf="!i">
+                    <label class="form-check-label font-14 ">
+                       **THIS SHOULD BE UPDATED TO TERM DATE ONCE THAT IS FINALIZED**
+                      <input type="checkbox" class="form-check-input" #extendCheckbox
+                        (change)="onConExtModifyNewClicked($event, extendCheckbox)" id="{{permit.batchId}}" name="{{permit.batchId}}"
+                        [checked]="isChecked(permit)" value="EXT" *ngIf="!i">
+                      Extend to 12/21/2021
+                    </label>
+                    <label class="form-check-label ml-5" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input name="new1"
+                        class="form-check-input" type="checkbox" #new (change)="onConExtModifyNewClicked($event, new)"
+                        id="{{permit.batchId}}" name="{{permit.batchId}}" value="NEW">New</label>
+                    <label class="form-check-label ml-5" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input name="new1"
+                        class="form-check-input" type="checkbox" #modify (change)="onConExtModifyNewClicked($event, modify)"
+                        id="{{permit.batchId}}" name="{{permit.batchId}}" value="MOD">Modify</label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="last">
+              <td colspan="4">
+                <div  class="shadow-div"></div>
+              </td>
+            </tr>
+          </ng-container>
+            </tbody>
+      </table>
+    </ng-container>
+    <ng-container *ngIf="extendedPermitsExpired?.length">
+      <div>
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="material-icons ml-2" style="color:red">
+            error
+            </span>
+          </div>
+            <p class="text-center mt-2 header-font">
+              You cannot make any changes to an expired permit.
+            </p>
+            <div>
+               Intentionally left blank
+            </div>
+        </div>
+       
+        <p class="sub-header-font ml-2">
+          Choose <strong>Extend</strong> if you are only requesting additional time without any changes to the previously authorized activity
+        </p>
+        <p class="sub-header-font ml-2">
+          
+If you need more time than te extension date below and/or there are changes to the authorized activity, please apply for a <strong>New permit</strong>
+        </p>
+        
+
+
+        <hr class="gray">
+      </div>
+      <table class="table table-borderless mb-0" aria-label="A table which shows the permits you have applied for"
+        aria-describedby="A table which shows the permits you have applied for">
+        <tbody role="rowgroup">
+          <ng-container *ngFor="let permit of extendedPermitsExpired; let i = index; let last = last">
+            <tr scope="col" role="cell" >
+              <td class="permit-desc permit-td-color pt-0" [ngStyle]="{'width': '295px'}">
+                {{ permit?.permitTypeDesc }}
+              </td>
+              <td class="permit-desc permit-td-color pt-0 p-0" [ngStyle]="{'width': '161px'}">
+                {{ permit?.programIdFormatted }}
+              </td>
+              <td scope="col" role="cell" class="permit-action pt-0 permit-td-color">
+                <div class="d-flex goUp">
+                  <div class="form-check permit-text-align header-1n pl-0" *ngIf="!i">
+                    <label class="form-check-label font-14 ">
+                       **THIS SHOULD BE UPDATED TO TERM DATE ONCE THAT IS FINALIZED** 
+                      <input type="radio" class="form-check-input" #extendCheckbox
+                        (change)="onConExtModifyNewClicked($event, extendCheckbox)" id="{{permit.batchId}}" name="{{permit.batchId}}"
+                        [checked]="isChecked(permit)" value="EXT" *ngIf="!i">
+                      Extend
+                    </label>
+                    <label class="form-check-label ml-5" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input name="new1"
+                        class="form-check-input" type="radio" #new (change)="onConExtModifyNewClicked($event, new)"
+                        id="{{permit.batchId}}" name="{{permit.batchId}}" value="NEW">New</label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="last">
+              <td colspan="4">
+                <div  class="shadow-div"></div>
+              </td>
+            </tr>
+          </ng-container>
+            </tbody>
+      </table>
+    </ng-container>
+  -->
+
+    <span class="ml-little addr-error-msg"
+      *ngIf="showYesNoRequiredError && isSubmitted">{{errorMsgObj?.YES_NO_SEL_REQD}}</span>
+    <div class="text-center">
+      <!-- <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload text-center btn-597"
+        (click)="onShowConExtPopup()">
+        OK
+      </button> -->
+      <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload text-center btn-597"
+        (click)="onPermitTypeSubmitRevised()" id="okBtn2">
+        OK
+      </button>
+
+      
+      <button class="btn btn-sm btn-outline-dark closebutton mb-2 text-center" (click)="closeIsClicked()" id="cancelBtn2">
+        Cancel
+      </button>
+    </div>
+  </ng-container>
+
+  <!--Scenario 2 Construction Extension-->
+  <ng-container *ngIf="showConExtPopup">
+    <div>
+      <p class="text-center mt-2 header-font">For each of the permit groupings listed below <br> <br> If you need more
+        time than the listed extension date, please choose to apply for a new permit.</p>
+      <p class="text-center sub-header-font">
+        Additionally, you cannot make any changes to the authorized activity. <br>
+        If that is needed for this project, please choose to modify the permit.
+      </p>
+      <hr class="gray">
+    </div>
+    <table class="table table-borderless mb-0" aria-label="A table which shows the permits you have applied for"
+      aria-describedby="A table which shows the permits you have applied for">
+      <tbody role="rowgroup">
+        <ng-container *ngFor="let batch of permitGroupKeys; let last = last">
+          <tr scope="col" role="cell" *ngFor="let permit of groupedPermits[batch]; let i = index;">
+            <td class="permit-desc permit-td-color pt-0" [ngStyle]="{'width': '295px'}">
+              {{ permit?.permitTypeDesc }}
+            </td>
+            <td class="permit-desc permit-td-color pt-0 p-0" [ngStyle]="{'width': '161px'}">
+              {{ permit?.programIdFormatted }}
+            </td>
+
+            <!-- <td class="permit-td-color pt-0" [ngStyle]="{'width': '178px'}">
+       <label *ngIf="!i">
+                   **THIS SHOULD BE UPDATED TO TERM DATE ONCE THAT IS FINALIZED** 
+                  <input type="radio" #extendCheckbox (change)="onConExtModifyNewClicked($event, extendCheckbox)" id="{{batch}}" name="{{batch}}" [checked]="isChecked(permit)" value="EXT" *ngIf="!i" >
+                  Extend to 12/21/2021
+                </label>
+               </td> -->
+            <td scope="col" role="cell" class="permit-action pt-0 permit-td-color">
+              <div class="d-flex goUp">
+                <div class="form-check permit-text-align header-1n pl-0" *ngIf="!i">
+                  <label class="form-check-label font-14 ">
+                    <!-- **THIS SHOULD BE UPDATED TO TERM DATE ONCE THAT IS FINALIZED** -->
+                    <input type="radio" class="form-check-input" #extendCheckbox
+                      (change)="onConExtModifyNewClicked($event, extendCheckbox)" id="{{batch}}" name="{{batch}}"
+                      [checked]="isChecked(permit)" value="EXT" *ngIf="!i">
+                    Extend to 12/21/2021
+                  </label>
+                  <label class="form-check-label ml-5" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input name="new1"
+                      class="form-check-input" type="radio" #new (change)="onConExtModifyNewClicked($event, new)"
+                      id="{{batch}}" name="{{batch}}" value="NEW">New</label>
+                  <label class="form-check-label ml-5" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input name="new1"
+                      class="form-check-input" type="radio" #modify (change)="onConExtModifyNewClicked($event, modify)"
+                      id="{{batch}}" name="{{batch}}" value="MOD">Modify</label>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4">
+              <div *ngIf="!last" class="shadow-div"></div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+
+    <span class="ml-little addr-error-msg"
+      *ngIf="showYesNoRequiredError && isSubmitted">{{errorMsgObj?.YES_NO_SEL_REQD}}</span>
+    <div class="text-center">
+      <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload text-center btn-675"
+        (click)="onShowPermitPopup()" id="okBtn3">
+        OK
+      </button>
+      <button class="btn btn-sm btn-outline-dark closebutton mb-2 text-center" (click)="closeIsClicked()" id="cancelBtn3">
+        Cancel
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- scenario 3 operating permit -->
+  <ng-container *ngIf="showPermitPopup">
+    <div>
+      <p class="text-center mt-2 header-font">Do the proposed changes qualify as administrative amendments or minor <br>
+        modifications under applicable regulations?</p>
+      <p class="ml-6 sub-header-font">
+        -State Pollutant Discharge Elimination System (40 CFR 122.63); <br>
+        -Hazardous Waste Management (6 NYCRR 373-1.7(c)); <br>
+        -Air State Facility (6 NYCRR 201-5.5(c)); <br>
+        -Air Title V Facility (6 NYCRR 201-6.6 (b) or (c))? <br>
+      </p>
+    </div>
+    <hr class="gray">
+
+    <table class="table table-borderless mb-0" aria-label="A table which shows the permits you have applied for"
+      aria-describedby="A table which shows the permits you have applied for">
+      <tbody role="rowgroup">
+        <ng-container *ngFor="let batch of permitGroupKeys; let last = last">
+          <tr scope="col" role="cell" *ngFor="let permit of groupedPermits[batch]; let i = index;">
+            <td class="permit-desc permit-td-color pt-0" [ngStyle]="{'width': '295px'}">
+              {{ permit?.permitTypeDesc }}
+            </td>
+            <td class="permit-desc permit-td-color pt-0 p-0" [ngStyle]="{'width': '161px'}">
+              {{ permit?.programIdFormatted }}
+            </td>
+
+            <td class="permit-desc permit-td-color pt-0 p-0" [ngStyle]="{'width': '161px'}">
+              <span>
+                {{ permit?.effectiveEndDate }}<!-- {{ permit?.effectiveStartDate }}-{{ permit?.effectiveEndDate }} -->
+              </span>
+            </td>
+            <td scope="col" role="cell" class="permit-action pt-0">
+              <div class="d-flex goUp">
+                <div class="form-check permit-text-align header-1n" *ngIf="!i">
+                  <label class="form-check-label mr-4" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input
+                      class="form-check-input" type="radio" #yes
+                      (change)="extendYesNoClicked($event, yes, '3', groupedPermits[batch],true,permit)" id="{{batch}}"
+                      name="{{batch}}" value="Y">YES</label>
+                  <label class="form-check-label mr-4" [ngStyle]="{'font-size': '14px', 'color' : 'black'}"><input
+                      class="form-check-input" type="radio" #no
+                      (change)="extendYesNoClicked($event, no, '3', groupedPermits[batch],false,permit)" id="{{batch}}"
+                      name="{{batch}}" value="N">NO</label>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4">
+              <div *ngIf="!last" class="shadow-div"></div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <span class="ml-little addr-error-msg"
+      *ngIf="showYesNoRequiredError && isSubmitted">{{errorMsgObj?.YES_NO_SEL_REQD}}</span>
+    <div class="text-center">
+      <button class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload text-center btn-750"
+        (click)="onPermitTypeSubmit()" id="okBtn4">
+        OK
+      </button>
+      <button class="btn btn-sm btn-outline-dark closebutton mb-2 text-center" (click)="closeIsClicked()" id="cancelBtn4">
+        Cancel
+      </button>
+    </div>
+  </ng-container>
+
+</app-custom-modal-popup>
+
+
+<app-custom-modal-popup #confirmApplicant [modalConfig]="confirmConfig">
+  <ng-container *ngIf="isOpenPopUp | async">
+    <div class="modal-body center-align" style="padding: 20px 0 0 0">
+      <p>Do you already have a prepared form <br />you are going to upload?</p>
+      <p class="note-text-more">
+        *** By selecting Yes, we will collect your prepared application <br />
+        later in the process, along with other supporting documents.
+      </p>
+    </div>
+    <div class="modal-footer model-footer-reduced" style="padding: 0 0 20px 0">
+      <button type="button" class="b-box btn btn-outline-dark p-btn" (click)="yesClicked()">
+        Yes
+      </button>
+      <button type="button" class="b-box btn btn-outline-dark p-btn" (click)="noClicked()">
+        No
+      </button>
+    </div>
+  </ng-container>
+</app-custom-modal-popup>

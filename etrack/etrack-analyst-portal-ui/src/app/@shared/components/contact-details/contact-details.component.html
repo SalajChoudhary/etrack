@@ -1,0 +1,127 @@
+<div class="container form-container mt-20 pl-0">
+    <form [formGroup]="contactDetailsFormGroup">
+        <div class="col-12 pl-0">
+           <div class="row">
+            <!-- <input type="text" tabindex="2">
+            <input type="text" tabindex="2"> -->
+
+               <div class="col-12 offset-1 pl-0">
+                <div class="form-group d-flex ">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label typo-2" for="inlineCheckbox1"> <span class="phone-number-margin">Phone Number(s):</span><span class="cell-margin">(Cell):</span></label>
+                        <input tabindex="0"  [maxlength]="addressType=='us'? 14:20" mask='(000) 000-0000' class="form-control" type="text" #cph id="cph"  
+                        formControlName="cellPhNumber">
+                        <ng-container *ngIf="isModeValidate && applicantDetailsHistory?.contact?.cellNumber && applicantDetailsHistory?.contact?.cellNumber !== applicantDetails?.contact?.cellNumber">                     
+                            <div class="icon-holder-1" *ngIf="contactDetailsFormGroup?.get('cellPhNumber')?.value === applicantDetails?.contact?.cellNumber ">
+                                <img [src]="yieldSignPath" alt="A yellow yield sign" 
+                                (click)="toggleValue('cellPhNumber', applicantDetailsHistory?.contact?.cellNumber)"
+                                [ngbTooltip]="showFormattedPhoneNumber(applicantDetailsHistory?.contact?.cellNumber)" />
+                              </div>  
+                              <div class="icon-holder-1" *ngIf="contactDetailsFormGroup?.get('cellPhNumber')?.value === applicantDetailsHistory?.contact?.cellNumber">
+                                <img [src]="editSignPath" alt="A yellow yield sign" 
+                                (click)="toggleValue('cellPhNumber', applicantDetails?.contact?.cellNumber)"
+                                [ngbTooltip]="showFormattedPhoneNumber(applicantDetails?.contact?.cellNumber)" />
+                              </div>
+                            </ng-container>
+                        
+                        <!-- <div class="icon-holder-1" [hidden]="!applicantDetailsHistory?.contact?.cellNumber || applicantDetailsHistory?.contact?.cellNumber === applicantDetails?.contact?.cellNumber">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign" 
+                            [ngbTooltip]="showFormattedPhoneNumber(applicantDetailsHistory?.contact?.cellNumber)" />
+                          </div>   -->
+                    </div>
+
+                </div>
+                <div  class="d-block addr-error-msg ml-85 mtb-align" *ngIf="(formControls?.cellPhNumber?.errors?.minlength ||  formControls?.cellPhNumber?.errors?.maxlength)&&( (ngFormInstance?.submitted || isClosevalidationCheck)&& addressType=='us')">
+                    <span>{{errorMessages?.PHONE_NUMBER_INVALID_MSG}}</span>
+                </div>
+                <div class="form-group d-flex ">
+
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label typo-2" for="inlineCheckbox1">(Work):</label>
+                        <input [maxlength]="addressType=='us'? 14:20" mask='(000) 000-0000'  class="form-control"   type="text" id="wph" (keyup)="validateExt()" #wph formControlName="workPhNumber">
+                        <ng-container *ngIf="isModeValidate && applicantDetailsHistory?.contact?.workPhoneNumber && applicantDetailsHistory?.contact?.workPhoneNumber && applicantDetailsHistory?.contact?.workPhoneNumber !== applicantDetails?.contact?.workPhoneNumber">                     
+                        <div class="icon-holder-1" *ngIf="contactDetailsFormGroup?.get('workPhNumber')?.value === applicantDetails?.contact?.workPhoneNumber ">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign" 
+                            (click)="toggleValue('workPhNumber', applicantDetailsHistory?.contact?.workPhoneNumber);toggleValue('extension',applicantDetailsHistory?.contact?.workPhoneNumberExtn)"
+                            [ngbTooltip]="showFormattedPhoneNumber(applicantDetailsHistory?.contact?.workPhoneNumber)" />
+                          </div>  
+                          <div class="icon-holder-1" *ngIf="applicantDetailsHistory?.contact?.workPhoneNumber && contactDetailsFormGroup?.get('workPhNumber')?.value === applicantDetailsHistory?.contact?.workPhoneNumber">
+                            <img [src]="editSignPath" alt="A yellow yield sign" 
+                            (click)="toggleValue('workPhNumber', applicantDetails?.contact?.workPhoneNumber);;toggleValue('extension',applicantDetails?.contact?.workPhoneNumberExtn)"
+                            [ngbTooltip]="showFormattedPhoneNumber(applicantDetails?.contact?.workPhoneNumber)" />
+                          </div>
+                        </ng-container>
+                    </div>
+
+                    <div class="form-check form-check-inline small-cont">
+                        <label class="form-check-label typo-2 " for="inlineCheckbox1">Ext:</label>
+                        <input   maxlength="10" class="form-control" mask="0000000000" type="text" id="ext" #ext  formControlName="extension">
+                        <!-- <div class="icon-holder-1" [hidden]="!applicantDetailsHistory?.contact?.workPhoneNumberExtn || applicantDetailsHistory?.contact?.workPhoneNumberExtn === applicantDetails?.contact?.workPhoneNumberExtn">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign" 
+                            ngbTooltip="{{applicantDetailsHistory?.contact?.workPhoneNumberExtn}}" />
+                          </div>   -->
+                    </div>
+                </div>
+                <div  class="d-block addr-error-msg ml-85 mtb-align" *ngIf="(formControls?.workPhNumber?.errors?.minlength ||  formControls?.workPhNumber?.errors?.maxlength)&&( (ngFormInstance?.submitted || isClosevalidationCheck)&& addressType=='us')">
+                    <span>{{errorMessages?.PHONE_NUMBER_INVALID_MSG}}</span>
+                </div>
+                <div class="form-group ">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label typo-2" for="inlineCheckbox1"> (Home):</label>
+                        <input  [maxlength]="addressType=='us'? 14:20" mask='(000) 000-0000' class="form-control" type="text"  id="hph" #hph  formControlName="homePhNumber">
+                        <ng-container *ngIf="isModeValidate && applicantDetailsHistory?.contact?.homePhoneNumber && applicantDetailsHistory?.contact?.homePhoneNumber !== applicantDetails?.contact?.homePhoneNumber">                     
+                            <div class="icon-holder-1" *ngIf="contactDetailsFormGroup?.get('homePhNumber')?.value === applicantDetails?.contact?.homePhoneNumber ">
+                                <img [src]="yieldSignPath" alt="A yellow yield sign" 
+                                (click)="toggleValue('homePhNumber', applicantDetailsHistory?.contact?.homePhoneNumber)"
+                                [ngbTooltip]="showFormattedPhoneNumber(applicantDetailsHistory?.contact?.homePhoneNumber)" />
+                              </div>  
+                              <div class="icon-holder-1" *ngIf="contactDetailsFormGroup?.get('homePhNumber')?.value === applicantDetailsHistory?.contact?.homePhoneNumber">
+                                <img [src]="editSignPath" alt="A yellow yield sign" 
+                                (click)="toggleValue('homePhNumber', applicantDetails?.contact?.homePhoneNumber)"
+                                [ngbTooltip]="showFormattedPhoneNumber(applicantDetails?.contact?.homePhoneNumber)" />
+                              </div>
+                            </ng-container>
+                        
+                        <!-- <div class="icon-holder-1" [hidden]="!applicantDetailsHistory?.contact?.homePhoneNumber || applicantDetailsHistory?.contact?.homePhoneNumber === applicantDetails?.contact?.homePhoneNumber">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign" 
+                            [ngbTooltip]="showFormattedPhoneNumber(applicantDetailsHistory?.contact?.homePhoneNumber)" />
+                          </div>  -->
+                    </div>
+                    <div  class="d-block addr-error-msg col-12" >
+                    <span class=" ml-71" *ngIf="(formControls?.workPhNumber?.errors?.atleastOneRequired && formControls?.homePhNumber?.errors?.atleastOneRequired && formControls.cellPhNumber?.errors?.atleastOneRequired) &&( ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.PHONE_NUMBER_REQD_MSG}}</span>
+                </div>
+                <div class="d-block addr-error-msg ml-71" *ngIf="(formControls?.homePhNumber?.errors?.minlength ||  formControls?.homePhNumber?.errors?.maxlength)&&( (ngFormInstance?.submitted || isClosevalidationCheck) && addressType=='us')">
+                    <span>{{errorMessages?.PHONE_NUMBER_INVALID_MSG}}</span>
+                </div>
+                </div>
+               </div>
+           </div>
+        </div>
+        <div class="col-12 pl-0 ">
+            <div class="container pl-0">
+                <div class="row">
+                    <div class="col-12 offset-1 pl-0">
+                        <div class="form-group bottom-cont ">
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label typo-2" for="inlineCheckbox1">Email Address:</label>
+                                <input   maxlength="100" class="form-control" type="text" id="emailId" formControlName="emailAddress">         
+                            </div>
+                            <span class="d-block addr-error-msg emailError"  id="emailError" *ngIf=" (isPaperMail ==='0') && !formControls?.emailAddress?.errors?.required && formControls?.emailAddress?.errors?.isEmailValidated && (ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.EMAIL_ADDR_INVALID_MSG}}</span>
+
+                        </div>
+                        <div class="form-group bottom-cont" *ngIf="['P'].includes(selectedApplicantType)">
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label typo-2" for="inlineCheckbox1">DBA:</label>
+                                <input  maxlength="100" class="form-control" type="text" id="dba" formControlName="dba">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+
+
+
+

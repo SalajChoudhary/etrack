@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwaggerConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">etrack-gis-service</a> &gt; <a href="index.source.html" class="el_package">dec.ny.gov.etrack.gis.config</a> &gt; <span class="el_source">SwaggerConfig.java</span></div><h1>SwaggerConfig.java</h1><pre class="source lang-java linenums">package dec.ny.gov.etrack.gis.config;
+
+import java.util.Collections;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import lombok.val;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
+import springfox.documentation.service.Parameter;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration
+@EnableSwagger2
+<span class="nc" id="L22">public class SwaggerConfig {</span>
+
+  @Autowired
+  private BuildProperties buildProperties;
+
+  @Bean
+	public Docket productApi() {
+<span class="nc" id="L29">		return new Docket(DocumentationType.SWAGGER_2).apiInfo(</span>
+<span class="nc" id="L30">            new ApiInfoBuilder().title(buildProperties.getName())</span>
+<span class="nc" id="L31">            .version(buildProperties.getVersion()).build())</span>
+<span class="nc" id="L32">		    .forCodeGeneration(true).globalOperationParameters(globalParameterList()).select()</span>
+<span class="nc" id="L33">				.apis(RequestHandlerSelectors.basePackage(&quot;dec.ny.gov.etrack.gis.controller&quot;))</span>
+<span class="nc" id="L34">				.paths(PathSelectors.any()).build();</span>
+	}
+	
+	private List&lt;Parameter&gt; globalParameterList() {
+<span class="nc" id="L38">	    val authTokenHeader =</span>
+	        new ParameterBuilder()
+<span class="nc" id="L40">	            .name(&quot;Authorization&quot;) // name of the header</span>
+<span class="nc" id="L41">	            .modelRef(new ModelRef(&quot;string&quot;)) // data-type of the header</span>
+<span class="nc" id="L42">	            .required(true) // required/optional</span>
+<span class="nc" id="L43">	            .parameterType(&quot;header&quot;) // for query-param, this value can be 'query'</span>
+<span class="nc" id="L44">	            .description(&quot;Basic Auth Token&quot;)</span>
+<span class="nc" id="L45">	            .build();</span>
+
+<span class="nc" id="L47">	    return Collections.singletonList(authTokenHeader);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

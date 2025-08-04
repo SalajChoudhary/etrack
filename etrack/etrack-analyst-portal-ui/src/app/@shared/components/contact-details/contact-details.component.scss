@@ -1,0 +1,119 @@
+.container{
+  label{
+    margin-right: 15px;
+  }
+}
+
+.form-check-label {
+  width: 220px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+label{
+  text-align: right;
+  margin-right: 8px;
+}
+
+.label-small {
+  width: 100px;
+}
+.phone-form {
+  margin-left: -80px;
+}
+.mtb-align{
+  margin-top: -13px;
+    margin-bottom: 10px;
+}
+.phone-form label {
+  width: 240px;
+}
+.small-cont label {
+  width: 50px;
+}
+.small-cont input {
+  width: 100px;
+}
+.bottom-cont label {
+  width: 136px;
+}
+.bottom-cont input {
+  width: 422px;
+}
+.font-weight {
+  font-weight: 500 !important;
+}
+.phone-number-margin{
+    margin-left:-185px;
+}
+.cell-margin{
+    margin-left:53px;
+}
+.ml-75{
+    margin-left: 75px;
+}
+
+.ml-70{
+  margin-left: 70px;
+}
+
+.ml-80{
+  margin-left: 80px;
+}
+
+.ml-86{
+  margin-left: 86px;
+}
+
+.ml-85{
+  margin-left: 85px;
+}
+
+.emailError{
+  margin-left: 152px!important;
+}
+
+.history-data {
+  // color: red;
+  // background-color: yellow;
+}
+
+.icon-holder{
+  position: relative;
+  top: 5px;
+  right:0;
+}
+.icon-holder-1{
+  position: relative;
+  top: 0px;
+  right:0;
+}
+@media only screen and (min-width: 992px){
+  .icon-holder{
+    left:-27px;
+  }
+  .icon-holder-1{
+    left:-27px;
+  }
+}
+
+.input-box-wrap {
+  display: flex;
+}
+
+.hide-icon {
+  display: none;
+}
+
+.tooltip-inner {
+  background-color: white !important;
+  width: 300px !important;
+  max-width: unset !important;
+  border: 1px solid black !important;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+.ml-71{
+  margin-left: 133px;
+}

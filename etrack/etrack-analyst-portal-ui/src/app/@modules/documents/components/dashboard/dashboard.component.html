@@ -1,0 +1,218 @@
+<app-analyst-sub-header [showButton]="true"></app-analyst-sub-header>
+<div class="search-box">
+  <img width="30px" height="30px" class="search-icon" alt="Search Icon" src="assets/icons/search-icon.png" />
+  <input type="text" [(ngModel)]="searchItem" (keyup)="search()" class="search-field" [placeholder]="searchTitle" />
+</div>
+<div style="height: 100%;padding-bottom:10px !important;" class="roww col-12"
+  *ngIf="!userRoles.includes(UserRole.DEC_Program_Staff) && isDisplayGrids">
+  <div class="col-2 p-0">
+
+    <button (click)="innerTabChange('resume-entry')" [ngClass]="activeTab=='resume-entry'? 'active':''"
+      class="btn btn-sm  firstbutton has-border-top nextbutton  mr-2 upload wt-100">
+      <span>Resume Entry </span>
+      <span *ngIf="activeTab=='resume-entry'"> <img src="assets/icons/exclaim.png" class="exclaim-icon" alt="Note">
+        <span class="items-count">({{items?.length}})</span></span>
+    </button>
+    <button (click)="innerTabChange('validate')" [ngClass]="activeTab=='validate'? 'active':''"
+      class="btn btn-sm  firstbutton  nextbutton  mr-2 upload wt-100" id="validateBtn">
+      <span>Validate</span> <span *ngIf="activeTab=='validate'" class="items-count"> ({{validateData?.length}})</span>
+    </button>
+    <button (click)="innerTabChange('allActive')" [ngClass]="activeTab=='allActive'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="allActiveBtn">
+      All Active <span *ngIf="activeTab=='allActive'" class="items-count">({{allActiveData?.length}})</span>
+    </button>
+    <button (click)="innerTabChange('taskDue')" [ngClass]="activeTab=='taskDue'? 'active':''"
+      class="btn btn-sm firstbutton nextbutton  mr-2 upload wt-100" id="tasksDueBtn">
+      Tasks Due <span *ngIf="activeTab=='taskDue'" class="items-count">({{taskDueData?.length}})</span>
+    </button>
+    <button (click)="innerTabChange('applicantResponseDue')" [ngClass]="activeTab=='applicantResponseDue'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="responseDueBtn">
+      Applicant Response Due <span *ngIf="activeTab=='applicantResponseDue'"
+        class="items-count">({{applicantResponseData?.length}})</span>
+    </button>
+    <button (click)="innerTabChange('outForReview')" [ngClass]="activeTab=='outForReview'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="outForReviewBtn">
+      Out for Review <span *ngIf="activeTab=='outForReview'" class="items-count">({{outForReviewData?.length}})</span>
+    </button>
+    <button (click)="innerTabChange('emergencyAuthorization')"
+      [ngClass]="activeTab=='emergencyAuthorization'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="EABtn">
+      Emergency Authorizations <span *ngIf="activeTab=='emergencyAuthorization'"
+        class="items-count">({{emergencyAuthorizationData?.length}})</span>
+    </button>
+
+    <button (click)="innerTabChange('suspended')"
+      *ngIf="userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)"
+      [ngClass]="activeTab=='suspended'? 'active':''"
+      class="btn btn-sm  firstbutton gi-bottom-border nextbutton  mr-2 upload wt-100" id="suspendedBtn">
+      Suspended <span *ngIf="activeTab=='suspended'" class="items-count">({{suspendedData?.length}}) </span>
+    </button>
+    <button (click)="innerTabChange('bblDetermination')" [ngClass]="activeTab=='bblDetermination'? 'active':''"
+      class="btn btn-sm  firstbutton gi-top-border nextbutton  mr-2 upload wt-100" id="bblDeterminationBtn"> Borough/Block/Lot
+      <span *ngIf="activeTab=='bblDetermination'" class="items-count">({{bblDeterminationData?.length}}) </span>
+    </button>
+    <button (click)="innerTabChange('energyProject')" [ngClass]="activeTab=='energyProject'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="energyProjectBtn"> Energy Project
+      <span *ngIf="activeTab=='energyProject'" class="items-count">({{energyProjectData?.length}}) </span>
+    </button>
+    <button (click)="innerTabChange('mgmtComp')" [ngClass]="activeTab=='mgmtComp'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="mgmtCompBtn"> Mgmt/Comp Plan
+      <span *ngIf="activeTab=='mgmtComp'" class="items-count">({{mgmtCompData?.length}}) </span>
+    </button>
+    <button (click)="innerTabChange('permitScreenings')" [ngClass]="activeTab=='permitScreenings'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="permitScreeningsBtn"> Permit
+      Screenings <span *ngIf="activeTab=='permitScreenings'" class="items-count">({{permitScreeningData?.length}}) </span>
+    </button>
+    <button (click)="innerTabChange('preAppMtgRequest')" [ngClass]="activeTab=='preAppMtgRequest'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="preAppMtgRequestsBtn"> Pre-App Mtg
+      Requests <span *ngIf="activeTab=='preAppMtgRequest'" class="items-count">({{preAppMeetingRequestData?.length}}) </span>
+    </button>
+    <button (click)="innerTabChange('sanitorySewage')" [ngClass]="activeTab=='sanitorySewage'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="sanitorySewageBtn"> Sanitary Sewage
+      Extension <span *ngIf="activeTab=='sanitorySewage'" class="items-count">({{sanitorySewageData?.length}}) </span>
+    </button>
+    <button (click)="innerTabChange('leadAgencyRequest')" [ngClass]="activeTab=='leadAgencyRequest'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="leadAgencyRequestsBtn"> SEQR Lead Agency
+      Req <span *ngIf="activeTab=='leadAgencyRequest'" class="items-count">({{leadAgencyRequestData?.length}}) </span>
+    </button>
+    <button (click)="innerTabChange('serpCertification')" [ngClass]="activeTab=='serpCertification'? 'active':''"
+      class="btn btn-sm  firstbutton nextbutton  mr-2 upload wt-100" id="serpCertificationBtn"> SERP
+      Certification <span *ngIf="activeTab=='serpCertification'" class="items-count">({{serpCertificationData?.length}}) </span>
+    </button>
+    
+  </div>
+  <div class="col-10 grid-box">
+
+    <div class="grid-margin"
+      *ngIf="(userRoles?.includes(UserRole.Analyst) || userRoles?.includes(UserRole.System_Admin) || userRoles?.includes(UserRole.Override_Admin)) && activeTab=='resume-entry'">
+      <app-dashboard-table #dashboardTableComponent filename="resume-entry" [isRecords]="true" [isPagination]="false"
+        [dataList]="items" [activeTab]="activeTab" [headers]="resumeEntryHeaders" (deleteClicked)="onDelete($event)">
+      </app-dashboard-table>
+      <!-- <app-dashboard-resume-entry [rows]="items" [totalRecords]="totalRecords"></app-dashboard-resume-entry> -->
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles?.includes(UserRole.Analyst) || userRoles?.includes(UserRole.System_Admin) || userRoles?.includes(UserRole.Override_Admin)) && activeTab=='applicantResponseDue'">
+      <app-dashboard-table #dashboardTableComponent filename="application-response-due" [isMaxHeight]="true"
+        [isRecords]="true" [isPagination]="false" [dataList]="applicantResponseData"
+        [headers]="applicationResponseHeaders" [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles?.includes(UserRole.Analyst) || userRoles?.includes(UserRole.System_Admin) || userRoles?.includes(UserRole.Override_Admin)) && activeTab=='allActive'">
+      <app-dashboard-table #dashboardTableComponent filename="all-active" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="allActiveData" [headers]="allActiveHeaders" [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles?.includes(UserRole.Analyst) || userRoles?.includes(UserRole.System_Admin) || userRoles?.includes(UserRole.Override_Admin)) && activeTab=='validate'">
+      <app-dashboard-table #dashboardTableComponent filename="validate" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="validateData" [headers]="validateHeaders" [activeTab]="activeTab" (deleteClicked)="onValidateDelete($event)">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles?.includes(UserRole.Analyst) || userRoles?.includes(UserRole.System_Admin) || userRoles?.includes(UserRole.Override_Admin)) && activeTab=='taskDue'">
+      <app-dashboard-table #dashboardTableComponent filename="task-due" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="taskDueData" [headers]="taskDueHeaders" [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles?.includes(UserRole.Analyst) || userRoles?.includes(UserRole.System_Admin) || userRoles?.includes(UserRole.Override_Admin)) && activeTab=='outForReview'">
+      <app-dashboard-table #dashboardTableComponent filename="outForReview" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="outForReviewData" [headers]="outForReviewHeaders" [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles?.includes(UserRole.Analyst) || userRoles?.includes(UserRole.System_Admin) || userRoles?.includes(UserRole.Override_Admin)) && activeTab=='emergencyAuthorization'">
+      <app-dashboard-table #dashboardTableComponent filename="emergencyAuthorization" [isMaxHeight]="true"
+        [isRecords]="true" [isPagination]="false" [dataList]="emergencyAuthorizationData"
+        [headers]="emergencyAuthorizationHeaders" [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='suspended'">
+      <app-dashboard-table #dashboardTableComponent filename="suspended" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="suspendedData" [headers]="suspendedHeaders" [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='permitScreenings'">
+      <app-dashboard-table #dashboardTableComponent filename="permitScreenings" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="permitScreeningData" [headers]="permitScreeningHeaders"
+        [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='energyProject'">
+      <app-dashboard-table #dashboardTableComponent filename="energyProject" [isMaxHeight]="true" [isRecords]="true" [isPagination]="false"
+        [dataList]="energyProjectData" [headers]="energyProjectHeaders" [activeTab]="activeTab"></app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='sanitorySewage'">
+      <app-dashboard-table #dashboardTableComponent filename="sanitorySewage" [isMaxHeight]="true" [isRecords]="true" [isPagination]="false"
+        [dataList]="sanitorySewageData" [headers]="sanitorySewageHeaders" [activeTab]="activeTab"></app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='mgmtComp'">
+      <app-dashboard-table #dashboardTableComponent filename="mgmtComp" [isMaxHeight]="true" [isRecords]="true" [isPagination]="false"
+        [dataList]="mgmtCompData" [headers]="mgmtCompHeaders" [activeTab]="activeTab"></app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='bblDetermination'">
+      <app-dashboard-table #dashboardTableComponent filename="bblDetermination" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="bblDeterminationData" [headers]="bblDeterminationHeaders"
+        [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='preAppMtgRequest'">
+      <app-dashboard-table #dashboardTableComponent filename="preAppMtgRequest" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="preAppMeetingRequestData" [headers]="preAppMeetingRequestHeaders"
+        [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='leadAgencyRequest'">
+      <app-dashboard-table #dashboardTableComponent filename="leadAgencyRequest" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="leadAgencyRequestData" [headers]="leadAgencyRequestHeaders"
+        [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+    <div class="grid-margin"
+      *ngIf="(userRoles.includes(UserRole.Analyst)|| userRoles.includes(UserRole.System_Admin) || userRoles.includes(UserRole.Override_Admin)) && activeTab=='serpCertification'">
+      <app-dashboard-table #dashboardTableComponent filename="serpCertification" [isMaxHeight]="true" [isRecords]="true"
+        [isPagination]="false" [dataList]="serpCertificationData" [headers]="serpCertificationHeaders"
+        [activeTab]="activeTab">
+      </app-dashboard-table>
+    </div>
+  </div>
+</div>
+<div style="height: 100%;" class="roww col-12" *ngIf="userRoles.includes(UserRole.DEC_Program_Staff) && (isDisplayGrids ||  isDisplayGiGrid)">
+  <div class="col-2 p-0">
+    <button (click)="innerTabChange('permitApplications')" [ngClass]="activeTab=='permitApplications'? 'active':''"
+      class="btn btn-sm  firstbutton has-border-top nextbutton  mr-2 upload wt-100">
+      <span>Permit Applications </span>
+    </button>
+    <!-- PI 4 Stuffs -->
+    <button (click)="innerTabChange('geographical')" [ngClass]="activeTab=='geographical'? 'active':''"
+      class="btn btn-sm  firstbutton has-border-bottom nextbutton  mr-2 upload wt-100" id="geographicalBtn">
+      <span>Geographical Inquiries</span>
+    </button>
+  </div>
+  <div class="col-10 grid-box">
+    <div class="grid-margin" *ngIf="activeTab=='permitApplications'">
+      <app-dashboard-table #dashboardTableComponent [isMaxHeight]="true" [isRecords]="true" [isPagination]="false"
+        [dataList]="reviewItems" [headers]="reviewEntryHeaders"></app-dashboard-table>
+    </div>
+    <!-- PI-4 stuffs -->
+    <div class="grid-margin" *ngIf="activeTab=='geographical'">
+      <app-dashboard-table #dashboardTableComponent [isMaxHeight]="true" [isRecords]="true" [isPagination]="false"
+        [dataList]="geographicalData" [headers]="geographicalHeaders"></app-dashboard-table>
+    </div>
+  </div>
+
+  <!-- <div class="reviewer-margin"></div> -->
+</div>
+<div class="no-data col-12 header-1b" *ngIf="!isDisplayGrids && !isDisplayGiGrid">
+  <div class="warn-message">No active projects</div>
+
+</div>

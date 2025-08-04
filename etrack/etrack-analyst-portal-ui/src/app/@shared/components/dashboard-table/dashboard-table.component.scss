@@ -1,0 +1,96 @@
+.actions-btn-cont button {
+  background-color: transparent;
+  border: none;
+}
+.actions-btn-cont {
+  display: flex;
+}
+.clearbutton {
+  background-color: #233e2a !important;
+}
+.filter-icon {
+  width: 20px;
+  height: 20px;
+}
+
+:host ::ng-deep .multiselect .k-searchbar {
+  display: none;
+}
+.btn-colum {
+  text-align: center !important;
+  word-wrap: break-word;
+  width: 12%;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+.component {
+  position: relative;
+  // height: calc(100vh - 215px);
+  .component-footer {
+    // position:absolute;
+    // left:0;
+    // bottom:0;
+    position: relative; 
+    width: 100%;
+    //z-index: 10;
+    // background: white;
+    //   margin-top: 5rem;
+    //min-height: 10rem;
+  }
+}
+.note-below {
+  text-align: center;
+    font-size: 12px;
+    font-style: italic;
+    margin-bottom: 8rem;
+    margin-top: 1rem;
+}
+@media (max-width: 820px) {
+  td.resume-project-id {
+    text-align: right !important;
+    width: 14% !important;
+  }
+  td.validate-project-id {
+    text-align: right !important;
+    width: 12% !important;
+  }
+}
+@media (min-width: 1000px) and (max-width: 1030px) {
+  td.resume-project-id {
+    text-align: center !important;
+    width: 14% !important;
+  }
+  td.validate-project-id {
+    text-align: right !important;
+    width: 8% !important;
+  }
+}
+
+::ng-deep .tooltip-inner {
+  min-width: 125px;
+  position: relative !important;
+}
+
+.tooltip{
+  
+  display: block;
+}
+
+
+
+.text-bold-red {
+  font-weight: bold;
+  color: red;
+}
+
+.blue-circular-arrow {
+  transform: scaleX(-1);
+
+  filter: invert(35%) sepia(97%) saturate(3553%) hue-rotate(199deg) brightness(101%) contrast(109%);
+}
+
+.grey-circular-arrow {
+  transform: scaleX(-1);
+
+  filter: invert(64%) sepia(0%) saturate(1144%) hue-rotate(200deg) brightness(109%) contrast(82%);
+}

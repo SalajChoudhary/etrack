@@ -1,0 +1,126 @@
+<div class="header-bg">
+  <div class="sub-header-container">
+    <div style="display: flex;">
+      <a [routerLink]="['/dashboard']">
+        <img ngbTooltip="Home"
+        placement="bottom"class="primary-logo" src="../../../../assets/etrack_secondary-logo.png" alt="An ETRACK logo"/>
+        <!-- <img width="30px" height="30px" class="bell_icon" alt="bell icon" src="assets/icons/bell-icon.jpg"> -->
+      </a>
+      </div>
+    <div class="container-fluid bg-grey main-container " *ngIf="showButton">
+      <div class="nav-btns-holders" *ngIf="!userRoles.includes(UserRole.DEC_Program_Staff)">
+        <div [ngClass]="router.url.indexOf('/dashboard') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/dashboard')"><span class="btn-text">My Projects</span></div>
+        <div [ngClass]="router.url.indexOf('/regional-project') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/regional-project')"><span class="btn-text">Regional Projects</span></div>
+        <div [ngClass]="router.url.indexOf('/documents') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/documents')"><span class="btn-text">Document Management</span></div>
+        <div [ngClass]="router.url.indexOf('/apply-for-permit-details') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="beforeOpenModal()"><span class="btn-text curserHover">Enter App</span></div>
+        <div [ngClass]="router.url.indexOf('/dimsr') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/dimsr')"><span class="btn-text curserHover">DIMSR</span></div>
+        <div [ngClass]="router.url.indexOf('/apply-for-inquiry') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/apply-for-inquiry')"><span class="btn-text curserHover">Inquiry</span></div>
+        <!-- <div [ngClass]="router.url.indexOf('/search') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/search')"><span class="btn-text curserHover">Search</span></div> -->
+        <div  [ngClass]="router.url.indexOf('/reports-dashboard') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/reports-dashboard')"><span class="btn-text curserHover">Reports</span></div>
+        <div [ngClass]="router.url.indexOf('/maintenance-dashboard') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/maintenance-dashboard')"><span class="btn-text curserHover">Maintenance</span></div>
+      </div>
+
+
+
+
+
+
+      <div class="nav-btns-holders" *ngIf="userRoles.includes(UserRole.DEC_Program_Staff)">
+        <div [ngClass]="router.url.indexOf('/dashboard') != -1 ? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/dashboard')"><span class="btn-text curserHover">My Reviews</span></div>
+        <div [ngClass]="router.url.indexOf('/regional-project') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/regional-project')"><span class="btn-text curserHover">Regional Projects</span></div>
+        <div [ngClass]="router.url.indexOf('/documents') != -1? 'dark-div header-3b':'light-div header-3n'"
+          (click)="navigateTo('/documents')"><span class="btn-text curserHover">Document Management</span></div>
+      </div>
+    </div>
+
+    <!-- <div class="nav-btns-holders" *ngIf="isValidateMode">
+        <div class="light-div header-3n-validate"><span class="btn-text">My Projects</span></div>
+        <div class="light-div header-3n-validate"><span class="btn-text">Regional Projects</span></div>
+        <div class="light-div header-3n-validate"  ><span class="btn-text">Document Management</span></div>
+        <div class="light-div header-3n-validate"  ><span class="btn-text">Enter Application</span></div>
+      </div> -->
+
+    <!-- <div [ngClass]="router.url.indexOf('/dashboard') != -1? 'dark-div header-3b':'light-div header-3n'"><span class="btn-text">Enter Application</span></div>  -->
+
+    <div class="container-fluid bg-grey main-container address-head-left" *ngIf="headerCollection && showAddress && router?.url!=='/apply-for-permit-details'">
+      <div [ngClass]="isPopUp ? 'nav-content-pop' :'nav-content-holders'">
+        <!-- {{address}} -->
+        <div class="address-heading" >{{headerCollection.facilityName}}</div>
+  <div>{{headerCollection.street1}}</div>
+  <div>{{headerCollection.city}} {{headerCollection.state}} {{headerCollection.zip}}</div>
+      </div>
+    </div>
+      <ng-template #applyForPermit let-modal>
+        <!-- <div class="modal-header text-center modal-header-dec-reduced">
+          <h2 class="modal-title modal-basic-title-dec" id="modal-basic-title">
+            <span class="span1"> New York State Department of Environmental Conservation</span>
+            <span class="span3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+          </svg>
+            </span>
+          </h2>
+        </div> -->
+        <div class="modal-body">
+        <app-apply-for-permit [userRoles]="userRoles" (closeBtnClicked)="closeModal($event)"></app-apply-for-permit>
+        </div>
+      </ng-template>
+  </div>
+
+  <!-- <div  [ngClass]="noBorderComponents?.includes(router?.url) ?'pt-3':'hr pt-3'"></div> -->
+
+  <div class="container-fluid bg-grey main-container" *ngIf="headerCollection && showAddress && router?.url==='/apply-for-permit-details'">
+    <div [ngClass]="isPopUp ? 'nav-content-pop' :'nav-content-holder'">
+      <!-- {{address}} -->
+      <div class="address-heading" >{{headerCollection.facilityName}}</div>
+  <div>{{headerCollection.street1}}</div>
+  <div>{{headerCollection.city}} {{headerCollection.state}} {{headerCollection.zip}}</div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<ng-template #validateModeLeaveConfirm let-modal>
+  <div class="modal-body pb-0">
+    <div class="">
+      <div class="mr-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red" class="bi bi-exclamation-triangle float-left" viewBox="0 0 16 16">
+          <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+          <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+        </svg>
+      </div>
+      <div class="d-flex justify-content-center align-items-center flex-column">
+        <p class="instruction-font text-center">You are about to leave validation mode.</p>
+        <p class="instruction-font text-center">Click <b>OK</b> to exit validation mode or click <b>Cancel</b> to return to current screen </p>
+
+      </div>
+    </div>
+
+    </div>
+  <div class="modal-footer model-footer-reduced align-center border-0 pt-0">
+    <button type="button" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+      (click)="onOkClick();modal.close(true)">
+      OK
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-dark closebutton mb-2"
+    (click)="modal.dismiss(false)">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<app-pending-changes-popup #pendingPopup (onOkClick)="goBack()"></app-pending-changes-popup>

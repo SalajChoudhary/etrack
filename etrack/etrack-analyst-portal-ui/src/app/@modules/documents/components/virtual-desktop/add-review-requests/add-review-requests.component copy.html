@@ -1,0 +1,184 @@
+<ng-container>
+  <form [formGroup]="addReviewerForm" (ngSubmit)="onFormSubmit()">
+    <div style="min-height: 40px" class="top-header header-align">
+      <!-- Select DEC Program Staff to review: -->
+    </div>
+    <div class="modal-body-confirmation">
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group js-center lh">
+            <h3 class="p-0 m-0 font-weight">Reviewer*:</h3>
+            <div class="form-check dropdown">
+              <input aria-label="Reviewer Field" id="reviewerField" (click)="isInputClicked = !isInputClicked"
+                (input)="onDrpdownChange()" [formControl]="reviewer" [ngStyle]="{ width: '20rem' }" />
+              <div [ngClass]="
+                  isInputClicked
+                    ? 'dropdown-menu-visible'
+                    : 'dropdown-menu-hidden'
+                ">
+                <li class="dropdown-option" (click)="onDropdownSelect(review)" *ngFor="let review of reviewers"
+                  [value]="review.userId" [ngStyle]="{ width: '20rem' }">
+                  {{ review.managerName }}
+                </li>
+              </div>
+              <!-- <select class="form-input form-control w-260" formControlName="reviewer" value="">
+                <option value="">--SELECT--</option>
+                <option *ngFor="let action of reviewersList" [value]="action?.reviewerId">
+                  {{ action?.managerName }}
+                </option>
+              </select> -->
+
+              <div class="d-block">
+                <span class="addr-error-msg" *ngIf="
+                    addReviewerForm?.controls?.reviewer?.errors?.required &&
+                    submitted
+                  ">{{ errorMsgObj?.REVIEWER_REQD }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row col-12">
+        <div class="form-group lh col-6">
+          <h3 class="w-70p p-0 m-0 font-weight r-align">Date Assigned*:</h3>
+          <div class="form-check">
+            <input aria-label="Date Assigned Field" id="dateAssignedField" type="date" formControlName="dateAssigned"
+              class="form-input" id="inlineCheckbox3" />
+          </div>
+          <div class="d-block marginl-10">
+            <span class="addr-error-msg" *ngIf="
+                addReviewerForm?.controls?.dateAssigned?.errors?.required &&
+                submitted
+              ">{{ errorMsgObj?.ASSIGNED_DATE_REQD }}</span>
+            <span class="addr-error-msg" *ngIf="
+                addReviewerForm?.controls?.dateAssigned?.errors
+                  ?.isGreaterThanStart && submitted
+              ">{{ errorMsgObj?.DATE_ASSIGN_GT_CURR_DATE }}</span>
+          </div>
+        </div>
+
+        <div class="form-group lh col-5 ml-3">
+          <h3 class="w-100 p-0 m-0 font-weight r-align">Due Date*:</h3>
+          <div class="form-check">
+            <input type="date" aria-label="Due Date Field" id="dueDateField" formControlName="dueDate"
+              class="form-input" id="inlineCheckbox3" />
+          </div>
+          <div class="d-block marginl-4">
+            <span class="addr-error-msg" *ngIf="
+                addReviewerForm?.controls?.dueDate?.errors?.required &&
+                submitted
+              ">{{ errorMsgObj?.DUE_DATE_REQD }}</span>
+            <span class="addr-error-msg" *ngIf="
+                addReviewerForm?.controls?.dueDate?.errors
+                  ?.isGreaterThanStart && submitted
+              ">{{ errorMsgObj?.DUE_DATE_NOT_LT_ASSIGNED }}</span>
+          </div>
+        </div>
+      </div>
+      <!-- Payment Received Note -->
+      <div class="row col-12">
+        <div class="p-5">
+          <span class="header-3n">Select Project Document(s), optional</span>
+          <p-table [value]="reviewData" [scrollable]="true" scrollHeight="65vh">
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="table-header-primary" [pSortableColumn]="'projectId'" [ngStyle]="{ width: '5%','text-align': 'center'}">
+                  <input type="checkbox" name="scene2" id="checkboxes" aria-label="Applicant name Radio"
+                    (change)="checkUncheckAll($event)" />
+                </th>
+                <th class="table-header-primary" [pSortableColumn]="'documentType'" [ngStyle]="{ width: '11%','text-align': 'center' }">
+                  Type
+                </th>
+                <th class="table-header-primary" [pSortableColumn]="'subType'" [ngStyle]="{ width: '13%', 'text-align': 'center'}">
+                  Sub-Type
+                </th>
+                <th class="table-header-primary" [pSortableColumn]="'documentName'" [ngStyle]="{ width: '16%', 'text-align': 'center'}">Document Name
+                </th>
+                <th class="table-header-primary" [pSortableColumn]="'description'" [ngStyle]="{ width: '16%','text-align': 'center' }">Description
+                </th>
+                <th class="table-header-primary" [pSortableColumn]="'files'"
+                  [ngStyle]="{ width: '13%', 'word-wrap': 'break-word','text-align': 'center' }">#Files
+                </th>
+                <th class="table-header-primary" [pSortableColumn]="'uploadDate'" [ngStyle]="{ width: '13%','text-align': 'left' }">Upload Dt/Tm
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row let-i="rowIndex">
+              <tr>
+                <td scope="col" role="cell" aria-label="Individual Applicants Name List Check box"
+                  [ngStyle]="{ width: '5%','text-align': 'center' }" class="table-check-box table-body">
+                  <!-- <p-tableCheckbox (click)="selectRow(g.checked,item)" #g [value]="item"></p-tableCheckbox> -->
+                  <input type="checkbox" name="scene1" id="checkbox{{ i }}" aria-label="Applicant name Radio"
+                    [value]="row?.documentId" (change)="selectRow($event, row)" #g />
+                </td>
+                <td class="table-body" [ngStyle]="{
+                    'text-align': 'center',
+                    'word-wrap': 'break-word',
+                    width: '11%'
+                  }">
+                  {{row?.documentType}}
+                </td>
+                <td class="table-body" [ngStyle]="{
+                    'text-align': 'center',
+                    'word-wrap': 'break-word',
+                    width: '13%'
+                  }">
+                  {{row?.subType}}
+                </td>
+                <td class="table-body" [ngStyle]="{
+                    'text-align': 'center',
+                    'word-wrap': 'break-word',
+                    width: '16%'
+                  }">
+                  {{row?.documentName}}
+                </td>
+                <td class="table-body" [ngStyle]="{
+                    'text-align': 'center',
+                    'word-wrap': 'break-word',
+                    width: '16%'
+                  }">
+                  {{row?.description}}
+                </td>
+
+                <td class="table-body" [ngStyle]="{
+                    'text-align': 'center',
+                    'word-wrap': 'break-word',
+                    width: '13%'
+                  }">{{row?.files}}
+                </td>
+                <td class="table-body" [ngStyle]="{
+                    'text-align': 'center',
+                    'word-wrap': 'break-word',
+                    width: '13%'
+                  }">
+                  {{row?.uploadDate}}
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <!-- <div>
+          <span class="addr-error-msg ml-3rem" *ngIf="showOneDocRequiredError && submitted">{{
+            errorMsgObj?.ONE_DOC_MUST_BE_SELECTED }}</span>
+        </div> -->
+      </div>
+      <!-- Required Documents Not Submitted -->
+    </div>
+    <div class="float-right mr-2" *ngIf="showServerError">
+      <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" style="width: 60px" class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload">
+        OK
+      </button>
+
+      <button type="button" style="width: 60px" class="btn btn-sm btn-outline-dark closebutton mb-2"
+        (click)="closeModal()">
+        Cancel
+      </button>
+    </div>
+  </form>
+</ng-container>
+
+<app-pending-changes-popup #pendingPopup (onOkClick)="goBack()"></app-pending-changes-popup>
+<app-email-compose #emailModal></app-email-compose>

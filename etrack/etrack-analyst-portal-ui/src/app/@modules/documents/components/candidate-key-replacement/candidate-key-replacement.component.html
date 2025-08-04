@@ -1,0 +1,136 @@
+<div class="col-12 pl-0 pr-0 d-flex">
+  <div class="container-fluid">
+      <div class=" row col-lg-12 pl-0 pr-0">
+        <div class="col-2"></div>
+        <div class="col-7 mb-2 mt-2" style="text-align: center ">
+          <strong class="header-3b">Candidate Keyword Replacement</strong>
+        </div>
+      </div>
+    <div class="row">
+      <div class="col-2"></div>
+      <div class="col-lg-7  pr-0">
+        <p-table id="upload_sign_table" styleClass="p-datatable-lg no-header-scoll" class="w"
+          [scrollable]="candidateKeywordsList?.length > 10 ? true : false" scrollHeight="400px" #permitTable
+          [value]="candidateKeywordsList">
+          <ng-template pTemplate="header">
+            <tr role="rowgroup">
+              <th scope="col" role="columnheader" aria-sort="ascending" pSortableColumn="permitTypeCode"
+                class="table-header-primary " [ngStyle]="{
+                'text-align': 'left',
+                'word-wrap': 'break-word',
+                width: '70%',
+                position: 'relative'
+              }">
+                'Other' Keyword Text
+              </th>
+              <th scope="col" role="columnheader" aria-sort="ascending" pSortableColumn="keywordText"
+                class="table-header-primary" [ngStyle]="{
+                'text-align': 'center',
+                'word-wrap': 'break-word',
+                width: '30%', 
+                position: 'relative'
+              }">
+                Replace</th>
+
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-i="rowIndex">
+            <tr role="rowgroup">
+              <td scope="col" role="cell" aria-sort="none" class="table-body"
+                [ngStyle]="{ 'text-align': 'left','width': '70%', 'word-wrap': 'break-word' }">
+                {{ item?.keywordText }}
+              </td>
+              <td scope="col" role="cell" aria-sort="none" class="table-body"
+                [ngStyle]="{ 'text-align': 'center','width': '30%', 'word-wrap': 'break-word' }">
+                <span style="cursor: pointer;  margin-left: -2px;">
+                  <input #keywordCheckBox class="form-check-input mb-2" type="checkbox"
+                    [ngModel]="item[checkBoxKey] == 1" (ngModelChange)="
+                    item[checkBoxKey] = $event ? 1 : 0; emitChanges(item)
+                  " />
+                </span>
+              </td>
+
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td style="text-align:center ;" colspan="10">No Records Available.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+      <div class="col-3">
+        <button [hidden]="!categoryList" (click)="replace()" aria-label="Replace Button" type="button" class="btn btn-sm btn-primari mb-2 mr-2 upload">
+          Replace
+        </button>
+        <p class="addr-error-msg" *ngIf="!noKeywordSelected && replaceButton ">{{errorMsgObj?.ATLEAST_ONE_CAND_KEY_SLTD}}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-custom-modal-popup #addCategoryKeywordPopup [modalConfig]="addCategoryKeywordConfig"
+  (modalClosed)="closeModal($event)">
+  <ng-container>
+    <div class="modal-header-confirmation pl-2 text-center"></div>
+    <div class="modal-body-confirmation" style="text-align: center">
+      <p class="header-3b typo-2">Candidate Keyword Replacement</p>
+    </div>
+    <form [formGroup]="categoryKeyWordForm">
+      <div class="form-group align-center lh">
+        <label> Keyword*:&nbsp;</label>
+        <div class="form-group mb-2 mr-2 search-input-cont">
+          <select class="form-control" 
+          aria-label="Keyword Text" style="width: 19.5rem" formControlName="keywordId">
+            <option value="">--SELECT-- </option>
+            <option *ngFor="let op of categoryList" [value]="op.keywordId">
+              {{ op.keywordText }}
+            </option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="addr-error-msg pl-2 text-center" style="margin-top:-15px" *ngIf=" replaceClicked && !categoryKeyWordForm.controls['keywordId'].valid">
+        {{errorMsgObj?.KEYWORD_TEXT_REQD}}
+      </div>
+      <div class="form-group col-12 align-center lh">
+        <label> Category:&nbsp;</label>
+        <div class="form-group mb-2 mr-2 search-input-cont">
+          <select class="form-control" 
+          aria-label="Select Category" style="width: 19.5rem" formControlName="keywordCategoryId">
+            <option value=""></option>
+            <option *ngFor="let op of keywordDropdownList" [value]="op.keywordCategoryId">
+              {{ op.keywordCategory }}
+            </option>
+          </select>
+        </div>
+        <div class="addr-error-msg pl-2" *ngIf="!categoryKeyWordForm.controls['keywordCategoryId'].getRawValue()">
+          
+        </div>
+      </div>
+      <div class=" col-12 text-center pl-2 pr-1">
+        <div>The Selected Category/Keyword combination is replacing the 'Other' Keyword Text:</div>
+        <div> {{selectedKeywordList.join(', ')}}</div>
+      </div>
+
+    </form>
+
+    <div *ngIf="showServerError" class="text-center">
+      <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+
+    
+    <br />
+    <div class="modal-footer-confirmation model-footer-reduced">
+      <button (click)="replaceCategoryKeyword()" 
+      aria-label="Replace Category Keyword" type="button" class="btn btn-sm btn-primari mb-2 mr-2 upload">
+        Replace
+      </button>
+
+      <button (click)="closeModal($event)" aria-label="Close Replace Category Keyword" type="button" class="btn btn-sm btn-outline-dark closebutton mb-2">
+        Cancel
+      </button>
+    </div>
+    
+  </ng-container>
+</app-custom-modal-popup>

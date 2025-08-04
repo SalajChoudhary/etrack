@@ -1,0 +1,220 @@
+<div class="component" role="table" aria-label="Dashboard Tables" aria-describedby="dashboard_table">
+  <p-table [customSort]="true" (sortFunction)="customSort($event)" #dataTable [value]="dataList" [autoLayout]="true" styleClass="p-datatable-lg" 
+  [paginator]="isPagination" (onFilter)="onFilter($event)"
+    [rows]="20" [rowsPerPageOptions]="[5,10,15,20]" [scrollable]="dataList?.length > 0 ? true : false" id="dashboard_table" [scrollHeight]="scrollHeight">
+    <ng-template pTemplate="header">
+      <tr role="rowgroup" [ngClass]="isMaxHeight?'height-max':null" id="Dashboard-Header-Title">
+        <th scope="col" role="columnheader" id="{{header?.columnTitle+i}}" aria-label="Header Title"
+          aria-sort="descending" *ngFor="let header of headers;let i=index;" class="table-header-primary justify-content-between"
+          [ngStyle]="{'width':header?.headerWidth ? header.headerWidth : 'auto', 'word-break':' break-word', 'text-align':header?.alignLabel ? header.alignLabel :''}"
+          [pSortableColumn]="header.isSort? header.columnTitle :'anyField'+i">{{header?.columnLabel}}
+          <p-columnFilter *ngIf="header.isFilter" class="p-ml-auto" type="text" [field]="header?.columnTitle"
+            display="menu" [hideOnClear]="true" [showApplyButton]="false" [showMatchModes]="false"
+            [matchMode]="header?.columnTitle==='permitType'? 'permitFilter': 'in'" [showOperator]="false"
+            [showClearButton]="false" [showAddButton]="false">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect [(ngModel)]="filterValues[i]" [options]="getFilterList(header?.filtersList)"
+                placeholder="Select" (onChange)="filter($event.value)">
+              </p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+          <input *ngIf="header?.columnTitle === 'markForReview' || header?.columnTitle === 'markForDownload'" 
+            type="checkbox" [disabled]="(isReadOnly && header?.columnTitle === 'markForReview') ? true : null" (change)="checkAllClicked($event)" [(ngModel)]="headerCheckbox">
+          <button *ngIf="'trashcanPurge' === header?.columnTitle" aria-label="Delete All" (click)="onDeleteAllRows()"
+              onclick="this.blur()" class="btn px-0" container="body" [ngbTooltip]="'Delete All'" placement = "left">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash"
+                viewBox="0 0 16 16" alt="Delete icon">
+                <path
+                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                <path fill-rule="evenodd"
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+              </svg>
+            </button>
+          <button *ngIf="'archive' === header?.columnTitle" aria-label="Archive All" (click)="onArchiveAllRows()"
+            onclick="this.blur()" style="color:red" class="btn pl-1" placement="left" container="body" [ngbTooltip]="'Archive All'" >
+            <strong>X</strong>
+            </button>
+          <img class="blue-circular-arrow" *ngIf="'removePurgeArchive' === header?.columnTitle && !isReadOnly && !disableRemoveAll" src="assets/icons/revert_symbol.svg" 
+            alt="A circular arrow" (click)="onRemoveAllClicked()" [ngbTooltip]="'Remove All'"
+            placement="left" />
+            <img class="grey-circular-arrow" *ngIf="'removePurgeArchive' === header?.columnTitle && (isReadOnly || disableRemoveAll)" src="assets/icons/revert_symbol.svg" 
+            alt="A circular arrow" placement="left" />
+          <img *ngIf="header?.isClearFilterIcon && dataList.length>0" style="cursor:pointer;" class="filter-icon"
+            ngbTooltip="Reset filters" placement = "left" alt="filter" src="assets/icons/funnel-cross.jpg" (click)="resetFilters()">
+          <span *ngIf="header?.isExportIcon && dataList.length>0"> &nbsp; <img class="export-icon" alt="export"
+            ngbTooltip="Export to Excel" placement = "left" src="assets/icons/export.png" (click)="exportToExcel()" style="cursor: 'pointer';"></span>
+          </th>
+      </tr>
+    </ng-template>    
+
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr role="rowgroup">
+        <ng-container *ngFor="let header of headers">
+          <td scope="col" role="columnheader" aria-label="Header Button" aria-sort="none" *ngIf="header?.isButton"
+            class="table-body btn-colum"
+            [ngStyle]="{'width':header?.bodyWidth ? header.bodyWidth : '90px','color':'#65666B'}"
+            >
+            <button *ngIf="item.isButton" type="button" #resume_button id="{{header.isButton}}{{i}}"
+              [attr.aria-labelledBy]="header.isButton+i" (click)="resumeButtonClicked(item,resume_button)"
+              class="btn btn-sm btn-primari nextbutton upload" value="resume_button{{i}}">{{item.isButton}} 
+            </button>
+            <button *ngIf="'removePurgeArchive' === header?.columnTitle && !isReadOnly && !item.removeDisabled" (click)="removeButtonClicked(item)"
+            placement="left" [ngbTooltip]="'Remove from List'" container="body" class="btn pl-1">
+              <img class="blue-circular-arrow"  src="assets/icons/revert_symbol.svg" 
+                alt="A circular arrow" 
+                />
+            </button>
+            <img class="grey-circular-arrow ml-1" *ngIf="'removePurgeArchive' === header?.columnTitle && (isReadOnly || item.removeDisabled)" src="assets/icons/revert_symbol.svg" 
+              alt="A circular arrow"/>
+            <button *ngIf="'trashcanPurge' === header?.columnTitle && !item.litigationHoldInd" aria-label="Delete Document" (click)="onDeleteApplication(item,header)"
+              onclick="this.blur()" class="btn pl-1" container="body" [ngbTooltip]="'Delete Document'" placement = "left">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash"
+                viewBox="0 0 16 16" alt="Delete icon">
+                <path
+                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                <path fill-rule="evenodd"
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+              </svg>
+            </button>
+            <button *ngIf="'trashcanPurge' === header?.columnTitle && item.litigationHoldInd" aria-label="Delete Document"
+              class="btn pl-1" container="body" [ngbTooltip]="'Litigation Hold – cannot delete'" placement = "left"
+              disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash"
+                viewBox="0 0 16 16" alt="Delete icon">
+                <path
+                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                <path fill-rule="evenodd"
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+              </svg>
+            </button>
+            <button *ngIf="'archive' === header?.columnTitle" aria-label="Archive Document" (click)="onDeleteApplication(item,header)"
+              onclick="this.blur()" style="color:red" class="btn pl-1" placement="left" container="body" [ngbTooltip]="'Archive Document'" >
+              <strong>X</strong>
+              </button>
+          </td>
+          <td scope="col" role="cell" aria-label="Dashboard Item" *ngIf="header?.isDate" class="table-body"
+            [ngStyle]="{'text-align':header?.align ? header.align :'left','width':header?.bodyWidth ? header.bodyWidth : 'auto','word-wrap':'break-word',
+            'color': header?.isRejected && item['rejectedProject'] == 'Y' ? 'red':''}"  >
+            <span *ngIf="header?.isDateRed && isPastDate(item[header.columnTitle])"
+              class="text-bold-red" placement="bottom" container="body" [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null">{{item[header.columnTitle] ? (item[header.columnTitle]| date:'MM/dd/yyyy')
+              :''}}</span>
+            <span *ngIf="!header?.isDateRed || !isPastDate(item[header.columnTitle])" placement="bottom" container="body"  [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null">{{item[header.columnTitle] ?
+              (item[header.columnTitle]| date:'MM/dd/yyyy') :''}}</span>
+          </td>
+          <td scope="col" role="cell" aria-label="Dashboard Item" *ngIf="header?.isCheckBox" class="table-body"
+            [ngStyle]="{'text-align':header?.align ? header.align :'left','width':header?.bodyWidth ? header.bodyWidth : 'auto','word-wrap':'break-word'}">
+            <div class="d-flex justify-content-center align-items-center">
+            <input *ngIf="item[header.columnTitle+'isCheckbox'] && header.columnTitle!=='outForReview'" type="checkbox"
+              disabled [checked]="true" id="{{header.columnLabel}}{{i}}">
+            <input *ngIf="header.columnTitle==='outForReview' && item[header.columnTitle]==='Yes'" type="checkbox"
+              [checked]="true" disabled id="{{header.columnLabel}}{{i}}">
+            <input *ngIf="header.columnTitle==='markForReview'" type="checkbox"
+            [disabled] = "isReadOnly ? true : null" [(ngModel)]="item[header.columnTitle]"
+            (click)="onReviewCheckboxClicked()">
+            <input *ngIf="header.columnTitle ==='markForDownload'" type="checkbox"
+            [(ngModel)]="item[header.columnTitle]">
+            <input *ngIf="header.columnTitle==='markedForReview'" type="checkbox"
+            [checked]="item[header.columnTitle] ? true : null" disabled>
+            </div>
+          </td>
+
+          <td scope="col" role="cell" [ngClass]="header?.className? header.className :''" aria-label="Dashboard Item"
+            aria-sort="descending"
+            *ngIf="!header?.isButton && !header?.isDate && !header?.isAction && !header?.isCheckBox && !header?.isExportIcon"
+            class="table-body"
+            [ngStyle]="{'text-align':header?.align ? header.align :'left','width':header?.bodyWidth ? header.bodyWidth : 'auto','word-wrap':'break-word',
+            'color': header?.isRejected && item['rejectedProject'] == 'Y' ? 'red':''}"  >
+
+            <span *ngIf="!header?.isLink && header?.columnTitle != 'permitType'" placement="bottom" container="body"  [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ? 'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null">{{header.columnTitle==='trackedId'?
+              formattedDECId(item[header.columnTitle]):
+              item[header.columnTitle]}}</span>
+            <span *ngIf="!header?.isLink && header?.columnTitle === 'permitType'" placement="bottom" container="body" [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null"
+              title="{{item[header?.desc]}}">{{item[header.columnTitle]}}</span>
+              <span scope="col" role="cell" *ngIf="header?.isLink && item.completedDate && header?.columnTitle === 'analystName' && item[header.columnTitle]!=='UNASSIGNED'" placement="bottom"  [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null">
+                {{item[header.columnTitle]}} </span>
+            <span scope="col" role="cell" *ngIf="header?.isLink && item[header.columnTitle]!=='UNASSIGNED' && !item?.completedDate" placement="bottom"  [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null"><a
+                *ngIf="(header?.columnTitle==='applicant' && item?.edbPublicId) || (header?.columnTitle==='facilityName' && item?.edbDistrictId) || header?.columnTitle==='analystName'"
+                routerLink="./" (click)="setLocal(item, header)">{{item[header.columnTitle]}}</a><span
+                *ngIf="(header?.columnTitle==='applicant' && !item?.edbPublicId)|| (header?.columnTitle==='facilityName' && !item?.edbDistrictId) ">{{item[header.columnTitle]}}</span></span>
+            <span scope="col" role="cell" placement="bottom" container="body" [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null"
+              *ngIf="header?.isLink && item[header.columnTitle]==='UNASSIGNED'" placement="bottom" container="body" [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null">{{item[header.columnTitle]}}</span>
+            <span scope="col" role="cell" placement="bottom" container="body" [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null"
+              *ngIf="header?.isLink && header.columnTitle==='projectId' && (activeTab==='unvalidated') && item?.isButton!=='ASSIGN'">
+              <a routerLink="./" (click)="setLocal(item, header)">{{item[header.columnTitle]}}</a></span>
+              <span scope="col" role="cell" placement="bottom" container="body" [ngbTooltip]="header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null"
+              *ngIf="header?.isLink && header.columnTitle==='inquiryId'">
+              <div *ngIf="!item?.inquiryIdlinkToNavigate" placement="bottom">{{item[header.columnTitle]}}</div>
+              <a *ngIf="item?.inquiryIdlinkToNavigate" routerLink="./" (click)="setLocal(item, header)" placement="bottom"  [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null">{{item[header.columnTitle]}}</a></span>
+              <span scope="col" role="cell" *ngIf="header?.isLink && header.columnTitle==='decId' && activeTab==='archive'">
+                <a [href]="item[header.columnTitle + 'linkToNavigate']" target="_blank">
+                  {{item[header.columnTitle]}}
+                </a>
+              </span>
+            <span scope="col" role="cell" placement="bottom" container="body" [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ? 'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null"
+              *ngIf="header?.isLink && header.columnTitle==='projectId' && activeTab==='unvalidated' && item?.isButton==='ASSIGN'">{{item[header.columnTitle]}}</span>
+            <span scope="col" role="cell" placement="bottom" container="body" [ngbTooltip]=" header?.isRejected && item['rejectedProject'] == 'Y' ?  'Rejected on '+item['rejectedDate']+' : '+item['rejectedReason']:null"
+              *ngIf="header?.isLink && header.columnTitle==='projectId' && activeTab!=='unvalidated'">
+              <a routerLink="./" (click)="setLocal(item, header)">{{item[header.columnTitle]}}</a></span>
+              <span scope="col" role="cell"
+              *ngIf="header?.isLink && header.columnTitle==='documentName' && activeTab==='archive'">
+              <a routerLink="./" (click)="openDocPopup(item)">{{item[header.columnTitle]}}</a></span>
+          </td>
+          <td scope="col" role="cell" aria-label="Dashboard Item" a aria-sort="descending" class="table-body"
+            *ngIf="header?.isExportIcon || header?.isAction"
+            [ngStyle]="{'width':header?.bodyWidth ? header?.bodyWidth :'auto'}">
+            <div scope="row" class="actions-btn-cont">
+              <button *ngIf="header?.isEdit" aria-label="Edit Application" (click)="editClickedFun(item.documentId)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#90730e"
+                  class="bi bi-pencil-square" viewBox="0 0 16 16">
+                  <path
+                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                  <path fill-rule="evenodd"
+                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                </svg>
+              </button>
+              <button *ngIf="header?.isDelete" aria-label="Delete Application" (click)="onDeleteApplication(item,header)"
+                onclick="this.blur()" class="btn pl-1" placement="left" container="body" [ngbTooltip]="'Delete application'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash"
+                  viewBox="0 0 16 16" alt="Delete icon">
+                  <path
+                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                  <path fill-rule="evenodd"
+                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                </svg>
+              </button>
+              <button *ngIf="header?.isReject" aria-label="Delete Application" (click)="onDeleteApplication(item,header)"
+              onclick="this.blur()" style="color:red" class="btn pl-1" placement="left" container="body" [ngbTooltip]="'Reject Project'" >
+              <strong>X</strong>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+      </tr>
+
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td style="text-align:center ;" colspan="100">No Records Available.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <div class="component-footer">
+    <div class="float-right mr-2" *ngIf="showServerError">
+      <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+    <p *ngIf="isRecords && totalRecords && totalRecords > 0 && dataList.length > 0" class="pl-3 pt-2 pb-2"><strong> #
+        Records:
+        {{totalRecords}}</strong></p>
+    <div *ngIf="activeTab==='taskDue'" class="note-below text-center">
+      Tasks Due: Completeness Determination Due, Written Comments Deadline, Hearing Decision Due, Final Decision Due, DIMSR Decision Due
+    </div>
+    <div *ngIf="activeTab==='applicantResponseDue'" class="note-below text-center">
+      Applicant Responses: Incomplete for 1 year, Incomplete, Chronically Incomplete, Permittee
+      Response Due, Insufficient
+    </div>
+  </div>
+</div>
+<app-delete-confirm-popup (onDeleteConfirmed)="deleteProjects($event)" [openModal]="deleteIsClicked"
+  [deleteApplicant]="deleteProject" [bodyText]="deleteBodyText" [secondLineBodyText]="secondLineDeleteBodyText"
+  [isDashboard]="true" [isValidate]="isValidate">  
+</app-delete-confirm-popup>

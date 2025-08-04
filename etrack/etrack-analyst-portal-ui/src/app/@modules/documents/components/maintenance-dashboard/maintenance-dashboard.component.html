@@ -1,0 +1,69 @@
+<app-analyst-sub-header [showButton]="true"></app-analyst-sub-header>
+
+<div class="roww col-12" style="padding-bottom:10px !important">
+    <ng-container >
+        <div class="col-2 p-0">
+            <button (click)="innerTabChange('keyword')"
+                [ngClass]="activeTab == 'keyword' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100"
+                aria-label="Keywords Button"
+                *ngIf="userRoles.includes(UserRole.System_Admin)">
+                <span>Keywords</span>
+            </button>
+            <button (click)="innerTabChange('candidate')"
+                [ngClass]="activeTab == 'candidate' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100"
+                aria-label="Candidate Keywords Button"
+                *ngIf="userRoles.includes(UserRole.System_Admin)">
+                <span>Candidate Replacement</span>
+            </button>
+            <button  (click)="innerTabChange('document')"
+                [ngClass]="activeTab == 'document' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100"
+                aria-label="Code Tables Button"
+                *ngIf="userRoles.includes(UserRole.System_Admin)">
+                <span>Code Tables</span>
+            </button>
+            <button  (click)="innerTabChange('permitType')"
+            [ngClass]="activeTab == 'permitType' ? 'active' : ''"
+            class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100"
+            aria-label="Permit Type Button"
+            *ngIf="userRoles.includes(UserRole.System_Admin)">
+            <span>Permit Category Assignment</span>
+        </button>
+            <button  (click)="innerTabChange('archive')"
+                [ngClass]="activeTab == 'archive' ? 'active' : ''"
+                class="btn btn-sm firstbutton nextbutton mr-2 upload wt-100"
+                aria-label="Archive/Purge Button">
+                <span>Archive/Purge</span>
+            </button>
+        </div>
+
+        <div class="col-10 grid-box">
+            <div class="grid-margin"
+                *ngIf="activeTab=='keyword' && userRoles.includes(UserRole.System_Admin)">
+                <app-keyword-maintenance></app-keyword-maintenance>                
+            </div>
+            <div class="grid-margin mt-4"
+                *ngIf="activeTab=='candidate' && userRoles.includes(UserRole.System_Admin)" >
+                <app-candidate-key-replacement></app-candidate-key-replacement>
+            </div>
+            <div class="grid-margin mt-4"
+                *ngIf="activeTab=='document' && userRoles.includes(UserRole.System_Admin)" >
+                <app-document-maintenance></app-document-maintenance>
+            </div>
+            <div class="grid-margin mt-4"
+                *ngIf="activeTab=='permitType' && userRoles.includes(UserRole.System_Admin)" >
+                <app-maintenance-permit-type></app-maintenance-permit-type>
+            </div>
+            <div class="grid-margin mt-4"
+                *ngIf="activeTab=='archive'" >
+                <app-purge-archive
+                [userIsSystemAdmin]="userIsSystemAdmin"
+                [activeTab]="activeTab"
+                ></app-purge-archive>
+            </div>
+
+        </div>
+    </ng-container>
+</div>

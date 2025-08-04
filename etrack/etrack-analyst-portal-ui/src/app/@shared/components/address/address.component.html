@@ -1,0 +1,420 @@
+<div class="container form-container mt-20">
+    <form [formGroup]="basicDetailsFormGroup" autocomplete="off">
+        <!-- <div class="col-12 pl-0">
+        <div class="form-group d-flex ">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                <label class="form-check-label font-lg w-100 typo-2" for="inlineCheckbox1">Mailing address is same as previously
+                    entered</label>
+            </div>
+        </div>
+    </div> -->
+        <div class="col-12 pl-0">
+            <div class="form-group d-flex ">
+                <label for="" class="address-type typo-2">Address Type: </label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" (change)="noUsChange($event)" formControlName="addressType"
+                        type="radio" value="us" id="flexRadioDefault2">
+                    <label class="form-check-label typo-2 " for="flexRadioDefault2">
+                        US Address
+                    </label>
+                    <ng-container
+                        *ngIf="isModeValidate && applicantDetailsHistory?.address?.adrType && applicantDetails?.address?.adrType==='0' && applicantDetailsHistory?.address?.adrType !== applicantDetails?.address?.adrType">
+
+                        <div class="icon-holder-1"
+                            *ngIf="addressType === 'us'">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('addressType', 'nonus'); toggleAddress('nonus')"
+                                [ngbTooltip]="'Non-US Address'" />
+                        </div>
+                        <div class="icon-holder-1"
+                            *ngIf="addressType === 'nonus'">
+                            <img [src]="editSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('addressType', 'us'); toggleAddress('us')"
+                                [ngbTooltip]="'US Address'" />
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" (change)="noUsChange($event)" type="radio"
+                        formControlName="addressType" value="nonus" id="flexRadioDefault3">
+                    <label class="form-check-label typo-2" for="flexRadioDefault3">
+                        Non-US Address
+                    </label>
+                    <ng-container
+                        *ngIf="isModeValidate && applicantDetailsHistory?.address?.adrType && applicantDetails?.address?.adrType === '1' && applicantDetailsHistory?.address?.adrType !== applicantDetails?.address?.adrType">
+
+                        <div class="icon-holder-1"
+                            *ngIf="addressType === 'nonus'">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('addressType', 'us'); toggleAddress('us')"
+                                [ngbTooltip]="'US Address'" />
+                        </div>
+                        <div class="icon-holder-1"
+                            *ngIf="addressType === 'us'">
+                            <img [src]="editSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('addressType', 'nonus'); toggleAddress('nonus')"
+                                [ngbTooltip]="'Non-US Address'" />
+                        </div>
+                    </ng-container>
+                    <!-- <div class="icon-holder-1"
+                        [hidden]="!applicantDetailsHistory?.address?.adrType || applicantDetailsHistory?.address?.adrType === applicantDetails?.address.adrType">
+                        <img [src]="yieldSignPath" alt="A yellow yield sign" [ngbTooltip]="showAddressTypeHistory()" />
+                    </div> -->
+                </div>
+
+            </div>
+        </div>
+        <div class="col-12 pl-0" *ngIf="['X', 'T', 'C'].includes(selectedApplicantType)">
+            <div class="form-group ">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label typo-2" [ngStyle]="{'width': '110px'}" for="inlineCheckbox1">Street
+                        Address 1*: </label> 
+                    <input autocomplete="off" maxlength="100" formControlName="streetAddress1"
+                        class="form-control mr-4 address1Input" (keyup)="addressKeyUp($event)" type="text"
+                        id="inlineCheckbox1">
+                    <ng-container
+                        *ngIf="isModeValidate && (applicantDetailsHistory?.address?.adrType === applicantDetails?.address?.adrType) && applicantDetailsHistory?.address?.streetAdr1 && applicantDetailsHistory?.address?.streetAdr1.toUpperCase() !== applicantDetails?.address?.streetAdr1.toUpperCase()">
+
+                        <div class="icon-holder-1"
+                            *ngIf="basicDetailsFormGroup?.get('streetAddress1')?.value === applicantDetails?.address?.streetAdr1 ">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('streetAddress1', applicantDetailsHistory?.address?.streetAdr1)"
+                                [ngbTooltip]="applicantDetailsHistory?.address?.streetAdr1" />
+                        </div>
+                        <div class="icon-holder-1"
+                            *ngIf="basicDetailsFormGroup?.get('streetAddress1')?.value === applicantDetailsHistory?.address?.streetAdr1">
+                            <img [src]="editSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('streetAddress1', applicantDetails?.address?.streetAdr1)"
+                                [ngbTooltip]="applicantDetails?.address?.streetAdr1" />
+                        </div>
+                    </ng-container>
+                </div>
+                <span class=" col-8 p-0 d-block addr-error-msg ml-110"
+                    *ngIf="formControls?.streetAddress1?.errors?.required && (ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.STREET_ADDR_1_REQD_MSG}}</span>
+            </div>
+            <div class="offset-7" *ngIf="currentTab==0">
+                <h4 class="corpHeader typo-1">*Address must reflect corporate headquarters</h4>
+            </div>
+            <div class="form-group" [ngClass]="currentTab==0? 'margin-top-20':''">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label typo-2 pl-five" [ngStyle]="{'width': '165px'}"
+                        for="inlineCheckbox1">Street Address 2:</label>
+                    <input autocomplete="off" maxlength="100" class="form-control streetAddress2Input"
+                        formControlName="streetAddress2" (keyup)="address2KeyUp()" type="text" id="inlineCheckbox1">
+                    <ng-container *ngIf="isModeValidate &&(applicantDetailsHistory?.address?.adrType === applicantDetails?.address?.adrType) && applicantDetailsHistory?.address?.streetAdr2 && (!applicantDetails?.address?.streetAdr2 || applicantDetailsHistory?.address?.streetAdr2.toUpperCase() !== applicantDetails?.address?.streetAdr2.toUpperCase())">
+
+                        <div class="icon-holder-1"
+                            *ngIf="applicantDetails?.address?.streetAdr2 && basicDetailsFormGroup?.get('streetAddress2')?.value === applicantDetails?.address?.streetAdr2 ">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('streetAddress2', applicantDetailsHistory?.address?.streetAdr2)"
+                                [ngbTooltip]="applicantDetailsHistory?.address?.streetAdr2" />
+                        </div>
+                        <div class="icon-holder-1"
+                            *ngIf="applicantDetails?.address?.streetAdr2 &&  basicDetailsFormGroup?.get('streetAddress2')?.value == applicantDetailsHistory?.address?.streetAdr2">
+                            <img [src]="editSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('streetAddress2', applicantDetails?.address?.streetAdr2)"
+                                [ngbTooltip]="applicantDetails?.address?.streetAdr2" />
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-12 pl-0" *ngIf="['F', 'I', 'M', 'P', 'S'].includes(selectedApplicantType)">
+            <div class="form-group">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label typo-2 w-112" for="inlineCheckbox1">Street Address 1*:</label> 
+                    <input maxlength="100" autocomplete="off" formControlName="streetAddress1"
+                        class="form-control address1Input" (keyup)="addressKeyUp($event)" type="text"
+                        id="inlineCheckbox1">
+                </div>
+              
+             
+                <ng-container
+                    *ngIf="isModeValidate && (applicantDetailsHistory?.address?.adrType === applicantDetails?.address?.adrType) && applicantDetailsHistory?.address?.streetAdr1 && 
+                    applicantDetailsHistory?.address?.streetAdr1.toUpperCase() !== applicantDetails?.address?.streetAdr1.toUpperCase()">
+                    <div class="icon-holder-1"
+                        *ngIf="basicDetailsFormGroup?.get('streetAddress1')?.value === applicantDetails?.address?.streetAdr1 ">
+                        <img [src]="yieldSignPath" alt="A yellow yield sign"
+                            (click)="toggleValue('streetAddress1', applicantDetailsHistory?.address?.streetAdr1)"
+                            [ngbTooltip]="applicantDetailsHistory?.address?.streetAdr1" />
+                    </div>
+                    <div class="icon-holder-1"
+                        *ngIf="basicDetailsFormGroup?.get('streetAddress1')?.value === applicantDetailsHistory?.address?.streetAdr1">
+                        <img [src]="editSignPath" alt="A yellow yield sign"
+                            (click)="toggleValue('streetAddress1', applicantDetails?.address?.streetAdr1)"
+                            [ngbTooltip]="applicantDetails?.address?.streetAdr1" />
+                    </div>
+                </ng-container>
+
+                <span class=" col-6 p-0 d-block addr-error-msg ml-110"
+                    *ngIf="formControls?.streetAddress1?.errors?.required && (ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.STREET_ADDR_1_REQD_MSG}}</span>
+            </div>
+
+            <div class="form-group">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label typo-2 w-170 pl-five" for="inlineCheckbox1">Street Address
+                        2:</label>
+                    <input maxlength="100" autocomplete="off" class="form-control" formControlName="streetAddress2"
+                        (keyup)="address2KeyUp()" type="text" id="inlineCheckbox1">
+                    <ng-container *ngIf="(applicantDetailsHistory?.address?.adrType === '0' && addressType==='us') && applicantDetailsHistory?.address?.streetAdr2 &&
+                    applicantDetailsHistory?.address?.streetAdr2?.toUpperCase() !== applicantDetails?.address?.streetAdr2?.toUpperCase()">
+
+                        <div class="icon-holder-1"
+                            *ngIf="applicantDetails?.address?.streetAdr2 && basicDetailsFormGroup?.get('streetAddress2')?.value === applicantDetails?.address?.streetAdr2 ">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('streetAddress2', applicantDetailsHistory?.address?.streetAdr2)"
+                                [ngbTooltip]="applicantDetailsHistory?.address?.streetAdr2" />
+                        </div>
+                        <div class="icon-holder-1"
+                            *ngIf="applicantDetails?.address?.streetAdr2 &&  basicDetailsFormGroup?.get('streetAddress2')?.value === applicantDetailsHistory?.address?.streetAdr2">
+                            <img [src]="editSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('streetAddress2', applicantDetails?.address?.streetAdr2)"
+                                [ngbTooltip]="applicantDetails?.address?.streetAdr2" />
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 pl-0" *ngIf="addressType=='us'">
+            <div class="form-group">
+                <div class="form-check form-check-inline zip-cont">
+                    <label class="form-check-label typo-2 pl-40">Zip Code*:</label>
+                    <input autocomplete="off" (input)="onZipInput(nInput)" #nInput maxlength="5"
+                        formControlName="zipCode" class="form-control zipInput" (keyup)="zipKeyup()" type="text"
+                        id="zipId">
+                    <ng-container
+                        *ngIf="isModeValidate && applicantDetailsHistory?.address?.zipCode && applicantDetailsHistory?.address?.zipCode !== applicantDetails?.address?.zipCode">
+                        <div class="icon-holder-1"
+                            *ngIf="basicDetailsFormGroup?.get('zipCode')?.value === applicantDetails?.address?.zipCode ">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('zipCode', applicantDetailsHistory?.address?.zipCode)"
+                                [ngbTooltip]="applicantDetailsHistory?.address?.zipCode" />
+                        </div>
+                        <div class="icon-holder-1"
+                            *ngIf="basicDetailsFormGroup?.get('zipCode')?.value === applicantDetailsHistory?.address?.zipCode">
+                            <img [src]="editSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('zipCode', applicantDetails?.address?.zipCode)"
+                                [ngbTooltip]="applicantDetails?.address?.zipCode" />
+                        </div>
+                    </ng-container>
+
+                    <!-- <div class="icon-holder-1" *ngIf = "(applicantDetailsHistory?.address?.adrType === '0' && addressType==='us')">
+                        <img [src]="yieldSignPath" alt="A yellow yield sign"
+                        [hidden]="!applicantDetailsHistory?.address?.zipCode || applicantDetailsHistory?.address?.zipCode === applicantDetails?.address.zipCode"
+                        ngbTooltip="{{applicantDetailsHistory?.address?.zipCode}}" />
+                    </div> -->
+                </div>
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label state-label typo-2" for="inlineCheckbox1">State*:</label>
+                    <!-- <input autocomplete="off" class="form-control state-align" id="state" 
+                    [attr.disabled]="true"
+                        formControlName="state" type="text"> -->
+                    <input autocomplete="off" class="form-control state-align" id="state"
+                        formControlName="state" (keyup)="stateKeyUp()" type="text" maxlength=2>
+                        <ng-container
+                            *ngIf="isModeValidate && applicantDetailsHistory?.address?.state && applicantDetailsHistory?.address?.state !== applicantDetails?.address?.state">
+
+                            <div class="icon-holder-4"
+                                *ngIf="basicDetailsFormGroup?.get('state')?.value === applicantDetails?.address?.state ">
+                                <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                    (click)="toggleValue('state', applicantDetailsHistory?.address?.state)"
+                                    [ngbTooltip]="applicantDetailsHistory?.address?.state" />
+                            </div>
+                            <div class="icon-holder-4"
+                                *ngIf="basicDetailsFormGroup?.get('state')?.value === applicantDetailsHistory?.address?.state">
+                                <img [src]="editSignPath" alt="A yellow yield sign"
+                                    (click)="toggleValue('state', applicantDetails?.address?.state)"
+                                    [ngbTooltip]="applicantDetails?.address?.state" />
+                            </div>
+                        </ng-container>
+                    <!-- <div class="icon-holder-1" *ngIf = "(applicantDetailsHistory?.address?.adrType === '0' && addressType==='us')">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                            [hidden]="!applicantDetailsHistory?.address?.state || applicantDetailsHistory?.address?.state.toUpperCase() === applicantDetails?.address.state.toUpperCase()"
+                            ngbTooltip="{{applicantDetailsHistory?.address?.state}}" />
+                        </div> -->
+                    <!--To disabled field [attr.disabled]="true" -->
+                </div>
+                <div class="col-12 ml-96">
+                    <span class=" addr-error-msg  mr-2"
+                        *ngIf="formControls?.zipCode?.errors?.required &&  (ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.ZIP_CODE_REQD_MSG}}</span>
+                    <span class="addr-error-msg mr-2"
+                        *ngIf="!formControls?.zipCode?.errors?.required &&  (ngFormInstance?.submitted || isClosevalidationCheck) && (formControls?.zipCode?.errors?.minlength || formControls?.zipCode?.errors?.maxlength)">{{errorMessages?.ZIP_CODE_INVALID_MSG}}</span>
+                    <span class="addr-error-msg"
+                        *ngIf="formControls?.state?.errors?.required && (formControls?.zipCode?.errors?.required || (formControls?.zipCode?.errors?.minlength || formControls?.zipCode?.errors?.maxlength) ) &&  (ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.STATE_CODE_REQD_MSG}}</span>
+                    <span class="addr-error-msg ml-173"
+                        *ngIf="formControls?.state?.errors?.required && formControls?.zipCode?.valid   &&  (ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.STATE_CODE_REQD_MSG}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-check form-check-inline ">
+                    <label class="form-check-label typo-2 w-170" for="inlineCheckbox1">Post Office / City*:</label>
+                    <!-- <input autocomplete="off" tabindex="0" #post_city id="city" maxlength="65" [attr.disabled]="true"
+                        formControlName="postOffice" class="form-control" type="text"> -->
+                    <input autocomplete="off" tabindex="0" #post_city id="city" maxlength="65"
+                        formControlName="postOffice" (keyup)="cityKeyUp()" class="form-control" type="text">
+                    <!-- <div class="icon-holder-1"  *ngIf = "(applicantDetailsHistory?.address?.adrType === '0' && addressType==='us')">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                            [hidden]="!applicantDetailsHistory?.address?.city || applicantDetailsHistory?.address?.city.toUpperCase() === applicantDetails?.address.city.toUpperCase()"
+                            ngbTooltip="{{applicantDetailsHistory?.address?.city}}" />
+                        </div> -->
+                        <ng-container
+                        *ngIf="isModeValidate &&(applicantDetailsHistory?.address?.adrType === applicantDetails?.address?.adrType) && applicantDetailsHistory?.address?.city && applicantDetailsHistory?.address?.city !== applicantDetails?.address?.city">
+
+                        <div class="icon-holder-4"
+                            *ngIf="basicDetailsFormGroup?.get('postOffice')?.value === applicantDetails?.address?.city ">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('postOffice', applicantDetailsHistory?.address?.city)"
+                                [ngbTooltip]="applicantDetailsHistory?.address?.city" />
+                        </div>
+                        <div class="icon-holder-4"
+                            *ngIf="basicDetailsFormGroup?.get('postOffice')?.value === applicantDetailsHistory?.address?.city">
+                            <img [src]="editSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('postOffice', applicantDetails?.address?.city)"
+                                [ngbTooltip]="applicantDetails?.address?.city" />
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="col-12 p-0">
+                    <span class="addr-error-msg ml-110 d-block"
+                        *ngIf="this.showAddressLookupDownError && !(ngFormInstance?.submitted)">{{errorMessages?.UNABLE_TO_PROCESS_NOW}}</span>
+                    <span class="addr-error-msg ml-110 d-block"
+                        *ngIf="this.showNoMatchFoundError && !(ngFormInstance?.submitted)">{{errorMessages?.NO_ADDR_MATCH_FOUND}}</span>
+                    <span class="addr-error-msg ml-110 d-block"
+                        *ngIf="formControls?.postOffice?.errors?.required && ( ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.POST_OFFICE_REQD_MSG}}</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-12 pl-0" *ngIf="addressType=='nonus'">
+            <div class="form-group d-flex">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label typo-2 city-align w-148 mr-10" for="inlineCheckbox1">City*:</label>
+                    <input autocomplete="off" formControlName="city" (input)="nonUsCityInput($event)" maxlength="65"
+                        class="form-control cityInput" type="text" id="inlineCheckbox1">
+                    <div class="icon-holder-1"
+                        *ngIf="(applicantDetailsHistory?.address?.adrType === '1' && addressType==='nonus')">
+                        <!-- <img [src]="yieldSignPath" alt="A yellow yield sign" [hidden]="!applicantDetailsHistory?.address?.city || applicantDetailsHistory?.address?.city === applicantDetails?.address.city"
+                            ngbTooltip="{{applicantDetailsHistory?.address?.city}}" /> -->
+                        <ng-container
+                            *ngIf="isModeValidate &&(applicantDetailsHistory?.address?.adrType === applicantDetails?.address?.adrType) && applicantDetailsHistory?.address?.city && applicantDetailsHistory?.address?.city !== applicantDetails?.address?.city">
+
+                            <div class="icon-holder-4"
+                                *ngIf="basicDetailsFormGroup?.get('city')?.value === applicantDetails?.address?.city ">
+                                <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                    (click)="toggleValue('city', applicantDetailsHistory?.address?.city)"
+                                    [ngbTooltip]="applicantDetailsHistory?.address?.city" />
+                            </div>
+                            <div class="icon-holder-4"
+                                *ngIf="basicDetailsFormGroup?.get('city')?.value === applicantDetailsHistory?.address?.city">
+                                <img [src]="editSignPath" alt="A yellow yield sign"
+                                    (click)="toggleValue('city', applicantDetails?.address?.city)"
+                                    [ngbTooltip]="applicantDetails?.address?.city" />
+                            </div>
+                        </ng-container>
+
+                    </div>
+                </div>
+                <div class="form-check form-check-inline zip-cont">
+                    <label class="form-check-label typo-2" for="inlineCheckbox1">State/Province*:</label>
+                    <input autocomplete="off" formControlName="stateProvince" (input)="nonUsStateProvinceInput($event)"
+                        maxlength=2 class="form-control state-province" type="text" id="inlineCheckbox1">
+                    <!-- <div class="icon-holder-1" *ngIf = "(applicantDetailsHistory?.address?.adrType === '1' && addressType==='nonus')">
+                           
+                            <ng-container *ngIf="isModeValidate && applicantDetailsHistory?.address?.state && applicantDetailsHistory?.address?.state.toUpperCase() !== applicantDetails?.address?.state.toUpperCase()">
+                        
+                                <div class="icon-holder-4" *ngIf="basicDetailsFormGroup?.get('stateProvince')?.value === applicantDetails?.address?.state ">
+                                    <img [src]="yieldSignPath" alt="A yellow yield sign" (click)="toggleValue('stateProvince', applicantDetailsHistory?.address?.state)"
+                                    [ngbTooltip]="applicantDetailsHistory?.address?.state" />
+                                  </div>  
+                                  <div class="icon-holder-4" *ngIf="basicDetailsFormGroup?.get('stateProvince')?.value === applicantDetailsHistory?.address?.state">
+                                    <img [src]="editSignPath" alt="A yellow yield sign" (click)="toggleValue('stateProvince', applicantDetails?.address?.state)"
+                                    [ngbTooltip]="applicantDetails?.address?.state" />
+                                  </div>
+                                </ng-container>
+                        </div> -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6" id="cityErrorCol">
+                    <span class="addr-error-msg" id="cityErrorSpan"
+                        *ngIf="formControls?.city?.errors?.required && ( ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.CITY_CODE_REQD_MSG}}</span>
+                </div>
+                <div class="col-6 offset-7 p-0" id="stateErrorCol">
+                    <span class="addr-error-msg" id="stateErrorSpan"
+                        *ngIf="formControls?.stateProvince?.errors?.required && ( ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.STATE_CODE_REQD_MSG}}</span>
+                </div>
+            </div>
+
+            <div class="form-group d-flex mb-0">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label typo-2 postal-align" for="inlineCheckbox1">Postal Code*:</label>
+                    <input autocomplete="off" maxlength="10" (keypress)="onKeyPress($event)"
+                        (keyup)="onPostalCodeKeyUp($event)" formControlName="postalCode"
+                        class="form-control postalInput" type="text" id="inlineCheckbox1">
+                    <ng-container
+                        *ngIf="isModeValidate &&(applicantDetailsHistory?.address?.adrType === applicantDetails?.address?.adrType) && applicantDetailsHistory?.address?.postalCode && applicantDetailsHistory?.address?.postalCode.toUpperCase() !== applicantDetails?.address?.postalCode.toUpperCase()">
+
+                        <div class="icon-holder-1"
+                            *ngIf="basicDetailsFormGroup?.get('postalCode')?.value === applicantDetails?.address?.postalCode ">
+                            <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('postalCode', applicantDetailsHistory?.address?.postalCode)"
+                                [ngbTooltip]="applicantDetailsHistory?.address?.postalCode" />
+                        </div>
+                        <div class="icon-holder-1"
+                            *ngIf="basicDetailsFormGroup?.get('postalCode')?.value === applicantDetailsHistory?.address?.postalCode">
+                            <img [src]="editSignPath" alt="A yellow yield sign"
+                                (click)="toggleValue('postalCode', applicantDetails?.address?.postalCode)"
+                                [ngbTooltip]="applicantDetails?.address?.postalCode" />
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label typo-2 country-align" [ngStyle]="{'margin-left':'4px'}"
+                        for="inlineCheckbox1">Country*:</label>
+                    <select tabindex="0" formControlName="country" name="country" (change)="onCountryChange($event)"
+                        class="form-control country-box">
+                        <option value="" selected> --SELECT-- </option>
+                        <option *ngFor="let country of configObject?.countries" value="{{country?.countryCode}}">
+                            {{country?.countryName}}</option>
+                    </select>
+                    <div *ngIf="(applicantDetailsHistory?.address?.adrType === '1' && addressType==='nonus')">
+                        <ng-container
+                            *ngIf="isModeValidate && applicantDetailsHistory?.address?.country && applicantDetailsHistory?.address?.country.toUpperCase() !== applicantDetails?.address?.country.toUpperCase()">
+
+                            <div class="icon-holder-4"
+                                *ngIf="basicDetailsFormGroup?.get('country')?.value === applicantDetails?.address?.country ">
+                                <img [src]="yieldSignPath" alt="A yellow yield sign"
+                                    (click)="toggleValue('country', applicantDetailsHistory?.address?.country)"
+                                    [ngbTooltip]="applicantDetailsHistory?.address?.country" />
+                            </div>
+                            <div class="icon-holder-4"
+                                *ngIf="basicDetailsFormGroup?.get('country')?.value === applicantDetailsHistory?.address?.country">
+                                <img [src]="editSignPath" alt="A yellow yield sign"
+                                    (click)="toggleValue('country', applicantDetails?.address?.country)"
+                                    [ngbTooltip]="applicantDetails?.address?.country" />
+                            </div>
+                        </ng-container>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 offset-1">
+                    <span class="addr-error-msg" id="postalErrorSpan" *ngIf="formControls?.postalCode?.errors?.required &&
+        ( ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.POSTAL_CODE_REQD_MSG}}</span>
+                </div>
+                <div class="col-5 p-0">
+                    <span class="addr-error-msg" id="nonUsCountryError" *ngIf="formControls?.country?.errors?.required &&
+         ( ngFormInstance?.submitted || isClosevalidationCheck)">{{errorMessages?.COUNTRY_CODE_REQD_MSG}}</span>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="float-right mr-2" *ngIf="showServerError">
+        <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+    </div>
+</div>

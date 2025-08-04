@@ -1,0 +1,55 @@
+.skip-track {
+    margin-left: auto;
+    margin-right: 100px;
+    cursor: pointer;
+  }
+
+  .skip-track-disabled {
+    margin-left: auto;
+    margin-right: 100px;
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.3;
+  }
+  
+::ng-deep .row {
+    margin-right: 0px;
+    margin-left: 0px;
+  }
+
+  ::ng-deep {
+    /* Add application styles & imports to this file! */
+    .tooltip {
+      
+       //position: relative !important;
+      // left:57% !important;
+      //top: 10% !important;
+    }
+    .tooltip-inner {
+      //background-color: white !important;
+      width: 200px !important;
+      max-width: unset !important;
+      border: 1px solid black !important;
+      max-height: 200px;
+      //overflow-y: scroll;
+    }
+    .bs-tooltip-auto[x-placement^="right"] .arrow::before,
+    .bs-tooltip-right .arrow::before {
+      border-right-color: black !important;
+    }
+  
+    .bs-tooltip-auto[x-placement^="left"] .arrow::before,
+    .bs-tooltip-left .arrow::before {
+      border-left-color: black !important;
+    }
+  
+    .bs-tooltip-auto[x-placement^="top"] .arrow::before,
+    .bs-tooltip-top .arrow::before {
+      border-top-color: black !important;
+    }
+  
+    .bs-tooltip-auto[x-placement^="bottom"] .arrow::before,
+    .bs-tooltip-bottom .arrow::before {
+      border-bottom-color: black !important;
+    }
+  }

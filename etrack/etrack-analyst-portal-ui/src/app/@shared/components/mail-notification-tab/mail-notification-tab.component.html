@@ -1,0 +1,29 @@
+<mat-tab-group animationDuration="0ms">
+    <mat-tab label="Received" (click)="openSections('Received')">
+        <div *ngIf="data?.Received?.length === 0">
+            <mat-list role="list">
+                <mat-list-item role="listitem">No New Mail Notifications
+                </mat-list-item>
+              </mat-list>
+        </div>
+        <div *ngIf="data?.Received?.length > 0">
+            <div *ngFor="let item of data.Received; index as i">
+                <app-accordion-child [type]="'received'" [projectId]="projectId" [user]="item" [index]="i"></app-accordion-child>
+            </div>
+        </div>
+
+    </mat-tab>
+    <mat-tab label="Sent" (click)="openSections('Sent')">
+        <div *ngIf="data?.Sent?.length === 0">
+            <mat-list role="list">
+                <mat-list-item role="listitem">No New Mail Notifications
+                </mat-list-item>
+              </mat-list>
+        </div>
+        <div *ngIf="data?.Sent?.length > 0">
+            <div *ngFor="let item of data.Sent; index as i">
+                <app-accordion-child [type]="'sent'" [projectId]="projectId" [user]="item" [index]="i"></app-accordion-child>
+            </div>
+        </div>
+    </mat-tab>
+</mat-tab-group>

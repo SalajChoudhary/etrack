@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+Test set: dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest
+-------------------------------------------------------------------------------
+Tests run: 68, Failures: 1, Errors: 2, Skipped: 0, Time elapsed: 0.699 s <<< FAILURE! - in dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest
+testUpdateDocumentReviewerCompletionDetailsMakesCallToDMS(dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest)  Time elapsed: 0.006 s  <<< ERROR!
+java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest.testUpdateDocumentReviewerCompletionDetailsMakesCallToDMS(ProjectServiceTest.java:927)
+
+testDeleteProjectsCallsDAOToDeleteProject(dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest)  Time elapsed: 0.005 s  <<< ERROR!
+dec.ny.gov.etrack.permit.exception.ETrackPermitException: java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest.testDeleteProjectsCallsDAOToDeleteProject(ProjectServiceTest.java:655)
+Caused by: java.lang.NullPointerException
+	at dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest.testDeleteProjectsCallsDAOToDeleteProject(ProjectServiceTest.java:655)
+
+testGetProjectPermitStatusMapsTaskStatusCorrectlyForSubmitProjectValInValidateMode(dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest)  Time elapsed: 0.01 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1002> but was: <null>
+	at dec.ny.gov.etrack.permit.service.impl.ProjectServiceTest.testGetProjectPermitStatusMapsTaskStatusCorrectlyForSubmitProjectValInValidateMode(ProjectServiceTest.java:354)
+

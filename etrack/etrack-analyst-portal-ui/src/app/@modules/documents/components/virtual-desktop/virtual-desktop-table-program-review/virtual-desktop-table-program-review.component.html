@@ -1,0 +1,105 @@
+<div class="row mb-3">
+    <div class="col-12">
+      <div class="header">
+        <h3 class="header-1b mb-0"> Program Reviewer</h3>
+        <div>
+          <button [disabled]="isReadOnly || ('Y' === inquiryCompletedInd)" (click)="openAddModal()" class="btn btn-sm btn-outline-dark nextbutton mb-2 upload">
+            Add New
+          </button>
+        </div>
+      </div>
+      <hr class="mt-1">
+    </div>
+  
+    <div class="col-12">
+      <div class="scrollable">
+      <table class="table table-borderless table-striped mb-0" style="overflow-x:scroll;">
+        <tbody role="rowgroup">
+          <tr role="columnheader" *ngFor="let reviewer of programReviewers; let i = index">
+            <td role="cell" scope="row">
+              <!-- <div class="font-16"><button class="btn btn-link p-0">{{reviewer.docReviewerName}}</button></div> -->
+              <div *ngIf="!isGi"><a (click)="reviewerClicked(reviewer)" class="btn typo-2 btn-link p-0">{{reviewer.docReviewerName}}</a></div>
+              <div class="typo-2 p-0" *ngIf="isGi">{{reviewer.docReviewerName}}</div>
+              <!-- <div *ngIf="reviewer?.documentTitle" ><a (click)="reviewerClicked(reviewer)" class="btn typo-2 btn-link p-0">{{reviewer.docReviewerName}}</a></div> -->
+              <!-- <div *ngIf="!reviewer?.documentTitle" ><a  class="btn typo-2 p-0 btn-link" placement="top" ngbTooltip="No document needed">{{reviewer.docReviewerName}}</a></div> -->
+
+
+              <div >{{reviewer.documentTitle}}</div>
+            </td>
+            <td role="cell" scope="row">
+              <div class="float-right">
+                <div class="text-right mb-2"><span>{{reviewer.reviewAssignedDate}}</span> - <span  [ngClass]="{'past-due': compareDates(reviewer.reviewDueDate)}">{{reviewer.reviewDueDate}}</span></div>
+                <div class="text-right"><input [disabled]="isReadOnly"  type="checkbox" #checkbox [checked]="isReviewCompleteChecked(reviewer, checkbox)"  [name]="reviewer.documentId" [id]="reviewer.documentId" (change) ='reviewCompleteClicked(reviewer, $event)' /> Review Complete</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <hr class="m-0" *ngIf="!isEmpty(programReviewers)">
+    </div>
+  </div>
+  <div class="float-right mr-2" *ngIf="showServerError">
+    <app-server-error-message [serverErrorMessage]="serverErrorMessage"></app-server-error-message>
+  </div>
+</div>
+
+  <app-custom-modal-popup #addModal [modalConfig]="nodalConfig">
+    <app-add-review-requests *ngIf="isAddModalOpen | async" 
+        (onClose)="onClose($event)"
+        [inquiryId]="inquiryId"
+        [isGi]="isGi">
+    </app-add-review-requests>
+  </app-custom-modal-popup>
+  
+
+  <app-custom-modal-popup #confirmationPopup [modalConfig]="modalConfig">
+    <ng-container>
+      <div>
+      <p class="text-center mt-2">
+        {{confirmationMessage}}
+      </p>
+      
+      <div class="text-center mb-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="confirmOkClicked(true)"
+        >
+          OK
+        </button>
+        <button
+          (click)="confirmCloseClicked()"
+          type="button"
+          class="btn btn-sm btn-outline-dark closebutton mb-2"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    </ng-container>
+  </app-custom-modal-popup>
+  
+
+  <app-custom-modal-popup #confirmationPopup [modalConfig]="modalConfig">
+    <ng-container>
+      <div>
+      <p class="text-center mt-2">Mark this review Complete and save <br> correspondence to DMS. For additional coordination with {{currentReviewer}}, request a new review.</p>
+      <div class="text-center mb-2">
+        <button
+          class="btn btn-sm btn-primari nextbutton mb-2 mr-2 upload"
+          (click)="confirmOkClicked(true)"
+        >
+          OK
+        </button>
+        <button
+          (click)="confirmCloseClicked()"
+          type="button"
+          class="btn btn-sm btn-outline-dark closebutton mb-2"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    </ng-container>
+  </app-custom-modal-popup>
+
+  <app-email-compose (popUpClosed)="onEmailClose()" #emailModal [existingData]='emailData'></app-email-compose>
